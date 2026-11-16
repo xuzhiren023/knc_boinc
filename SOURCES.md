@@ -23,8 +23,8 @@ Only libraries already bundled in this commit are compiled:
 | dSFMT | 2.1 | BSD-3-Clause, `dSFMT/LICENSE.txt` |
 | CORE-MATH functions | bundled snapshots | MIT, notices in `milkyway/src/milkyway_math_funcs.c` |
 
-No BOINC, glfw, glm, tao, graphics, OpenCL, crlibm or external dependency is
-fetched separately. The upstream checkout includes other bundled directories;
+No glfw, glm, tao, OpenCL or crlibm dependency is fetched separately.
+BOINC is pinned separately below. The upstream checkout includes other bundled directories;
 `mk/sources.mk` is the exact list used by the standalone executable.
 
 `patches/popt-cygwin.patch` prevents redeclaring Cygwin's `glob_pattern_p`.
@@ -36,3 +36,23 @@ Math uses `NBODY_CRLIBM=0`: normal system libm for the default math macros.
 Upstream 1.97 unconditionally uses its bundled CORE-MATH implementations for
 `erf`, `cbrt` and gamma functions (`milkyway/include/milkyway_math_double.h`);
 these remain enabled, as required by this pinned source. No fast-math flags.
+
+## BOINC app-side API (S2-01)
+
+- Repository: https://github.com/BOINC/boinc.git
+- Client release tag: `client_release/8.2/8.2.8`
+- Peeled commit: `0bb9686b9ea2cb26e342c715026d8059fa58b922`
+- Fetch just BOINC: `bash scripts/fetch.sh boinc`; the default fetch supplies
+  both pinned repositories. Shallow tag clone, no submodules; subsequent calls
+  verify HEAD and patch state without network access.
+- Licence: LGPL-3.0-or-later for the app API and library sources (upstream
+  `COPYING.LESSER` and per-file notices; see also `COPYING`).
+- Build list: `mk/boinc.mk`. Only `api/` and `lib/` app-side pieces; no client,
+  manager, server, renderer, OpenGL, curl or SSL build. The host-info XML parser
+  also needs the bundled coprocessor/OpenCL/WSL metadata code; no GPU runtime
+  is linked or loaded by these tests.
+- `patches/boinc/cygwin-win32.patch` fixes Cygwin header/implementation directory
+  guards, uses POSIX delete/fopen paths, omits MSVC-only share.h, qualifies
+  exception functions, and uses DWORD for three Win32 out parameters.
+  `config/boinc/` supplies the minimal config and CRT compatibility helpers.
+  Mapping names, SHARED_MEM layout, channel operations and XML are unmodified.

@@ -31,3 +31,5 @@ $(filter $(OUT)/nbody/src/nbody_lua%,$(OBJECTS)): CPPFLAGS += $(NBODY_LUA_CPPFLA
 $(filter $(OUT)/milkyway/src/milkyway_lua%,$(OBJECTS)): CPPFLAGS += $(MW_LUA_CPPFLAGS)
 $(OUT)/milkyway/src/milkyway_math_funcs.c.o: CPPFLAGS += $(MW_MATH_CPPFLAGS)
 -include $(OBJECTS:.o=.d)
+
+include boinc.mk
