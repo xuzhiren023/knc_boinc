@@ -7,3 +7,4 @@ runs/
 *.mic
 __pycache__/
 .codex-logs/
+.work/
