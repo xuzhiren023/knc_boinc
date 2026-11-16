@@ -22,8 +22,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   through real BOINC Win32 IPC with a fake card running the x86 app; restarted output equals uninterrupted.
 - knc-twin 0.4.0 (S1-05): fildl repro +0.0 and all 16 crlibm log_rn cases match x86 bits, so the S1-03 mismatch was
   a twin defect, not GCC-KNC wrong code. Gravity functional ok with the region cut before the never-taken cold error
-  branch (until gcc-knc S14-20). Gravity timing is not usable: bound 43,656 > simulate 33,622 cycles/call, reported
-  to the knc-twin session.
+  branch (until gcc-knc S14-20). Gravity timing: simulate 33,622 cycles/call (unvalidated estimate). The bounds
+  critical-path term (43,656) charges every first touch full cold latency, so it is a cold-start scenario, not a
+  floor; the real bound term is memory_concurrency 5,658 (knc-twin session, fix as gcc-knc S14-27 after S14-20).
 
 ## Not proven yet
 
