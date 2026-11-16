@@ -20,7 +20,7 @@ export PATH := $(TOOLCHAIN):$(PATH)
 include sources.mk
 OUT := $(ROOT)/build/$(TARGET)
 OBJECTS := $(addprefix $(OUT)/,$(addsuffix .o,$(SOURCES)))
-CPPFLAGS := $(COMMON_CPPFLAGS) -I$(ROOT)/config $(addprefix -I$(UPSTREAM)/,$(INCLUDE_DIRS))
+CPPFLAGS := $(COMMON_CPPFLAGS) -I$(ROOT)/config -I$(ROOT)/src $(addprefix -I$(UPSTREAM)/,$(INCLUDE_DIRS))
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
@@ -40,10 +40,10 @@ card:
 program: $(OUT)/$(PROGRAM)
 $(OUT)/$(PROGRAM): $(OBJECTS) Makefile
 	$(CXX) $(COMMON_LDFLAGS) $(OBJECTS) $(COMMON_LDLIBS) -o $@
-$(OUT)/%.c.o: $(UPSTREAM)/%.c sources.mk Makefile $(wildcard $(ROOT)/config/*.h)
+$(OUT)/%.c.o: $(UPSTREAM)/%.c sources.mk Makefile $(wildcard $(ROOT)/config/*.h) $(ROOT)/src/knc_graphics_format.h
 	@$(TOOLCHAIN)/mkdir -p $(dir $@) ../build/tmp
 	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -c $< -o $@
-$(OUT)/%.cc.o: $(UPSTREAM)/%.cc sources.mk Makefile $(wildcard $(ROOT)/config/*.h)
+$(OUT)/%.cc.o: $(UPSTREAM)/%.cc sources.mk Makefile $(wildcard $(ROOT)/config/*.h) $(ROOT)/src/knc_graphics_format.h
 	@$(TOOLCHAIN)/mkdir -p $(dir $@) ../build/tmp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 $(filter $(OUT)/nbody/src/nbody_lua%,$(OBJECTS)): CPPFLAGS += $(NBODY_LUA_CPPFLAGS)

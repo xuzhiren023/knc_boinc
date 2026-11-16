@@ -1,6 +1,6 @@
 --- a/nbody/src/nbody_plain.c
 +++ b/nbody/src/nbody_plain.c
-@@ -38,11 +38,24 @@
+@@ -38,11 +38,73 @@
    #include "blender_visualizer.h"
  #endif
 
@@ -14,18 +14,67 @@
 +    return rename(tmp, path) != 0;
 +}
 +
++#include "knc_graphics_format.h"
++#include <time.h>
++/* CLI storage lives in main.c; disabled means no clock calls or side files. */
++extern double kncSnapshotInterval;
++static void kncSnapshot(const NBodyCtx* ctx, const NBodyState* st)
++{
++    static double last = -1, cost = 0;
++    static unsigned int writes = 0;
++    static knc_snapshot frame;
++    struct timespec ts;
++    double now;
++    uint32_t i, count;
++    FILE* f;
++    if (kncSnapshotInterval <= 0) return;
++    if (clock_gettime(CLOCK_MONOTONIC, &ts)) return;
++    now = ts.tv_sec + ts.tv_nsec * 1e-9;
++    if (last >= 0 && now-last < kncSnapshotInterval && st->step < ctx->nStep) {
++        if (!clock_gettime(CLOCK_MONOTONIC, &ts)) cost += ts.tv_sec + ts.tv_nsec * 1e-9 - now;
++        return;
++    }
++    last = now;
++    memset(&frame, 0, sizeof(frame));
++    frame.magic = KNC_SNAPSHOT_MAGIC;
++    frame.version = KNC_GRAPHICS_VERSION;
++    frame.size = sizeof(frame);
++    count = st->nbody < 4096 ? st->nbody : 4096; /* deterministic subsample */
++    frame.body_count = count;
++    frame.step = st->step;
++    frame.sim_time = st->step * ctx->timestep;
++    frame.fraction_done = ctx->nStep ? (double)st->step / ctx->nStep : 1;
++    for (i=0; i<count; ++i) {
++        const Body* b = &st->bodytab[(uint64_t)i * st->nbody / count];
++        frame.bodies[i].x = X(Pos(b));
++        frame.bodies[i].y = Y(Pos(b));
++        frame.bodies[i].z = Z(Pos(b));
++        frame.bodies[i].type = Type(b) < 0 ? KNC_DARK : KNC_LIGHT;
++    }
++    f = fopen("snapshot.tmp", "wb");
++    if (!f) return;
++    { int ok = fwrite(&frame, 1, sizeof(frame), f) == sizeof(frame);
++      if (fclose(f)) ok = 0;
++      if (ok) { if (!rename("snapshot.tmp", "snapshot")) ++writes; }
++      else remove("snapshot.tmp"); }
++    if (!clock_gettime(CLOCK_MONOTONIC, &ts)) cost += ts.tv_sec + ts.tv_nsec * 1e-9 - now;
++    if (st->step >= ctx->nStep)
++        fprintf(stderr, "KNC snapshot writes=%u cost_seconds=%.9f%c", writes, cost, 10);
++}
++
  static void nbReportProgress(const NBodyCtx* ctx, NBodyState* st)
  {
      real frac = (real) st->step / (real) ctx->nStep;
 
      mw_fraction_done(frac);
++    kncSnapshot(ctx, st);
 +    /* Opt in: ordinary standalone users do not acquire side files. */
 +    if (getenv("KNC_WRAPPER_FILES"))
 +        kncPublish("progress", "progress.tmp", (double) frac);
 
      if (st->reportProgress)
      {
-@@ -59,13 +72,26 @@
+@@ -59,13 +121,26 @@
 
  static NBodyStatus nbCheckpoint(const NBodyCtx* ctx, NBodyState* st)
  {
@@ -97,3 +146,38 @@
              mw_report("Resumed from checkpoint '%s'\n", nbf->checkpointFileName);
          }
      }
+--- a/nbody/src/main.c
++++ b/nbody/src/main.c
+@@ -195,6 +195,8 @@
+ }
+
+ /* Read the command line arguments, and do the inital parsing of the parameter file. */
++double kncSnapshotInterval = 0;
++
+ static mwbool nbReadParameters(const int argc, const char* argv[], NBodyFlags* nbfOut)
+ {
+     int argRead;
+@@ -300,6 +302,12 @@
+             "checkpoint", 'c',
+             POPT_ARG_STRING, &nbf.checkpointFileName,
+             0, "Checkpoint file to use", NULL
++        },
++
++        {
++            "snapshot-interval", 0,
++            POPT_ARG_DOUBLE, &kncSnapshotInterval,
++            0, "Snapshot wall seconds (0 disables)", NULL
+         },
+
+         {
+@@ -631,6 +639,10 @@
+         nbPrintVersion(TRUE, FALSE);
+     }
+
++    if (!isfinite(kncSnapshotInterval) || kncSnapshotInterval < 0) {
++        fprintf(stderr, "Invalid snapshot interval");
++        return 1;
++    }
+     nbSetDefaultFlags(&nbf);
+     if (nbSetNumThreads(nbf.numThreads))
+     {

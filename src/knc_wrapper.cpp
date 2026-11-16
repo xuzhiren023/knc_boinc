@@ -1,5 +1,9 @@
 // Host-only BOINC wrapper. The card process owns no BOINC state.
 #include "boinc_api.h"
+#include "graphics2.h"
+#include "knc_graphics_format.h"
+#include <cstring>
+#include <functional>
 #include "filesys.h"
 #include "util.h"
 #include <sys/cygwin.h>
@@ -60,7 +64,7 @@ struct Config {
     std::string base="/tmp/knc-boinc", app="milkyway_nbody.mic";
     fs::path package;
     int threads=240,retries=3,connect=10,bodies=64;
-    double poll=10,checkpoint_timeout=60;
+    double poll=10,checkpoint_timeout=60,snapshot_interval=5;
     Config(const fs::path& file, const fs::path& exe) {
         package=exe/"card";
         std::ifstream f(file); if (!f) throw std::runtime_error("cannot read knc_wrapper.cfg");
@@ -78,12 +82,14 @@ struct Config {
             else if (k=="connect_timeout") connect=std::stoi(v);
             else if (k=="poll_interval") poll=std::stod(v);
             else if (k=="checkpoint_timeout") checkpoint_timeout=std::stod(v);
+            else if (k=="snapshot_interval") snapshot_interval=std::stod(v);
             else if (k=="bodies") bodies=std::stoi(v);
             else throw std::runtime_error("unknown config key: "+k);
         }
         if (package.is_relative()) package=file.parent_path()/package;
         package=fs::absolute(package);
         if (threads<1 || retries<0 || retries>100 || connect<1 || connect>600 || bodies<1 ||
+            !std::isfinite(snapshot_interval) || snapshot_interval<.05 || snapshot_interval>3600 ||
             !std::isfinite(poll) || poll<.05 || poll>3600 || !std::isfinite(checkpoint_timeout) || checkpoint_timeout<1)
             throw std::runtime_error("config value out of range");
         if (app.empty() || app=="." || app==".." || app.find('/')!=app.npos ||
@@ -95,6 +101,7 @@ struct Config {
         while (base.back()=='/') base.pop_back();
     }
 };
+static std::function<void()> graphics_tick, graphics_wait;
 // No local shell interpolation. Every child is timed, including a hung scp.
 static int command(const std::vector<std::string>& args, double timeout, std::string& out) {
     std::string pattern=(fs::path(getenv("TMPDIR") ? getenv("TMPDIR") : ".")/"knc-command.XXXXXX").string();
@@ -114,6 +121,7 @@ static int command(const std::vector<std::string>& args, double timeout, std::st
         if (std::chrono::duration<double>(Clock::now()-start).count()>timeout) {
             kill(-child,SIGKILL); kill(child,SIGKILL); waitpid(child,&status,0); break;
         }
+        if (graphics_tick) graphics_tick();
         boinc_sleep(.05);
     }
     out=read(temp.data()); unlink(temp.data());
@@ -132,6 +140,7 @@ class Card {
     template<class F> void retry(const std::string& operation, F action) const {
         for (int n=0;n<=c.retries;++n) {
             if ((fake.empty() || !fs::exists(fake/".unreachable")) && action()) return;
+            if (graphics_wait) graphics_wait();
             log(operation+" failed (attempt "+std::to_string(n+1)+"/"+std::to_string(c.retries+1)+")");
             if (n<c.retries) boinc_sleep(std::min(c.poll,1.0));
         }
@@ -175,6 +184,16 @@ public:
             std::string out; return command(a,c.connect+30,out)==0;
         });
     }
+    bool snapshot(const fs::path& local) const {
+        if (!fake.empty()) {
+            std::error_code ec;
+            fs::copy_file(fs::path(dir)/"snapshot",local,fs::copy_options::overwrite_existing,ec);
+            return !ec;
+        }
+        auto a=options(true); a.push_back("--");
+        a.push_back(c.user+"@"+c.host+":"+quote(dir+"/snapshot")); a.push_back(native(local));
+        std::string out; return command(a,c.connect+5,out)==0;
+    }
     std::string at(const std::string& script) const {return exec("cd "+quote(dir)+" && "+script);}
     void signal(const char* sig) const {
         at("p=$(cat pid); case $p in ''|*[!0-9]*) exit 2;; esac; kill -"+std::string(sig)+" \"$p\"");
@@ -182,18 +201,20 @@ public:
     }
     void clean() const {exec("rm -rf -- "+quote(dir)); fs::remove("knc_remote"); log("remote cleaned");}
 };
-struct State {double progress=0; int exit=-1; bool live=false,checkpoint=false,pid=false;};
+struct State {double progress=0; int exit=-1; bool live=false,checkpoint=false,pid=false,snapshot=false;};
 static State state(const Card& card) {
     auto text=card.at("if test -f exit; then printf 'exit '; cat exit; fi; "
         "if test -f pid; then p=$(cat pid); case $p in ''|*[!0-9]*) exit 2;; esac; echo pid 1; "
         "if kill -0 \"$p\" 2>/dev/null; then echo live 1; fi; fi; "
         "if test -f progress; then printf 'progress '; cat progress; fi; "
+        "if test -f snapshot; then echo snapshot 1; fi; "
         "if test -f checkpoint.ready; then echo checkpoint 1; fi; true");
     State s; std::istringstream in(text); std::string k; double v;
     while (in>>k>>v) {
         if (!std::isfinite(v)) throw std::runtime_error("non-finite remote status");
         if (k=="exit") {if (v<0 || v>255 || v!=std::floor(v)) throw std::runtime_error("invalid exit status"); s.exit=int(v);}
         else if (k=="live") s.live=v==1; else if (k=="pid") s.pid=v==1;
+        else if (k=="snapshot") s.snapshot=v==1;
         else if (k=="checkpoint") s.checkpoint=v==1;
         else if (k=="progress") s.progress=std::clamp(v,0.0,1.0);
     }
@@ -236,7 +257,7 @@ struct Task {
             {'w',"checkpoint-interval"},{'n',"nthreads"},{'e',"seed"},{'d',"device"},{'p',"p"}};
         auto takes_value=[&](const std::string& key) {
             return rules.count(key) || key=="checkpoint-interval" || key=="nthreads" ||
-                key=="seed" || key=="device" || key=="platform" || key=="np" || key=="visualizer-args";
+                key=="snapshot-interval" || key=="seed" || key=="device" || key=="platform" || key=="np" || key=="visualizer-args";
         };
         bool threads=false,interval=false,options=true;
         for (size_t i=0;i<incoming.size();++i) {
@@ -280,8 +301,8 @@ struct Task {
             args.push_back(fs::is_regular_file(local)?file(arg,'a'):arg);
         }
         // Prepend defaults so POSIX parsing cannot mistake them for Lua parameters.
-        std::vector<std::string> defaults;
-        if (checkpoint.empty()) {checkpoint=card.dir+"/checkpoint"; defaults={"--checkpoint",checkpoint};}
+        std::vector<std::string> defaults={"--snapshot-interval",std::to_string(c.snapshot_interval)};
+        if (checkpoint.empty()) {checkpoint=card.dir+"/checkpoint"; defaults.insert(defaults.end(),{"--checkpoint",checkpoint});}
         if (!interval) defaults.push_back("--checkpoint-interval=1");
         if (!threads) defaults.insert(defaults.end(),{"--nthreads",std::to_string(c.threads)});
         args.insert(args.begin(),defaults.begin(),defaults.end());
@@ -300,9 +321,55 @@ struct Task {
         }
     }
 };
+// Graphics failures must never turn a science task into a failed workunit.
+class Graphics {
+    knc_graphics* memory;
+    knc_snapshot frame={};
+    Clock::time_point fetched=Clock::now()-std::chrono::hours(1), beat=fetched;
+public:
+    uint32_t status=KNC_WAITING;
+    Graphics():memory((knc_graphics*)boinc_graphics_make_shmem(KNC_GRAPHICS_NAME,sizeof(knc_graphics))) {
+        frame.magic=KNC_SNAPSHOT_MAGIC; frame.version=1; frame.size=sizeof(frame);
+        if (!memory) log("graphics mapping unavailable");
+        publish();
+    }
+    void publish() {
+        if (!memory) return;
+        uint32_t seq=__atomic_load_n(&memory->sequence,__ATOMIC_RELAXED);
+        __atomic_store_n(&memory->sequence,seq+1,__ATOMIC_SEQ_CST);
+        memory->magic=KNC_GRAPHICS_MAGIC; memory->version=1; memory->size=sizeof(*memory);
+        memory->status=status; memset(memory->reserved,0,sizeof(memory->reserved));memory->snapshot=frame;
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        __atomic_store_n(&memory->sequence,seq+2,__ATOMIC_SEQ_CST);beat=Clock::now();
+    }
+    void heartbeat() {if (Clock::now()-beat>=std::chrono::seconds(1)) publish();}
+    void fetch(const Card& card,const State& s,double interval) {
+        if (!s.snapshot || (s.exit<0 && std::chrono::duration<double>(Clock::now()-fetched).count()<interval)) return;
+        fetched=Clock::now();
+        if (!card.snapshot("knc_snapshot.tmp")) return;
+        knc_snapshot next={};
+        std::ifstream f("knc_snapshot.tmp",std::ios::binary);
+        f.read((char*)&next,sizeof(next));
+        bool ok=f && f.peek()==EOF && next.magic==KNC_SNAPSHOT_MAGIC && next.version==1 &&
+            next.size==sizeof(next) && next.body_count<=KNC_MAX_BODIES && !next.reserved[0] && !next.reserved[1] &&
+            std::isfinite(next.sim_time) && std::isfinite(next.fraction_done) &&
+            next.fraction_done>=0 && next.fraction_done<=1;
+        if(ok) for(uint32_t i=0;i<KNC_MAX_BODIES;i++) {
+            auto b=next.bodies[i];
+            if(i<next.body_count) ok &= b.type<=KNC_LIGHT && std::isfinite(b.x) && std::isfinite(b.y) && std::isfinite(b.z);
+            else ok &= b.x==0 && b.y==0 && b.z==0 && b.type==0;
+        }
+        f.close();
+        if(ok) {frame=next;std::error_code ec;fs::rename("knc_snapshot.tmp","knc_snapshot",ec);publish();}
+        else {fs::remove("knc_snapshot.tmp");log("ignored invalid graphics snapshot");}
+    }
+};
 int main(int argc,char** argv) {
     BOINC_OPTIONS opt; boinc_options_defaults(opt); opt.direct_process_action=0; opt.normal_thread_priority=1;
     if (boinc_init_options(&opt)) return 2;
+    Graphics graphics;
+    graphics_tick=[&]{graphics.heartbeat();};
+    graphics_wait=[&]{graphics.status=KNC_WAITING;graphics.publish();};
     try {
         fs::path fake;
         int first=1;
@@ -349,9 +416,11 @@ int main(int argc,char** argv) {
             BOINC_STATUS initial; boinc_get_status(&initial);
             if (s.live && !initial.suspended) card.signal("CONT");
         }
+        graphics.status=KNC_RUNNING; graphics.publish();
         bool suspended=false; auto last=Clock::now()-std::chrono::hours(1);
         auto missing_since=Clock::now();
         while (true) {
+            graphics.heartbeat();
             BOINC_STATUS b; boinc_get_status(&b);
             if (b.abort_request) {
                 s=state(card); if (s.live) card.signal("KILL"); card.clean(); log("abort acknowledged"); return boinc_finish(202);
@@ -373,11 +442,13 @@ int main(int argc,char** argv) {
             }
             if (bool(b.suspended)!=suspended) {
                 s=state(card);
-                if (s.live) {card.signal(b.suspended?"STOP":"CONT"); suspended=b.suspended;}
+                if (s.live) {card.signal(b.suspended?"STOP":"CONT"); suspended=b.suspended;graphics.status=suspended?KNC_SUSPENDED:KNC_RUNNING;graphics.publish();}
             }
             if (std::chrono::duration<double>(Clock::now()-last).count()>=c.poll) {
                 s=state(card); last=Clock::now();
+                graphics.status=suspended?KNC_SUSPENDED:KNC_RUNNING;graphics.publish();
                 boinc_fraction_done(s.progress);
+                graphics.fetch(card,s,c.snapshot_interval);
                 if (s.exit>=0) break;
                 if (s.live) missing_since=Clock::now();
                 // The supervisor publishes exit just after the app PID vanishes.
@@ -386,6 +457,7 @@ int main(int argc,char** argv) {
             }
             boinc_sleep(.05);
         }
+        graphics.status=KNC_FINISHED; graphics.publish();
         card.copy(resolved("nbody_stdout.txt"),card.dir+"/stdout.txt",false);
         card.copy(resolved("nbody_stderr.txt"),card.dir+"/stderr.txt",false);
         if (!s.exit) task.collect(card);
@@ -393,6 +465,7 @@ int main(int argc,char** argv) {
         if (s.exit) {log("card app exit "+std::to_string(s.exit)); return boinc_finish(s.exit);}
         fs::remove("knc_checkpoint"); boinc_fraction_done(1); log("finished"); return boinc_finish(0);
     } catch (const Unreachable& e) {
+        graphics.status=KNC_WAITING;graphics.publish();
         log(e.what()); boinc_temporary_exit(60,e.what()); return 0;
     } catch (const std::exception& e) {
         log(e.what()); return boinc_finish(1);

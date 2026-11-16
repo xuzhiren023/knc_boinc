@@ -20,7 +20,9 @@ Histogram capture uses upstream `--print-histogram`; no output patch is needed.
   only after upstream's checkpoint writer succeeds. No science or checkpoint
   layout changes. On wrapper restart it also rebuilds context softening arrays
   from the same Lua input: upstream serializes their pointer values but not
-  their contents. Both x86 and k1om use the same patch.
+  their contents. Both x86 and k1om use the same patch. S3-01 adds opt-in
+  wall-clock snapshots at safe steps, using the shared S3-02 wire header,
+  deterministic subsampling and atomic rename. No body evolution changes.
 - `boinc/cygwin-win32.patch` uses the compiler's `__CYGWIN__` guard consistently
   for its compatibility changes, including upstream header/CRT branches; no
   synthetic `__CYGWIN32__` build definition is required.
