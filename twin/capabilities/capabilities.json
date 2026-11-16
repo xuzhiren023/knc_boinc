@@ -1,0 +1,2875 @@
+{
+  "adapters": [
+    "scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
+    "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"
+  ],
+  "branch_scenarios": [
+    "all_predicted",
+    "all_mispredicted",
+    "exit_mispredicted (direction change)",
+    "ids_mispredicted"
+  ],
+  "commands": [
+    "capabilities",
+    "selftest",
+    "validate",
+    "functional",
+    "simulate",
+    "bounds",
+    "compare",
+    "batch",
+    "prepare-native",
+    "import-native"
+  ],
+  "engine_version": "0.3.1",
+  "functional_coverage": {
+    "exact": "scalar integer ALU (8/16/32/64-bit, flags, adc/sbb/setcc/bt/movsx/movzx/cltq/cqto/idiv/imul/push/pop/leave), conditional branches, mask ops, int32 and int64-logic vector ops, f32/f64 add/sub/subr/mul/max/min/FMA with single rounding and explicit rounding mode/FTZ/DAZ, compares to mask, blends, conversions (dq<->ps, pd->dq, ps<->pd, round), register swizzles, broadcasts, up/down conversions (float16/uint8/sint8/uint16/sint16), masked loads/stores, vloadunpack/vpackstore halves, dword/qword gather and scatter with completion masks, vpermd/vpermf32x4, x87 stack with extended precision, control word (RC/PC), fld/fst/fild/fistp/fxch/fchs/fabs/fsqrt/fcom/fnstsw/fldcw",
+    "timing_only": [
+      "cmova",
+      "cmovae",
+      "cmovb",
+      "cmovbe",
+      "cmove",
+      "cmovg",
+      "cmovge",
+      "cmovl",
+      "cmovle",
+      "cmovne",
+      "mfence",
+      "movzx",
+      "vexp223ps",
+      "vlog2ps",
+      "vmaxpd",
+      "vmaxps",
+      "vminpd",
+      "vminps"
+    ]
+  },
+  "input_representations": [
+    "normalized-records (JSON, knc-twin.kernel/1)",
+    "gas-att-subset (GAS AT&T assembly, see references/input-format.md)"
+  ],
+  "instructions": [
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "adc",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "add",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "and",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "bt",
+      "note": "CF = selected bit; other flags left unchanged (undefined)",
+      "pipes": "UV"
+    },
+    {
+      "class": "call",
+      "functional": true,
+      "mnemonic": "call",
+      "note": "pushes the return address and enters the callee when it is in the region; otherwise the callee must be declared in the kernel's 'calls' (costed stub)",
+      "pipes": "U"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "cltd",
+      "note": "edx = sign of eax",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "cltq",
+      "note": "rax = sign-extend eax",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmova",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovae",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovb",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovbe",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmove",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovg",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovge",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovl",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovle",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "cmovne",
+      "note": "KNC has no CMOV; -march=knc never emits it (S1-04)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "cmp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "cqto",
+      "note": "rdx = sign of rax",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "dec",
+      "note": "does not change CF",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_idiv",
+      "functional": true,
+      "mnemonic": "div",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fabs",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fadd",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "faddl",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "faddp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fadds",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fchs",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcom",
+      "note": "sets C0/C2/C3 in the status word",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcomi",
+      "note": "sets ZF/PF/CF",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcomip",
+      "note": "sets ZF/PF/CF",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcoml",
+      "note": "compares st0 with a binary32/64 memory operand; sets C0/C2/C3",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcomp",
+      "note": "sets C0/C2/C3 in the status word",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcompl",
+      "note": "compares st0 with a binary32/64 memory operand; sets C0/C2/C3",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcompp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcomps",
+      "note": "compares st0 with a binary32/64 memory operand; sets C0/C2/C3",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fcoms",
+      "note": "compares st0 with a binary32/64 memory operand; sets C0/C2/C3",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdiv",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivl",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivr",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivrl",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivrp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivrs",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fdivs",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fiaddl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fidivl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_div",
+      "functional": true,
+      "mnemonic": "fidivrl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "fildl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "fildq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "filds",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_mul",
+      "functional": true,
+      "mnemonic": "fimull",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fistl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fistpl",
+      "note": "rounds with the control word's RC",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fistpq",
+      "note": "rounds with the control word's RC",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fistps",
+      "note": "rounds with the control word's RC",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fistq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fists",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fisttpl",
+      "note": "truncates",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fisttpq",
+      "note": "truncates",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fisttps",
+      "note": "truncates",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fisubl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fisubrl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fld",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fld1",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_control",
+      "functional": true,
+      "mnemonic": "fldcw",
+      "note": "RC bits 10-11 and PC bits 8-9 take effect for later instructions",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "fldl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "flds",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_load",
+      "functional": true,
+      "mnemonic": "fldt",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fldz",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_mul",
+      "functional": true,
+      "mnemonic": "fmul",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_mul",
+      "functional": true,
+      "mnemonic": "fmull",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_mul",
+      "functional": true,
+      "mnemonic": "fmulp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_mul",
+      "functional": true,
+      "mnemonic": "fmuls",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_control",
+      "functional": true,
+      "mnemonic": "fnclex",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "x87_control",
+      "functional": true,
+      "mnemonic": "fnstcw",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "x87_control",
+      "functional": true,
+      "mnemonic": "fnstsw",
+      "note": "status word: C0 bit 8, C1 bit 9, C2 bit 10, C3 bit 14, TOP bits 11-13",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "frndint",
+      "note": "rounds st0 to an integer with the control word's RC; costed as an x87 add (assumed)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_sqrt",
+      "functional": true,
+      "mnemonic": "fsqrt",
+      "note": "correctly rounded in the control word's precision and RC; latency.x87_sqrt must be known",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fst",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fstl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fstp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fstpl",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fstps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fstpt",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fsts",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_store",
+      "functional": true,
+      "mnemonic": "fstt",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsub",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubl",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubr",
+      "note": "AT&T forms: '%st(i), %st' -> st0 = st0 OP st(i); '%st, %st(i)' -> st(i) = st0 OP st(i) for fsub/fdiv and st(i) OP st0 for fsubr/fdivr (GAS reversal); no operands -> faddp-like st(1), st0 with pop",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubrl",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubrp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubrs",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_add",
+      "functional": true,
+      "mnemonic": "fsubs",
+      "note": "memory source: st0 = st0 OP mem (OP reversed for fsubr/fdivr)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "ftst",
+      "note": "compares st0 with +0.0",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fucom",
+      "note": "sets C0/C2/C3 in the status word",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fucomi",
+      "note": "sets ZF/PF/CF",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fucomip",
+      "note": "sets ZF/PF/CF",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fucomp",
+      "note": "sets C0/C2/C3 in the status word",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fucompp",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fwait",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_compare",
+      "functional": true,
+      "mnemonic": "fxam",
+      "note": "classifies st0 into C3/C2/C0 and its sign into C1 (empty 101, zero 100, normal 010, infinity 011, NaN 001, denormal 110)",
+      "pipes": "U"
+    },
+    {
+      "class": "x87_move",
+      "functional": true,
+      "mnemonic": "fxch",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "scalar_idiv",
+      "functional": true,
+      "mnemonic": "idiv",
+      "note": "rdx:rax / src; latency.scalar_idiv must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "scalar_imul",
+      "functional": true,
+      "mnemonic": "imul",
+      "note": "two- and three-operand forms are exact; the one-operand rdx:rax form is unsupported",
+      "pipes": "U"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "inc",
+      "note": "does not change CF",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "ja",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jae",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jb",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jbe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jc",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "je",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jg",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jge",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jknzd",
+      "note": "branch if mask is nonzero",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jkzd",
+      "note": "branch if mask is zero",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jle",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jmp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jna",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnae",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnb",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnbe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnc",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jne",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jng",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnge",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnle",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jns",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jnz",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jpe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jpo",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "js",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "branch",
+      "functional": true,
+      "mnemonic": "jz",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kand",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kandn",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kandnr",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kmov",
+      "note": "k<-k, k<-gpr (low 16 bits), gpr<-k (zero-extended)",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "knot",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kor",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kortest",
+      "note": "ZF = (k1|k2)==0, CF = (k1|k2)==0xffff",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kxnor",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "mask_op",
+      "functional": true,
+      "mnemonic": "kxor",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "lea",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_load",
+      "functional": true,
+      "mnemonic": "leave",
+      "note": "rsp = rbp; pop rbp",
+      "pipes": "UV"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_add",
+      "note": "locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_and",
+      "note": "locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_cmpxchg",
+      "note": "compare rax with mem; equal: mem = reg, ZF=1; else rax = mem, ZF=0",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_dec",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_inc",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_or",
+      "note": "locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_sub",
+      "note": "locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_xadd",
+      "note": "tmp = mem; mem += reg; reg = tmp",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_xchg",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "locked_rmw",
+      "functional": true,
+      "mnemonic": "lock_xor",
+      "note": "locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "fence",
+      "functional": false,
+      "mnemonic": "mfence",
+      "note": "latency.fence must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "mov",
+      "note": "8/16/32/64-bit register or memory move; memory forms take the load/store class",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movabs",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movsbl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movsbq",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movsbw",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movslq",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movswl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movswq",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movzbl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movzbq",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movzbw",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movzwl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "movzwq",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": false,
+      "mnemonic": "movzx",
+      "note": "use the GAS mnemonics movzbl/movzwl/movzbq/movzwq",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "neg",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "nop",
+      "note": "costs an issue slot only",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "not",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "or",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_load",
+      "functional": true,
+      "mnemonic": "pop",
+      "note": "load; rsp += 8",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_store",
+      "functional": true,
+      "mnemonic": "push",
+      "note": "rsp -= 8; store",
+      "pipes": "UV"
+    },
+    {
+      "class": "ret",
+      "functional": true,
+      "mnemonic": "ret",
+      "note": "pops the return address; returning to the entry sentinel ends the stream",
+      "pipes": "U"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sahf",
+      "note": "SF, ZF, PF, CF from AH (AF not modeled); OF unchanged",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sal",
+      "note": "immediate or %cl count; CF per the SDM, OF only defined for a count of 1 (left unchanged otherwise)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sar",
+      "note": "immediate or %cl count; CF per the SDM, OF only defined for a count of 1 (left unchanged otherwise)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sbb",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "seta",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setae",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setb",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setbe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setc",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sete",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setg",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setge",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setle",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setna",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnae",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnb",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnbe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnc",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setne",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setng",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnge",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnl",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnle",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setns",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setnz",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setp",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setpe",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setpo",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sets",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "setz",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "shl",
+      "note": "immediate or %cl count; CF per the SDM, OF only defined for a count of 1 (left unchanged otherwise)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "shr",
+      "note": "immediate or %cl count; CF per the SDM, OF only defined for a count of 1 (left unchanged otherwise)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_store",
+      "functional": true,
+      "mnemonic": "stmxcsr",
+      "note": "stores MXCSR (RC, FTZ, DAZ, masks, sticky flags); the twin keeps MXCSR from the numerical policy and the flags its vector operations raise",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "sub",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "test",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vaddpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vaddps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vblendmpd",
+      "note": "dst = mask ? src2 : src1 per lane",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vblendmps",
+      "note": "dst = mask ? src2 : src1 per lane",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcastf32x4",
+      "note": "16-byte group broadcast to 4 groups",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcastf64x4",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcasti32x4",
+      "note": "16-byte group broadcast to 4 groups",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcasti64x4",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcastsd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vbroadcastss",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpeqpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpeqps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmplepd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpleps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpltpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpltps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpneqpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpneqps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpnlepd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpnleps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpnltpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpnltps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpordpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpordps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmppd",
+      "note": "predicate immediate: 0 eq, 1 lt, 2 le, 3 unord, 4 neq, 5 nlt, 6 nle, 7 ord",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpps",
+      "note": "predicate immediate: 0 eq, 1 lt, 2 le, 3 unord, 4 neq, 5 nlt, 6 nle, 7 ord",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpunordpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcmpunordps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcvtfxpntdq2ps",
+      "note": "imm bits 1:0 rounding (0 rn,1 rd,2 ru,3 rz); exponent adjust bits must be 0",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_convert_df",
+      "functional": true,
+      "mnemonic": "vcvtfxpntpd2dq",
+      "note": "8 doubles -> 8 int32 in the low lanes; upper lanes set to zero (assumed)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_convert_df",
+      "functional": true,
+      "mnemonic": "vcvtfxpntpd2udq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcvtfxpntps2dq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcvtfxpntps2udq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vcvtfxpntudq2ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_convert_df",
+      "functional": true,
+      "mnemonic": "vcvtpd2ps",
+      "note": "8 doubles -> low 8 floats, upper lanes zero (assumed); rounding per numerical policy",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_convert_df",
+      "functional": true,
+      "mnemonic": "vcvtps2pd",
+      "note": "low 8 floats -> 8 doubles (exact); latency assumed equal to pd->dq (7)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": false,
+      "mnemonic": "vexp223ps",
+      "note": "timing only",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfixupnanpd",
+      "note": "fix-up of special values of src1 by a 21-bit token table in src2 (classes -inf, <0, -0, +0, >0, +inf; tokens no change, -inf, -0, +0, +inf, QNaN, NMAX, -NMAX); NaN passes through quieted (R27 pp.193-198)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfixupnanps",
+      "note": "fix-up of special values of src1 by a 21-bit token table in src2 (classes -inf, <0, -0, +0, >0, +inf; tokens no change, -inf, -0, +0, +inf, QNaN, NMAX, -NMAX); NaN passes through quieted (R27 pp.193-198)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd132ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd213ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd231ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub132ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub213ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub231ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd132ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd213ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd231ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub132ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub213ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub231ps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_gather",
+      "functional": true,
+      "mnemonic": "vgatherdpd",
+      "note": "8 doubles; the low 8 dword indices are used",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_gather",
+      "functional": true,
+      "mnemonic": "vgatherdps",
+      "note": "dword gather with masked completion: gathered lanes have their mask bit cleared",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgetexppd",
+      "note": "unbiased exponent as a float; denormals normalized first unless DAZ; 0 -> -inf, inf -> +inf, NaN quieted (R27 pp.313-317)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgetexpps",
+      "note": "unbiased exponent as a float; denormals normalized first unless DAZ; 0 -> -inf, inf -> +inf, NaN quieted (R27 pp.313-317)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgetmantpd",
+      "note": "significand normalized to the interval imm[1:0] ([1,2) [1/2,2) [1/2,1) [3/4,3/2)) with sign control imm[3:2] (keep, zero, NaN if negative); 0 and inf pass through (R27 pp.319-326)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgetmantps",
+      "note": "significand normalized to the interval imm[1:0] ([1,2) [1/2,2) [1/2,1) [3/4,3/2)) with sign control imm[3:2] (keep, zero, NaN if negative); 0 and inf pass through (R27 pp.319-326)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgmaxpd",
+      "note": "R27 FpMax: a NaN operand returns the other operand, two NaNs the first (unquieted); max(-0,+0) returns the second source; DAZ applies, no FTZ",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgmaxps",
+      "note": "R27 FpMax: a NaN operand returns the other operand, two NaNs the first (unquieted); max(-0,+0) returns the second source; DAZ applies, no FTZ",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgminpd",
+      "note": "R27 FpMin: a NaN operand returns the other operand, two NaNs the first; min(-0,+0) returns the first source; DAZ applies, no FTZ",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vgminps",
+      "note": "R27 FpMin: a NaN operand returns the other operand, two NaNs the first; min(-0,+0) returns the first source; DAZ applies, no FTZ",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpackhd",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpackhpd",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpackhps",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpackhq",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpackld",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpacklpd",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpacklps",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vloadunpacklq",
+      "note": "unaligned load half: l takes the elements before the next 64-byte boundary, h those at or after it; masked merge; up-conversions on the memory operand",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": false,
+      "mnemonic": "vlog2ps",
+      "note": "timing only",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": false,
+      "mnemonic": "vmaxpd",
+      "note": "not an IMCI instruction (R27 lists vgmaxps/vgminps/vgmaxpd/vgminpd); GCC-KNC never emits it",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": false,
+      "mnemonic": "vmaxps",
+      "note": "not an IMCI instruction (R27 lists vgmaxps/vgminps/vgmaxpd/vgminpd); GCC-KNC never emits it",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": false,
+      "mnemonic": "vminpd",
+      "note": "not an IMCI instruction (R27 lists vgmaxps/vgminps/vgmaxpd/vgminpd); GCC-KNC never emits it",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": false,
+      "mnemonic": "vminps",
+      "note": "not an IMCI instruction (R27 lists vgmaxps/vgminps/vgmaxpd/vgminpd); GCC-KNC never emits it",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vmovapd",
+      "note": "register<->aligned memory, masked merge; store forms take the vector_store class; {float16}/{uint8}/... up- and down-conversions on the memory side",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vmovaps",
+      "note": "register<->aligned memory, masked merge; store forms take the vector_store class; {float16}/{uint8}/... up- and down-conversions on the memory side",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vmovdqa32",
+      "note": "register<->aligned memory, masked merge; store forms take the vector_store class; {float16}/{uint8}/... up- and down-conversions on the memory side",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vmovdqa64",
+      "note": "register<->aligned memory, masked merge; store forms take the vector_store class; {float16}/{uint8}/... up- and down-conversions on the memory side",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_store",
+      "functional": true,
+      "mnemonic": "vmovnrapd",
+      "note": "no-read store; functionally a store, timing as a store without a fill",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_store",
+      "functional": true,
+      "mnemonic": "vmovnraps",
+      "note": "no-read store; functionally a store, timing as a store without a fill",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_store",
+      "functional": true,
+      "mnemonic": "vmovnrngoapd",
+      "note": "no-read store; functionally a store, timing as a store without a fill",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_store",
+      "functional": true,
+      "mnemonic": "vmovnrngoaps",
+      "note": "no-read store; functionally a store, timing as a store without a fill",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vmulpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vmulps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorehd",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorehpd",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorehps",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorehq",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstoreld",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorelpd",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorelps",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_packstore",
+      "functional": true,
+      "mnemonic": "vpackstorelq",
+      "note": "unaligned store half; masked; down-conversions on the register operand",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpaddd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpandd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpandnd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpandnq",
+      "note": "64-bit logic (KNC has no 64-bit integer arithmetic)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpandq",
+      "note": "64-bit logic (KNC has no 64-bit integer arithmetic)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpblendmd",
+      "note": "dst = mask ? src2 : src1 per dword lane (the mask selects, it does not write-mask)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpblendmq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vpbroadcastd",
+      "note": "dword broadcast from memory",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_load",
+      "functional": true,
+      "mnemonic": "vpbroadcastq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpd",
+      "note": "predicate: 0 eq, 1 lt, 2 le, 4 ne, 5 nlt, 6 nle",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpeqd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpequd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpgtd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpled",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpleud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpltd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpltud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpneqd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpnequd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpnled",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpnleud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpnltd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpnltud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpcmpud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vpermd",
+      "note": "dword permute: dst[i] = src2[idx[i] & 15]",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vpermf32x4",
+      "note": "128-bit group permute: group i <- group (imm >> 2i) & 3",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_gather",
+      "functional": true,
+      "mnemonic": "vpgatherdd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_gather",
+      "functional": true,
+      "mnemonic": "vpgatherdq",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmadd231d",
+      "note": "dst = dst + low32(src1 * src2) per lane; costed like vpmulld (class vector_arith; the integer multiply latency is not measured separately)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmaxsd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmaxud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpminsd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpminud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmulhd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmulhud",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpmulld",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpord",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vporq",
+      "note": "64-bit logic (KNC has no 64-bit integer arithmetic)",
+      "pipes": "U"
+    },
+    {
+      "class": "prefetch_l1",
+      "functional": true,
+      "mnemonic": "vprefetch0",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetch1",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetch2",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l1",
+      "functional": true,
+      "mnemonic": "vprefetche0",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetche1",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetche2",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetchenta",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "prefetch_l2",
+      "functional": true,
+      "mnemonic": "vprefetchnta",
+      "note": "",
+      "pipes": "UV"
+    },
+    {
+      "class": "vector_scatter",
+      "functional": true,
+      "mnemonic": "vpscatterdd",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "vector_scatter",
+      "functional": true,
+      "mnemonic": "vpscatterdq",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpslld",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsllvd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsrad",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsravd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsrld",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsrlvd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsubd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpsubrd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpxord",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vpxorq",
+      "note": "64-bit logic (KNC has no 64-bit integer arithmetic)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrcp23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal stands in for the hardware's 0.912-ulp result (R27 p.577), special values and flags per Table 6.26; results that depend on the exact bits are marked approximate; the characterization plan captures the 2^23-entry table that makes it exact",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vrndfxpntps",
+      "note": "round to an integer-valued float with the immediate's rounding mode",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrsqrt23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal square root stands in for the hardware's 0.775-ulp result (R27 p.588), special values and flags per Table 6.29",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vscaleps",
+      "note": "src1 * 2^int32(src2) rounded like vmulps (rounding override or MXCSR.RC; FTZ/DAZ); out of range gives inf or 0 (R27 pp.591-592)",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_scatter",
+      "functional": true,
+      "mnemonic": "vscatterdpd",
+      "note": "",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "vector_scatter",
+      "functional": true,
+      "mnemonic": "vscatterdps",
+      "note": "dword scatter with masked completion; occupancy.scatter_cycles_per_line must be known",
+      "pipes": "UV_both"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vsubpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vsubps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vsubrpd",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vsubrps",
+      "note": "",
+      "pipes": "U"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "xchg",
+      "note": "register-register exchange only (the memory form is implicitly locked: use lock_xchg)",
+      "pipes": "UV"
+    },
+    {
+      "class": "scalar_alu",
+      "functional": true,
+      "mnemonic": "xor",
+      "note": "register or memory destination (memory destination is a read-modify-write, class scalar_rmw)",
+      "pipes": "UV"
+    }
+  ],
+  "memory_result_classes": [
+    "conditional_bound (bounds command)",
+    "unvalidated_scenario_estimate (simulate without a validated shape; every pair/card total)",
+    "calibrated_forecast (simulate on a kernel whose declared provenance.shape has a held-out validation entry in the profile)"
+  ],
+  "memory_scenarios": [
+    "fixed_level",
+    "classified",
+    "line_tracking (LRU L1+L2, software prefetch; optional tlb/hardware_prefetcher/memory_service sub-models)"
+  ],
+  "not_implemented": [
+    "any mnemonic outside the table (rejected, no default cost); call/ret are region boundaries",
+    "transcendental approximations (vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vscaleps) exact bit patterns",
+    "second-level TLB and page walks; the instruction cache; cross-core coherence traffic in core scale; card-level bandwidth sharing",
+    "contexts communicating through memory (functional model runs contexts sequentially)",
+    "C, Fortran or binaries: no translation is attempted; ABI, encodings, executable loading",
+    "symbolic immediates (addresses of labels), TLS @gottpoff operands, rep/lock prefixes other than 'rep ret' and 'lock add'"
+  ],
+  "profiles": [
+    {
+      "description": "Xeon Phi 3120A/3120P (57 cores, 1.1 GHz, 6 GB GDDR5, 240 GB/s peak). Card constants are Intel's published specification. Core timing in cycles is inherited from",
+      "file": "card-3120-documented.json",
+      "id": "card-3120-documented",
+      "kind": "card",
+      "synthetic": false
+    },
+    {
+      "description": "Xeon Phi 5110P (60 cores, 1.053 GHz, 8 GB GDDR5, 320 GB/s peak). Card constants are Intel's published specification. Core timing in cycles is inherited from cor",
+      "file": "card-5110p-literature.json",
+      "id": "card-5110p-literature",
+      "kind": "card",
+      "synthetic": false
+    },
+    {
+      "description": "The GCC-KNC project's card: Xeon Phi x100 with 61 cores at 1.238 GHz and 16 GB GDDR5 (7120-class). Latencies, throughputs and bandwidths below were measured nat",
+      "file": "card-7120-measured.json",
+      "id": "card-7120-measured",
+      "kind": "card",
+      "synthetic": false
+    },
+    {
+      "description": "Knights Corner x100 core timing in core cycles: instruction latencies, pairing rules, unit occupancies, cache hit latencies, store and gather rules, TLB and L2-",
+      "file": "core-x100-measured.json",
+      "id": "core-x100-measured",
+      "kind": "core",
+      "synthetic": false
+    },
+    {
+      "description": "Knights Corner (K1OM, IMCI) architecture rules shared by every card. Holds documented values and literature values only. Card profiles override with measured va",
+      "file": "knc-common.json",
+      "id": "knc-common",
+      "kind": "common",
+      "synthetic": false
+    },
+    {
+      "description": "Sensitivity overlay: no core issue cycle lost after a taken branch (the 0.2.x model). Apply with --overlay profiles/overlay-no-branch-bubble.json to see how muc",
+      "file": "overlay-no-branch-bubble.json",
+      "id": "overlay-no-branch-bubble",
+      "kind": "overlay",
+      "synthetic": false
+    },
+    {
+      "description": "Sensitivity overlay: plain vector load-to-use latency 12 cycles (the measured merge-form chain figure) instead of the documented 3. Apply with --overlay profile",
+      "file": "overlay-vector-load-12.json",
+      "id": "overlay-vector-load-12",
+      "kind": "overlay",
+      "synthetic": false
+    },
+    {
+      "description": "SYNTHETIC demonstration profile. Its numbers are round, invented values for exercising the engine (tests, examples of missing parameters). They describe no real",
+      "file": "synthetic-demo.json",
+      "id": "synthetic-demo",
+      "kind": "synthetic",
+      "synthetic": true
+    }
+  ],
+  "scales": {
+    "card": "analytical scenario only (compute vs bandwidth roofline with barriers and imbalance); never one-core throughput x cores",
+    "core": "implemented: 1-4 in-order contexts, U/V pairing rules, same-context issue spacing, round-robin picker, x87 stack with physical-register dependencies, AGI, demand-miss stalls, nonblocking prefetch, outstanding-miss limit, L1/L2 LRU line tracking, optional first-level DTLB, streaming L2 hardware prefetcher and per-core memory service sub-models, gather/scatter/x87/L2-prefetch occupancy",
+    "instruction": "implemented: latency/pipe class per supported mnemonic (capabilities table), exact functional semantics where 'functional' is true",
+    "pair": "analytical scenario only (two cores exchanging lines over the ring); needs core-scale cycles and transfer counts as parameters",
+    "region": "implemented: function or loop regions from GCC-KNC assembly (scripts/from_gcc_s.py) or hand-written records, 1-4 contexts; functional execution, timing, bounds, exhaustive reorder search (<= 12 instructions)"
+  },
+  "target": "Intel Xeon Phi Knights Corner (K1OM, IMCI). Not Knights Landing, not AVX-512, not an out-of-order x86 model."
+}

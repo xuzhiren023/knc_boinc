@@ -1,0 +1,23 @@
+capabilities: ok
+profiles: card-3120-documented, card-5110p-literature, card-7120-measured, core-x100-measured, knc-common, overlay-no-branch-bubble, overlay-vector-load-12, synthetic-demo
+result: twin/capabilities\result.json
+summary: twin/capabilities\summary.md
+function nbGravity: 286 instructions, 9 padding nops, 8 with two-cycle prefixes; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): fprintf, sqrt
+undeclared_callees: ['fprintf', 'sqrt']
+validation: unsupported
+streams[0]: instruction a405216 calls 'sqrt', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin/validate\result.json
+summary: twin/validate\summary.md
+functional: unsupported
+streams[0]: instruction a405216 calls 'sqrt', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin/functional\result.json
+summary: twin/functional\summary.md
+timing_prediction: unsupported
+streams[0]: instruction a405216 calls 'sqrt', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin/simulate\result.json
+summary: twin/simulate\summary.md
+analytical_bound: unsupported
+streams[0]: instruction a405216 calls 'sqrt', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin/bounds\result.json
+summary: twin/bounds\summary.md

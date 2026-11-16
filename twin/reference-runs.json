@@ -1,0 +1,62 @@
+[
+  {
+    "case": "small",
+    "threads": 1,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "49.215",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/small/params.lua -h workunits/small/input.hist -z runs/x86/small-1/histogram.txt -c runs/x86/small-1/checkpoint --seed 670828913 --nthreads 1 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 64",
+    "stdout.txt": "00:30:53: Making final checkpoint\n00:30:53: Removing checkpoint file 'runs/x86/small-1/checkpoint'",
+    "histogram_sha256": "41291687b4dae9cf9f05ce787f77a515af7f4039b346c81844247f77ee9036d0"
+  },
+  {
+    "case": "small",
+    "threads": 4,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "40.616",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/small/params.lua -h workunits/small/input.hist -z runs/x86/small-4/histogram.txt -c runs/x86/small-4/checkpoint --seed 670828913 --nthreads 4 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 64",
+    "stdout.txt": "00:31:34: Making final checkpoint\n00:31:34: Removing checkpoint file 'runs/x86/small-4/checkpoint'",
+    "histogram_sha256": "db2599df04b1cb97c190b421575feb26dd34ea538fdc45b931b33b1943b4659f"
+  },
+  {
+    "case": "medium",
+    "threads": 1,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "502.316",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/medium/params.lua -h workunits/medium/input.hist -z runs/x86/medium-1/histogram.txt -c runs/x86/medium-1/checkpoint --seed 670828913 --nthreads 1 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 1024",
+    "stdout.txt": "00:39:57: Making final checkpoint\n00:39:57: Removing checkpoint file 'runs/x86/medium-1/checkpoint'",
+    "histogram_sha256": "24b591c18eeb7e604a008cb925af9566593dc0ecbfbe89218122073f9205fcc4"
+  },
+  {
+    "case": "medium",
+    "threads": 4,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "158.418",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/medium/params.lua -h workunits/medium/input.hist -z runs/x86/medium-4/histogram.txt -c runs/x86/medium-4/checkpoint --seed 670828913 --nthreads 4 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 1024",
+    "stdout.txt": "00:42:36: Making final checkpoint\n00:42:36: Removing checkpoint file 'runs/x86/medium-4/checkpoint'",
+    "histogram_sha256": "05ad7e83c31d3589174fead8158510e93c374b5a3283eaef3a7da9a2beb2064f"
+  },
+  {
+    "case": "large",
+    "threads": 1,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "163.248",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/large/params.lua -h workunits/large/input.hist -z runs/x86/large-1/histogram.txt -c runs/x86/large-1/checkpoint --seed 670828913 --nthreads 1 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 20000",
+    "stdout.txt": "00:45:20: Making final checkpoint\n00:45:20: Removing checkpoint file 'runs/x86/large-1/checkpoint'",
+    "histogram_sha256": "a3cf9ae9800bb08fd03434ec1fbc4b1c25ba468b025afd02fd1c189ce9e0091d"
+  },
+  {
+    "case": "large",
+    "threads": 12,
+    "kind": "host_reference",
+    "exit.txt": "0",
+    "seconds.txt": "23.784",
+    "command.txt": "build/x86/milkyway_nbody.exe -f workunits/large/params.lua -h workunits/large/input.hist -z runs/x86/large-12/histogram.txt -c runs/x86/large-12/checkpoint --seed 670828913 --nthreads 12 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 20000",
+    "stdout.txt": "00:45:44: Making final checkpoint\n00:45:45: Removing checkpoint file 'runs/x86/large-12/checkpoint'",
+    "histogram_sha256": "1a8c11e095babc13fcf5bc349790a97aed41199800284cf3153ab4abe131afe1"
+  }
+]

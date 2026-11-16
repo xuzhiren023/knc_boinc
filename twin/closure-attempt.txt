@@ -1,0 +1,2 @@
+from_binary: unsupported: line 308: indirect branch or call '*0xb09bb0' is not supported (jump tables, function pointers)
+adapter_exit=2

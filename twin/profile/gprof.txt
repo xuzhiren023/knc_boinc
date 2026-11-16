@@ -1,0 +1,2616 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 43.67     30.50    30.50 815645997     0.00     0.00  log_rn
+ 30.77     51.99    21.49                             _mcount_private
+  9.25     58.45     6.46 105673896     0.00     0.00  pow_rn
+  5.87     62.55     4.10                             __fentry__
+  4.60     65.76     3.21 82459509     0.00     0.00  exp_rn
+  3.22     68.01     2.25                             leg_pol
+  1.75     69.23     1.22                             nbGravity
+  0.27     69.42     0.19   343269     0.00     0.00  pow_120
+  0.21     69.57     0.15   639221     0.00     0.00  nbExtAcceleration
+  0.09     69.63     0.06     8622     0.01     0.01  nbMakeTree
+  0.06     69.67     0.04   343269     0.00     0.00  pow_exact_rn
+  0.06     69.71     0.04                             hackCofM
+  0.04     69.74     0.03   551808     0.00     0.00  LMCAcceleration
+  0.04     69.77     0.03                             hackQuad
+  0.03     69.79     0.02        1    20.00    20.00  mwFixArgv
+  0.03     69.81     0.02        1    20.00    80.00  nbMain
+  0.03     69.83     0.02                             atan2
+  0.01     69.84     0.01                             threadTree
+  0.00     69.84     0.00  7031431     0.00     0.00  nbPrintReverseOrbit
+  0.00     69.84     0.00  2014131     0.00     0.00  equalNBodyCtx
+  0.00     69.84     0.00   551808     0.00     0.00  nbCalcChisq
+  0.00     69.84     0.00    12146     0.00     0.00  luaS_newudata
+  0.00     69.84     0.00    11669     0.00     0.00  luaH_set
+  0.00     69.84     0.00     9835     0.00     0.00  p_accu
+  0.00     69.84     0.00     8622     0.00     0.01  nbGravMap
+  0.00     69.84     0.00     8621     0.00     0.01  nbStepSystemPlain
+  0.00     69.84     0.00     8621     0.00     0.00  nbTimeToCheckpoint
+  0.00     69.84     0.00     7365     0.00     0.00  luaF_getlocalname
+  0.00     69.84     0.00     6189     0.00     0.00  luaH_get
+  0.00     69.84     0.00     6108     0.00     0.00  setModelTableItem
+  0.00     69.84     0.00     6000     0.00     0.00  luaM_realloc_
+  0.00     69.84     0.00     5679     0.00     0.00  exp_td_accurate
+  0.00     69.84     0.00     4263     0.00     0.00  luaC_linkupval
+  0.00     69.84     0.00     3279     0.00     0.00  luaC_separateudata
+  0.00     69.84     0.00     2598     0.00     0.00  luaS_newlstr
+  0.00     69.84     0.00     1707     0.00     0.00  luaK_dischargevars
+  0.00     69.84     0.00     1677     0.00     0.00  lua_setupvalue
+  0.00     69.84     0.00     1629     0.00     0.00  luaX_newstring
+  0.00     69.84     0.00     1561     0.00     0.00  luaV_settable
+  0.00     69.84     0.00     1503     0.00     0.00  luaO_chunkid
+  0.00     69.84     0.00     1415     0.00     0.00  mwRegisterTypes
+  0.00     69.84     0.00     1179     0.00     0.00  luaX_next
+  0.00     69.84     0.00     1158     0.00     0.00  rem_pio2_scs
+  0.00     69.84     0.00      919     0.00     0.00  luaC_link
+  0.00     69.84     0.00      822     0.00     0.00  lua_setfield
+  0.00     69.84     0.00      741     0.00     0.00  luaF_freeclosure
+  0.00     69.84     0.00      726     0.00     0.00  luaF_newCclosure
+  0.00     69.84     0.00      726     0.00     0.00  lua_pushcclosure
+  0.00     69.84     0.00      721     0.00     0.00  lua_pushstring
+  0.00     69.84     0.00      630     0.00     0.00  lua_settable
+  0.00     69.84     0.00      598     0.00     0.00  cos_rn
+  0.00     69.84     0.00      588     0.00     0.00  lua_pushlightuserdata
+  0.00     69.84     0.00      581     0.00     0.00  lua_settop
+  0.00     69.84     0.00      571     0.00     0.00  luaO_log2
+  0.00     69.84     0.00      560     0.00     0.00  sin_rn
+  0.00     69.84     0.00      470     0.00     0.00  luaV_gettable
+  0.00     69.84     0.00      450     0.00     0.00  luaH_setstr
+  0.00     69.84     0.00      423     0.00     0.00  lua_type
+  0.00     69.84     0.00      418     0.00     0.00  lua_gettop
+  0.00     69.84     0.00      418     0.00     0.00  lua_pushvalue
+  0.00     69.84     0.00      414     0.00     0.00  luaK_exp2RK
+  0.00     69.84     0.00      402     0.00     0.00  luaX_lexerror
+  0.00     69.84     0.00      369     0.00     0.00  luaK_stringK
+  0.00     69.84     0.00      365     0.00     0.00  luaO_rawequalObj
+  0.00     69.84     0.00      288     0.00     0.00  luaK_exp2nextreg
+  0.00     69.84     0.00      287     0.00     0.00  luaH_getnum
+  0.00     69.84     0.00      260     0.00     0.00  lua_getfield
+  0.00     69.84     0.00      258     0.00     0.00  luaK_codeABC
+  0.00     69.84     0.00      236     0.00     0.00  mwRandomUnitPoint
+  0.00     69.84     0.00      225     0.00     0.00  lua_pushlstring
+  0.00     69.84     0.00      213     0.00     0.00  luaO_str2d
+  0.00     69.84     0.00      207     0.00     0.00  luaM_growaux_
+  0.00     69.84     0.00      180     0.00     0.00  dsfmt_chk_init_by_array
+  0.00     69.84     0.00      174     0.00     0.00  luaX_lookahead
+  0.00     69.84     0.00      163     0.00     0.00  luaH_free
+  0.00     69.84     0.00      163     0.00     0.00  luaH_new
+  0.00     69.84     0.00      159     0.00     0.00  luaK_exp2anyreg
+  0.00     69.84     0.00      148     0.00     0.00  cartesianalign
+  0.00     69.84     0.00      126     0.00     0.00  lua_remove
+  0.00     69.84     0.00      124     0.00     0.00  lua_createtable
+  0.00     69.84     0.00      117     0.00     0.00  lua_gettable
+  0.00     69.84     0.00       98     0.00     0.00  lua_touserdata
+  0.00     69.84     0.00       92     0.00     0.00  mwMallocA
+  0.00     69.84     0.00       91     0.00     0.00  lua_setmetatable
+  0.00     69.84     0.00       90     0.00     0.00  lua_rawset
+  0.00     69.84     0.00       89     0.00     0.00  luaH_next
+  0.00     69.84     0.00       89     0.00     0.00  lua_next
+  0.00     69.84     0.00       86     0.00     0.00  lua_getmetatable
+  0.00     69.84     0.00       86     0.00     0.00  lua_rawequal
+  0.00     69.84     0.00       85     0.00     0.00  lua_newuserdata
+  0.00     69.84     0.00       85     0.00     0.00  lua_rawget
+  0.00     69.84     0.00       84     0.00     0.00  luaL_findtable
+  0.00     69.84     0.00       81     0.00     0.00  luaV_tonumber
+  0.00     69.84     0.00       80     0.00     0.00  pushType
+  0.00     69.84     0.00       78     0.00     0.00  cr_lgamma
+  0.00     69.84     0.00       78     0.00     0.00  luaO_int2fb
+  0.00     69.84     0.00       75     0.00     0.00  lua_tolstring
+  0.00     69.84     0.00       74     0.00     0.00  cartesianToLbr_rad
+  0.00     69.84     0.00       74     0.00     0.00  lua_isnumber
+  0.00     69.84     0.00       73     0.00     0.00  luaH_setnum
+  0.00     69.84     0.00       73     0.00     0.00  lua_isstring
+  0.00     69.84     0.00       72     0.00     0.00  luaC_step
+  0.00     69.84     0.00       72     0.00     0.00  luaL_openlib
+  0.00     69.84     0.00       72     0.00     0.00  luaL_register
+  0.00     69.84     0.00       70     0.00     0.00  lua_rawgeti
+  0.00     69.84     0.00       70     0.00     0.00  lua_tonumber
+  0.00     69.84     0.00       66     0.00     0.00  luaK_fixline
+  0.00     69.84     0.00       66     0.00     0.00  tanpi_rz
+  0.00     69.84     0.00       64     0.00     0.00  asin_rn
+  0.00     69.84     0.00       64     0.00     0.00  expectBody
+  0.00     69.84     0.00       64     0.00     0.00  lua_rawseti
+  0.00     69.84     0.00       64     0.00     0.00  mw_tonamedudata
+  0.00     69.84     0.00       64     0.00     0.00  nbXYZToLambdaBeta
+  0.00     69.84     0.00       64     0.00     0.00  pushBody
+  0.00     69.84     0.00       59     0.00     0.00  lua_pushnumber
+  0.00     69.84     0.00       47     0.00     0.00  luaD_poscall
+  0.00     69.84     0.00       47     0.00     0.00  luaD_precall
+  0.00     69.84     0.00       45     0.00     0.00  luaK_setreturns
+  0.00     69.84     0.00       42     0.00     0.00  luaK_indexed
+  0.00     69.84     0.00       42     0.00     0.00  luaK_setoneret
+  0.00     69.84     0.00       42     0.00     0.00  luaK_storevar
+  0.00     69.84     0.00       42     0.00     0.00  lua_insert
+  0.00     69.84     0.00       37     0.00     0.00  calc_distance
+  0.00     69.84     0.00       37     0.00     0.00  calc_vLOS
+  0.00     69.84     0.00       37     0.00     0.00  findLatUnitVec
+  0.00     69.84     0.00       37     0.00     0.00  nbVXVYVZtomuDec
+  0.00     69.84     0.00       37     0.00     0.00  nbVXVYVZtomuRA
+  0.00     69.84     0.00       36     0.00     0.00  luaO_fb2int
+  0.00     69.84     0.00       31     0.00     0.00  luaH_getstr
+  0.00     69.84     0.00       31     0.00     0.00  mwCalloc
+  0.00     69.84     0.00       30     0.00     0.00  luaL_newmetatable
+  0.00     69.84     0.00       30     0.00     0.00  luaT_gettm
+  0.00     69.84     0.00       30     0.00     0.00  registerStruct
+  0.00     69.84     0.00       27     0.00     0.00  luaK_ret
+  0.00     69.84     0.00       19     0.00     0.00  lua_pushnil
+  0.00     69.84     0.00       18     0.00     0.00  luaC_barrierback
+  0.00     69.84     0.00       18     0.00     0.00  luaD_call
+  0.00     69.84     0.00       18     0.00     0.00  luaK_concat
+  0.00     69.84     0.00       18     0.00     0.00  luaK_reserveregs
+  0.00     69.84     0.00       17     0.00     0.00  luaD_rawrunprotected
+  0.00     69.84     0.00       16     0.00     0.00  handleNamedArgumentTable
+  0.00     69.84     0.00       15     0.00     0.00  luaF_freeproto
+  0.00     69.84     0.00       15     0.00     0.00  luaF_newLclosure
+  0.00     69.84     0.00       15     0.00     0.00  luaF_newproto
+  0.00     69.84     0.00       15     0.00     0.00  luaS_resize
+  0.00     69.84     0.00       15     0.00     0.00  luaY_parser
+  0.00     69.84     0.00       14     0.00     0.00  nbCalcDisp
+  0.00     69.84     0.00       12     0.00     0.00  get_potential
+  0.00     69.84     0.00       12     0.00     0.00  luaK_codeABx
+  0.00     69.84     0.00       12     0.00     0.00  luaK_prefix
+  0.00     69.84     0.00       12     0.00     0.00  nbRemoveOutliers
+  0.00     69.84     0.00       11     0.00     0.00  luaD_pcall
+  0.00     69.84     0.00       11     0.00     0.00  lua_tointeger
+  0.00     69.84     0.00       10     0.00     0.00  mwCheckNormalPosNum
+  0.00     69.84     0.00       10     0.00     0.00  oneTableArgument
+  0.00     69.84     0.00        9     0.00     0.00  luaK_infix
+  0.00     69.84     0.00        9     0.00     0.00  luaK_posfix
+  0.00     69.84     0.00        9     0.00     0.00  luaK_setlist
+  0.00     69.84     0.00        9     0.00     0.00  luaL_checkinteger
+  0.00     69.84     0.00        9     0.00     0.00  lua_call
+  0.00     69.84     0.00        9     0.00     0.00  lua_pushinteger
+  0.00     69.84     0.00        9     0.00     0.00  registerVector
+  0.00     69.84     0.00        8     0.00     0.00  luaL_checknumber
+  0.00     69.84     0.00        8     0.00     0.00  luaL_checkudata
+  0.00     69.84     0.00        8     0.00     0.00  luaV_execute
+  0.00     69.84     0.00        8     0.00     0.00  lua_pcall
+  0.00     69.84     0.00        8     0.00     0.00  lua_toboolean
+  0.00     69.84     0.00        8     0.00     0.00  mw_checknamedudata
+  0.00     69.84     0.00        6     0.00     0.00  luaF_close
+  0.00     69.84     0.00        6     0.00     0.00  luaH_getn
+  0.00     69.84     0.00        6     0.00     0.00  luaL_checkany
+  0.00     69.84     0.00        6     0.00     0.00  luaL_newstate
+  0.00     69.84     0.00        6     0.00     0.00  luaZ_fill
+  0.00     69.84     0.00        6     0.00     0.00  luaZ_openspace
+  0.00     69.84     0.00        6     0.00     0.00  lua_objlen
+  0.00     69.84     0.00        6     0.00     0.00  lua_pushboolean
+  0.00     69.84     0.00        6     0.00     0.00  nbCalculateEps2_NEW
+  0.00     69.84     0.00        5     0.00     0.00  mwCheckNormalPosNumEps
+  0.00     69.84     0.00        5     0.00     0.00  mw_lua_getglobalfunction
+  0.00     69.84     0.00        5     0.00     0.00  poptDupArgv
+  0.00     69.84     0.00        5     0.00     0.00  poptParseArgvString
+  0.00     69.84     0.00        5     0.00     0.00  registerMilkywayMath
+  0.00     69.84     0.00        4     0.00     0.00  expectType
+  0.00     69.84     0.00        4     0.00     0.00  mwMalloc
+  0.00     69.84     0.00        4     0.00     0.00  registerModelFunctions
+  0.00     69.84     0.00        3     0.00     0.00  checkHaloConstants
+  0.00     69.84     0.00        3     0.00     0.00  checkSphericalConstants
+  0.00     69.84     0.00        3     0.00     0.00  dostringWithArgs
+  0.00     69.84     0.00        3     0.00     0.00  dsfmt_chk_init_gen_rand
+  0.00     69.84     0.00        3     0.00     0.00  dsfmt_gen_rand_all
+  0.00     69.84     0.00        3     0.00     0.00  first_derivative
+  0.00     69.84     0.00        3     0.00     0.00  getDwarfT
+  0.00     69.84     0.00        3     0.00     0.00  get_density
+  0.00     69.84     0.00        3     0.00     0.00  get_vel_disp_radius
+  0.00     69.84     0.00        3     0.00     0.00  luaC_barrierf
+  0.00     69.84     0.00        3     0.00     0.00  luaC_callGCTM
+  0.00     69.84     0.00        3     0.00     0.00  luaC_freeall
+  0.00     69.84     0.00        3     0.00     0.00  luaD_protectedparser
+  0.00     69.84     0.00        3     0.00     0.00  luaD_reallocstack
+  0.00     69.84     0.00        3     0.00     0.00  luaH_resizearray
+  0.00     69.84     0.00        3     0.00     0.00  luaK_exp2val
+  0.00     69.84     0.00        3     0.00     0.00  luaL_loadstring
+  0.00     69.84     0.00        3     0.00     0.00  luaL_optinteger
+  0.00     69.84     0.00        3     0.00     0.00  luaL_optlstring
+  0.00     69.84     0.00        3     0.00     0.00  luaT_init
+  0.00     69.84     0.00        3     0.00     0.00  luaX_init
+  0.00     69.84     0.00        3     0.00     0.00  luaX_setinput
+  0.00     69.84     0.00        3     0.00     0.00  luaZ_init
+  0.00     69.84     0.00        3     0.00     0.00  luaZ_lookahead
+  0.00     69.84     0.00        3     0.00     0.00  lua_atpanic
+  0.00     69.84     0.00        3     0.00     0.00  lua_checkstack
+  0.00     69.84     0.00        3     0.00     0.00  lua_close
+  0.00     69.84     0.00        3     0.00     0.00  lua_load
+  0.00     69.84     0.00        3     0.00     0.00  lua_newstate
+  0.00     69.84     0.00        3     0.00     0.00  luaopen_base
+  0.00     69.84     0.00        3     0.00     0.00  luaopen_string
+  0.00     69.84     0.00        3     0.00     0.00  luaopen_table
+  0.00     69.84     0.00        3     0.00     0.00  mwBindBOINCStatus
+  0.00     69.84     0.00        3     0.00     0.00  mwCallocA
+  0.00     69.84     0.00        3     0.00     0.00  mwFreadFileWithSize
+  0.00     69.84     0.00        3     0.00     0.00  mwReadFile
+  0.00     69.84     0.00        3     0.00     0.00  mwReadFileResolved
+  0.00     69.84     0.00        3     0.00     0.00  mw_lua_newstate
+  0.00     69.84     0.00        3     0.00     0.00  mw_lua_openlibs
+  0.00     69.84     0.00        3     0.00     0.00  nbLuaOpen
+  0.00     69.84     0.00        3     0.00     0.00  nbOpenLuaStateWithScript
+  0.00     69.84     0.00        3     0.00     0.00  nbReadMinVersion
+  0.00     69.84     0.00        3     0.00     0.00  nbRegisterUtilityFunctions
+  0.00     69.84     0.00        3     0.00     0.00  nbSetup
+  0.00     69.84     0.00        3     0.00     0.00  pushVector
+  0.00     69.84     0.00        3     0.00     0.00  registerBody
+  0.00     69.84     0.00        3     0.00     0.00  registerDSFMT
+  0.00     69.84     0.00        3     0.00     0.00  registerDisk
+  0.00     69.84     0.00        3     0.00     0.00  registerDiskKinds
+  0.00     69.84     0.00        3     0.00     0.00  registerDwarf
+  0.00     69.84     0.00        3     0.00     0.00  registerDwarfKinds
+  0.00     69.84     0.00        3     0.00     0.00  registerGenerateHernq
+  0.00     69.84     0.00        3     0.00     0.00  registerGenerateIsotropic
+  0.00     69.84     0.00        3     0.00     0.00  registerGenerateManualBodies
+  0.00     69.84     0.00        3     0.00     0.00  registerGenerateMixedDwarf
+  0.00     69.84     0.00        3     0.00     0.00  registerGenerateNFW
+  0.00     69.84     0.00        3     0.00     0.00  registerGeneratePlummer
+  0.00     69.84     0.00        3     0.00     0.00  registerHalo
+  0.00     69.84     0.00        3     0.00     0.00  registerHaloKinds
+  0.00     69.84     0.00        3     0.00     0.00  registerHistogramParams
+  0.00     69.84     0.00        3     0.00     0.00  registerNBodyCtx
+  0.00     69.84     0.00        3     0.00     0.00  registerNBodyTypes
+  0.00     69.84     0.00        3     0.00     0.00  registerPotential
+  0.00     69.84     0.00        3     0.00     0.00  registerPredefinedModelGenerators
+  0.00     69.84     0.00        3     0.00     0.00  registerSpherical
+  0.00     69.84     0.00        3     0.00     0.00  registerSphericalKinds
+  0.00     69.84     0.00        3     0.00     0.00  registerUtilityFunctions
+  0.00     69.84     0.00        3     0.00     0.00  set_model_params
+  0.00     69.84     0.00        3     0.00     0.00  showNBodyLikelihoodMethod
+  0.00     69.84     0.00        2     0.00     0.00  checkDiskConstants
+  0.00     69.84     0.00        2     0.00     0.00  checkNBodyCtx
+  0.00     69.84     0.00        2     0.00     0.00  checkPotentialConstants
+  0.00     69.84     0.00        2     0.00     0.00  destroyNBodyState
+  0.00     69.84     0.00        2     0.00     0.00  expectHistogramParams
+  0.00     69.84     0.00        2     0.00     0.00  getDiskT
+  0.00     69.84     0.00        2     0.00     0.00  getEMDRange
+  0.00     69.84     0.00        2     0.00     0.00  mwGetTime
+  0.00     69.84     0.00        2     0.00     0.00  mwLocalTime
+  0.00     69.84     0.00        2     0.00     0.00  mwOpenResolved
+  0.00     69.84     0.00        2     0.00     0.00  mw_lua_optboolean
+  0.00     69.84     0.00        2     0.00     0.00  mw_resolve_filename
+  0.00     69.84     0.00        2     0.00     0.00  nbEvaluateHistogramParams
+  0.00     69.84     0.00        2     0.00     0.00  nbEvaluateLikelihoodMethod
+  0.00     69.84     0.00        2     0.00     0.00  nbGetLikelihoodInfo
+  0.00     69.84     0.00        2     0.00     0.00  nbPrintHistogram
+  0.00     69.84     0.00        2     0.00     0.00  nbResolveCheckpoint
+  0.00     69.84     0.00        2     0.00     0.00  poptGetNextOpt
+  0.00     69.84     0.00        1     0.00     0.00  Xet_call
+  0.00     69.84     0.00        1     0.00     0.00  checkEnum
+  0.00     69.84     0.00        1     0.00     0.00  checkNBodyCtxConstants
+  0.00     69.84     0.00        1     0.00     0.00  checkPotential
+  0.00     69.84     0.00        1     0.00     0.00  checkVector
+  0.00     69.84     0.00        1     0.00     0.00  crlibm_init
+  0.00     69.84     0.00        1     0.00     0.00  dynamicalFriction_LMC
+  0.00     69.84     0.00        1     0.00     0.00  emdCalc
+  0.00     69.84     0.00        1     0.00     0.00  expectNBodyCtx
+  0.00     69.84     0.00        1     0.00     0.00  expectPotential
+  0.00     69.84     0.00        1     0.00     0.00  expectTable
+  0.00     69.84     0.00        1     0.00     0.00  getHaloT
+  0.00     69.84     0.00        1     0.00     0.00  getNumber
+  0.00     69.84     0.00        1     0.00     0.00  getSphericalT
+  0.00     69.84     0.00        1     0.00     0.00  indexHandler
+  0.00     69.84     0.00        1     0.00     0.00  lbrToCartesian
+  0.00     69.84     0.00        1     0.00     0.00  luaL_checklstring
+  0.00     69.84     0.00        1     0.00     0.00  luaL_checktype
+  0.00     69.84     0.00        1     0.00     0.00  luaT_gettmbyobj
+  0.00     69.84     0.00        1     0.00     0.00  luaU_header
+  0.00     69.84     0.00        1     0.00     0.00  mwBoincInit
+  0.00     69.84     0.00        1     0.00     0.00  mwCountLinesInFile
+  0.00     69.84     0.00        1     0.00     0.00  mwDisableErrorBoxes
+  0.00     69.84     0.00        1     0.00     0.00  mwGetBoincNumCPU
+  0.00     69.84     0.00        1     0.00     0.00  mwGetForwardedArguments
+  0.00     69.84     0.00        1     0.00     0.00  mwLocalTimeFull
+  0.00     69.84     0.00        1     0.00     0.00  mwReadArguments
+  0.00     69.84     0.00        1     0.00     0.00  mw_lua_typecheck
+  0.00     69.84     0.00        1     0.00     0.00  mw_rename
+  0.00     69.84     0.00        1     0.00     0.00  nbCacheEps2Indices
+  0.00     69.84     0.00        1     0.00     0.00  nbCorrectTimestep
+  0.00     69.84     0.00        1     0.00     0.00  nbCostComponent
+  0.00     69.84     0.00        1     0.00     0.00  nbCreateHistogram
+  0.00     69.84     0.00        1     0.00     0.01  nbGeneratePlummer
+  0.00     69.84     0.00        1     0.00     0.00  nbGetHistTrig
+  0.00     69.84     0.00        1     0.00     0.00  nbGetPotentialTyped
+  0.00     69.84     0.00        1     0.00     0.00  nbLikelihood
+  0.00     69.84     0.00        1     0.00     0.00  nbMatchEMD
+  0.00     69.84     0.00        1     0.00     0.00  nbReadHistogram
+  0.00     69.84     0.00        1     0.00    29.32  nbReverseOrbit
+  0.00     69.84     0.00        1     0.00    60.00  nbRunSystemPlain
+  0.00     69.84     0.00        1     0.00     0.00  nbSystemLikelihood
+  0.00     69.84     0.00        1     0.00     0.00  nbWriteCheckpointWithTmpFile
+  0.00     69.84     0.00        1     0.00     0.00  nbWriteFinalCheckpoint
+  0.00     69.84     0.00        1     0.00     0.00  nbWriteHistogram
+  0.00     69.84     0.00        1     0.00     0.00  poptFreeContext
+  0.00     69.84     0.00        1     0.00     0.00  poptGetArgs
+  0.00     69.84     0.00        1     0.00     0.00  poptGetContext
+  0.00     69.84     0.00        1     0.00     0.00  pushNBodyCtx
+  0.00     69.84     0.00        1     0.00     0.00  pushPotential
+  0.00     69.84     0.00        1     0.00     0.00  readEnum
+  0.00     69.84     0.00        1     0.00     0.00  readModels
+  0.00     69.84     0.00        1     0.00     0.00  setInitialNBodyState
+  0.00     69.84     0.00        1     0.00     0.00  showBool
+  0.00     69.84     0.00        1     0.00     0.00  showCriterionT
+  0.00     69.84     0.00        1     0.00     0.00  showExternalPotentialType
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2026 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.01% of 69.84 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     60.7    2.25   40.16                 leg_pol [1]
+               30.48    0.00 815006775/815645997     log_rn [2]
+                6.25    0.22 102275360/105673896     pow_rn [4]
+                3.21    0.00 82459509/82459509     exp_rn [6]
+                0.00    0.00 6392210/7031431     nbPrintReverseOrbit [42]
+-----------------------------------------------
+                0.00    0.00       1/815645997     nbMatchEMD [38]
+                0.02    0.00  639221/815645997     nbExtAcceleration [9]
+               30.48    0.00 815006775/815645997     leg_pol [1]
+[2]     43.7   30.50    0.00 815645997         log_rn [2]
+                0.00    0.00    9835/9835        p_accu [47]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     30.8   21.49    0.00                 _mcount_private [3]
+-----------------------------------------------
+                0.00    0.00       3/105673896     nbCalculateEps2_NEW [36]
+                0.00    0.00      37/105673896     nbVXVYVZtomuRA [33]
+                0.00    0.00      37/105673896     nbVXVYVZtomuDec [32]
+                0.00    0.00     198/105673896     nbGeneratePlummer [27]
+                0.04    0.00  639221/105673896     nbExtAcceleration [9]
+                0.17    0.01 2759040/105673896     LMCAcceleration [10]
+                6.25    0.22 102275360/105673896     leg_pol [1]
+[4]      9.6    6.46    0.23 105673896         pow_rn [4]
+                0.04    0.19  343269/343269      pow_exact_rn [8]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]      5.9    4.10    0.00                 __fentry__ [5]
+-----------------------------------------------
+                3.21    0.00 82459509/82459509     leg_pol [1]
+[6]      4.6    3.21    0.00 82459509         exp_rn [6]
+                0.00    0.00    5679/5679        exp_td_accurate [53]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      2.3    1.22    0.39                 nbGravity [7]
+                0.03    0.17  551808/551808      LMCAcceleration [10]
+                0.13    0.06  551808/639221      nbExtAcceleration [9]
+                0.00    0.00  551808/551808      nbCalcChisq [44]
+-----------------------------------------------
+                0.04    0.19  343269/343269      pow_rn [4]
+[8]      0.3    0.04    0.19  343269         pow_exact_rn [8]
+                0.19    0.00  343269/343269      pow_120 [11]
+-----------------------------------------------
+                0.02    0.01   87413/639221      nbReverseOrbit [20]
+                0.13    0.06  551808/639221      nbGravity [7]
+[9]      0.3    0.15    0.06  639221         nbExtAcceleration [9]
+                0.04    0.00  639221/105673896     pow_rn [4]
+                0.02    0.00  639221/815645997     log_rn [2]
+                0.00    0.00  639221/7031431     nbPrintReverseOrbit [42]
+-----------------------------------------------
+                0.03    0.17  551808/551808      nbGravity [7]
+[10]     0.3    0.03    0.17  551808         LMCAcceleration [10]
+                0.17    0.01 2759040/105673896     pow_rn [4]
+-----------------------------------------------
+                0.19    0.00  343269/343269      pow_exact_rn [8]
+[11]     0.3    0.19    0.00  343269         pow_120 [11]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.1    0.00    0.10                 main [12]
+                0.02    0.06       1/1           nbMain [13]
+                0.02    0.00       1/1           mwFixArgv [22]
+                0.00    0.00       1/1           mwDisableErrorBoxes [310]
+                0.00    0.00       1/1           crlibm_init [293]
+                0.00    0.00       1/1           poptGetContext [329]
+                0.00    0.00       1/1           mwReadArguments [314]
+                0.00    0.00       1/1           poptGetArgs [328]
+                0.00    0.00       1/1           mwGetForwardedArguments [312]
+                0.00    0.00       1/1           poptFreeContext [327]
+                0.00    0.00       1/1           mwBoincInit [308]
+                0.00    0.00       1/1           mwGetBoincNumCPU [311]
+                0.00    0.00       1/2           mwLocalTime [280]
+-----------------------------------------------
+                0.02    0.06       1/1           main [12]
+[13]     0.1    0.02    0.06       1         nbMain [13]
+                0.00    0.06       1/1           nbRunSystemPlain [14]
+                0.00    0.00       1/11          nbSetup <cycle 3> [246]
+                0.00    0.00       2/2           nbResolveCheckpoint [286]
+                0.00    0.00       2/2           mwGetTime [279]
+                0.00    0.00       2/2           destroyNBodyState [275]
+                0.00    0.00       1/1           dynamicalFriction_LMC [294]
+-----------------------------------------------
+                0.00    0.06       1/1           nbMain [13]
+[14]     0.1    0.00    0.06       1         nbRunSystemPlain [14]
+                0.00    0.06    8621/8621        nbStepSystemPlain [17]
+                0.00    0.00       1/8622        nbGravMap [15]
+                0.00    0.00       1/2           nbGetLikelihoodInfo [29]
+                0.00    0.00    8621/8621        nbTimeToCheckpoint [48]
+                0.00    0.00       1/1           nbWriteFinalCheckpoint [325]
+-----------------------------------------------
+                0.00    0.00       1/8622        nbRunSystemPlain [14]
+                0.00    0.06    8621/8622        nbStepSystemPlain [17]
+[15]     0.1    0.00    0.06    8622         nbGravMap [15]
+                0.06    0.00    8622/8622        nbMakeTree [16]
+-----------------------------------------------
+                0.06    0.00    8622/8622        nbGravMap [15]
+[16]     0.1    0.06    0.00    8622         nbMakeTree [16]
+                0.00    0.00   25866/2014131     equalNBodyCtx [43]
+                0.00    0.00      88/92          mwMallocA [104]
+-----------------------------------------------
+                0.00    0.06    8621/8621        nbRunSystemPlain [14]
+[17]     0.1    0.00    0.06    8621         nbStepSystemPlain [17]
+                0.00    0.06    8621/8622        nbGravMap [15]
+-----------------------------------------------
+                                                 <spontaneous>
+[18]     0.1    0.04    0.00                 hackCofM [18]
+                0.00    0.00  478819/2014131     equalNBodyCtx [43]
+-----------------------------------------------
+                                                 <spontaneous>
+[19]     0.0    0.03    0.00                 hackQuad [19]
+                0.00    0.00  478819/2014131     equalNBodyCtx [43]
+-----------------------------------------------
+                0.00    0.03       1/1           luaReverseOrbit [21]
+[20]     0.0    0.00    0.03       1         nbReverseOrbit [20]
+                0.02    0.01   87413/639221      nbExtAcceleration [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     0.0    0.00    0.03                 luaReverseOrbit [21]
+                0.00    0.03       1/1           nbReverseOrbit [20]
+                0.00    0.00       2/3           pushVector [247]
+                0.00    0.00       1/418         lua_gettop [80]
+                0.00    0.00       1/16          handleNamedArgumentTable [159]
+                0.00    0.00       1/3           checkHaloConstants [203]
+                0.00    0.00       1/2           checkPotentialConstants [274]
+-----------------------------------------------
+                0.02    0.00       1/1           main [12]
+[22]     0.0    0.02    0.00       1         mwFixArgv [22]
+-----------------------------------------------
+                                                 <spontaneous>
+[23]     0.0    0.02    0.00                 atan2 [23]
+-----------------------------------------------
+                                                 <spontaneous>
+[24]     0.0    0.01    0.00                 threadTree [24]
+                0.00    0.00 1030627/2014131     equalNBodyCtx [43]
+-----------------------------------------------
+[25]     0.0    0.00    0.00      11+140     <cycle 3 as a whole> [25]
+                0.00    0.00      47             luaD_precall <cycle 3> [26]
+                0.00    0.00      18             luaD_call <cycle 3> [155]
+                0.00    0.00      17             luaD_rawrunprotected <cycle 3> [158]
+                0.00    0.00      11             luaD_pcall <cycle 3> [170]
+                0.00    0.00       9             lua_call <cycle 3> [178]
+                0.00    0.00       8             luaV_execute <cycle 3> [183]
+                0.00    0.00       8             lua_pcall <cycle 3> [184]
+                0.00    0.00       3             lua_close <cycle 3> [229]
+                0.00    0.00       3             nbSetup <cycle 3> [246]
+                0.00    0.00       3             nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00       3             dostringWithArgs <cycle 3> [205]
+                0.00    0.00       3             luaL_loadstring <cycle 3> [219]
+                0.00    0.00       3             lua_load <cycle 3> [230]
+                0.00    0.00       3             luaD_protectedparser <cycle 3> [215]
+                0.00    0.00       3             nbLuaOpen <cycle 3> [242]
+                0.00    0.00       3             mw_lua_openlibs <cycle 3> [241]
+                0.00    0.00       3             mw_lua_newstate <cycle 3> [240]
+                0.00    0.00       3             lua_newstate <cycle 3> [231]
+-----------------------------------------------
+                                  18             luaD_call <cycle 3> [155]
+                                  29             luaV_execute <cycle 3> [183]
+[26]     0.0    0.00    0.00      47         luaD_precall <cycle 3> [26]
+                0.00    0.00       1/1           nbGeneratePlummer [27]
+                0.00    0.00       3/6           nbCalculateEps2_NEW [36]
+                0.00    0.00      39/47          luaD_poscall [137]
+                0.00    0.00       6/418         lua_gettop [80]
+                0.00    0.00       6/6           luaL_newstate [190]
+                0.00    0.00       3/3           getDwarfT [209]
+                0.00    0.00       3/550         registerVector <cycle 1> [180]
+                0.00    0.00       3/3           luaopen_string [233]
+                0.00    0.00       3/3           luaopen_table [234]
+                0.00    0.00       3/3           luaopen_base [232]
+                0.00    0.00       2/2           getEMDRange [278]
+                0.00    0.00       2/550         registerMilkywayMath <cycle 1> [199]
+                0.00    0.00       2/2           getDiskT [277]
+                0.00    0.00       1/1           getNumber [300]
+                0.00    0.00       1/1           Xet_call [288]
+                0.00    0.00       1/1           indexHandler [302]
+                0.00    0.00       1/4           registerModelFunctions [202]
+                0.00    0.00       1/1           checkPotential [291]
+                0.00    0.00       1/1           getHaloT [299]
+                0.00    0.00       1/1           getSphericalT [301]
+                0.00    0.00       1/2           checkNBodyCtx [273]
+                                   2             nbSetup <cycle 3> [246]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[27]     0.0    0.00    0.00       1         nbGeneratePlummer [27]
+                0.00    0.00     198/105673896     pow_rn [4]
+                0.00    0.00     236/236         mwRandomUnitPoint [90]
+                0.00    0.00      64/80          pushType [115]
+                0.00    0.00      64/64          pushBody [135]
+                0.00    0.00      64/64          lua_rawseti [132]
+                0.00    0.00       2/418         lua_gettop [80]
+                0.00    0.00       2/3           dsfmt_gen_rand_all [207]
+                0.00    0.00       1/16          handleNamedArgumentTable [159]
+                0.00    0.00       1/124         lua_createtable [101]
+-----------------------------------------------
+                                                 <spontaneous>
+[28]     0.0    0.00    0.00                 nbReportResults.constprop.0 [28]
+                0.00    0.00       1/1           nbCreateHistogram [30]
+                0.00    0.00       1/2           nbGetLikelihoodInfo [29]
+                0.00    0.00       1/1           nbSystemLikelihood [39]
+                0.00    0.00       1/1           nbReadHistogram [323]
+                0.00    0.00       1/1           nbWriteHistogram [326]
+                0.00    0.00       1/2           nbPrintHistogram [285]
+-----------------------------------------------
+                0.00    0.00       1/2           nbReportResults.constprop.0 [28]
+                0.00    0.00       1/2           nbRunSystemPlain [14]
+[29]     0.0    0.00    0.00       2         nbGetLikelihoodInfo [29]
+                0.00    0.00       2/11          nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00       2/2           nbEvaluateHistogramParams [34]
+                0.00    0.00       2/11          lua_close <cycle 3> [229]
+                0.00    0.00       2/2           nbEvaluateLikelihoodMethod [284]
+                0.00    0.00       2/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       2/15          luaY_parser [164]
+-----------------------------------------------
+                0.00    0.00       1/1           nbReportResults.constprop.0 [28]
+[30]     0.0    0.00    0.00       1         nbCreateHistogram [30]
+                0.00    0.00      37/37          nbVXVYVZtomuDec [32]
+                0.00    0.00      37/37          nbVXVYVZtomuRA [33]
+                0.00    0.00      64/64          nbXYZToLambdaBeta [134]
+                0.00    0.00      37/37          calc_vLOS [144]
+                0.00    0.00      37/37          calc_distance [143]
+                0.00    0.00      19/31          mwCalloc [148]
+                0.00    0.00      14/14          nbCalcDisp [165]
+                0.00    0.00      12/12          nbRemoveOutliers [169]
+                0.00    0.00       1/1           nbGetHistTrig [320]
+-----------------------------------------------
+                                                 <spontaneous>
+[31]     0.0    0.00    0.00                 doWithArgs [31]
+                0.00    0.00       3/11          lua_pcall <cycle 3> [184]
+                0.00    0.00       3/3           lua_checkstack [228]
+                0.00    0.00       3/721         lua_pushstring [70]
+-----------------------------------------------
+                0.00    0.00      37/37          nbCreateHistogram [30]
+[32]     0.0    0.00    0.00      37         nbVXVYVZtomuDec [32]
+                0.00    0.00      37/105673896     pow_rn [4]
+                0.00    0.00      74/148         cartesianalign [99]
+                0.00    0.00      37/74          cartesianToLbr_rad [119]
+                0.00    0.00      37/37          findLatUnitVec [145]
+-----------------------------------------------
+                0.00    0.00      37/37          nbCreateHistogram [30]
+[33]     0.0    0.00    0.00      37         nbVXVYVZtomuRA [33]
+                0.00    0.00      37/105673896     pow_rn [4]
+                0.00    0.00      74/148         cartesianalign [99]
+                0.00    0.00      37/74          cartesianToLbr_rad [119]
+                0.00    0.00      37/560         sin_rn [76]
+                0.00    0.00      37/598         cos_rn [72]
+-----------------------------------------------
+                0.00    0.00       2/2           nbGetLikelihoodInfo [29]
+[34]     0.0    0.00    0.00       2         nbEvaluateHistogramParams [34]
+                0.00    0.00       2/11          lua_pcall <cycle 3> [184]
+                0.00    0.00       2/5           mw_lua_getglobalfunction [196]
+                0.00    0.00       2/418         lua_gettop [80]
+                0.00    0.00       2/4           expectType [200]
+                0.00    0.00       2/2           expectHistogramParams [276]
+-----------------------------------------------
+                                                 <spontaneous>
+[35]     0.0    0.00    0.00                 callTMres [35]
+                0.00    0.00       1/11          luaD_call <cycle 3> [155]
+-----------------------------------------------
+                0.00    0.00       3/6           luaCalculateEps2Dwarf [37]
+                0.00    0.00       3/6           luaD_precall <cycle 3> [26]
+[36]     0.0    0.00    0.00       6         nbCalculateEps2_NEW [36]
+                0.00    0.00       3/105673896     pow_rn [4]
+                0.00    0.00       3/3           get_density [210]
+                0.00    0.00       3/3           get_vel_disp_radius [211]
+                0.00    0.00       3/3           first_derivative [208]
+                0.00    0.00       3/4           mwMalloc [201]
+-----------------------------------------------
+                                                 <spontaneous>
+[37]     0.0    0.00    0.00                 luaCalculateEps2Dwarf [37]
+                0.00    0.00       3/6           nbCalculateEps2_NEW [36]
+                0.00    0.00       9/59          lua_pushnumber [136]
+                0.00    0.00       6/8           mw_checknamedudata [186]
+                0.00    0.00       6/9           luaL_checkinteger [177]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSystemLikelihood [39]
+[38]     0.0    0.00    0.00       1         nbMatchEMD [38]
+                0.00    0.00       1/815645997     log_rn [2]
+                0.00    0.00       2/31          mwCalloc [148]
+                0.00    0.00       1/1           emdCalc [295]
+-----------------------------------------------
+                0.00    0.00       1/1           nbReportResults.constprop.0 [28]
+[39]     0.0    0.00    0.00       1         nbSystemLikelihood [39]
+                0.00    0.00       1/1           nbMatchEMD [38]
+                0.00    0.00       1/1           nbCostComponent [319]
+                0.00    0.00       1/1           nbLikelihood [322]
+-----------------------------------------------
+[40]     0.0    0.00    0.00    6009+7551    <cycle 2 as a whole> [40]
+                0.00    0.00    6108             setModelTableItem <cycle 2> [51]
+                0.00    0.00    6000             luaM_realloc_ <cycle 2> [52]
+                0.00    0.00     726             lua_pushcclosure <cycle 2> [69]
+                0.00    0.00     726             luaF_newCclosure <cycle 2> [68]
+-----------------------------------------------
+[41]     0.0    0.00    0.00     550+2435    <cycle 1 as a whole> [41]
+                0.00    0.00    1415             mwRegisterTypes <cycle 1> [62]
+                0.00    0.00     822             lua_setfield <cycle 1> [66]
+                0.00    0.00     260             lua_getfield <cycle 1> [88]
+                0.00    0.00     126             lua_remove <cycle 1> [100]
+                0.00    0.00      90             lua_rawset <cycle 1> [106]
+                0.00    0.00      84             luaL_findtable <cycle 1> [113]
+                0.00    0.00      72             luaL_openlib <cycle 1> [124]
+                0.00    0.00      42             lua_insert <cycle 1> [142]
+                0.00    0.00      30             registerStruct <cycle 1> [151]
+                0.00    0.00      30             luaL_newmetatable <cycle 1> [149]
+                0.00    0.00       9             registerVector <cycle 1> [180]
+                0.00    0.00       5             registerMilkywayMath <cycle 1> [199]
+-----------------------------------------------
+                0.00    0.00  639221/7031431     nbExtAcceleration [9]
+                0.00    0.00 6392210/7031431     leg_pol [1]
+[42]     0.0    0.00    0.00 7031431         nbPrintReverseOrbit [42]
+-----------------------------------------------
+                0.00    0.00   25866/2014131     nbMakeTree [16]
+                0.00    0.00  478819/2014131     hackQuad [19]
+                0.00    0.00  478819/2014131     hackCofM [18]
+                0.00    0.00 1030627/2014131     threadTree [24]
+[43]     0.0    0.00    0.00 2014131         equalNBodyCtx [43]
+-----------------------------------------------
+                0.00    0.00  551808/551808      nbGravity [7]
+[44]     0.0    0.00    0.00  551808         nbCalcChisq [44]
+-----------------------------------------------
+                0.00    0.00      73/12146       luaH_next [107]
+                0.00    0.00      85/12146       lua_newuserdata [111]
+                0.00    0.00     156/12146       luaH_get [50]
+                0.00    0.00     326/12146       luaH_new [97]
+                0.00    0.00     471/12146       resize [1282]
+                0.00    0.00   11035/12146       newkey [1149]
+[45]     0.0    0.00    0.00   12146         luaS_newudata [45]
+                0.00    0.00      85/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       3/11669       luaV_execute <cycle 3> [183]
+                0.00    0.00     252/11669       lua_rawset <cycle 1> [106]
+                0.00    0.00     456/11669       newkey [1149]
+                0.00    0.00     528/11669       luaH_setstr [78]
+                0.00    0.00     666/11669       addk [392]
+                0.00    0.00    3740/11669       luaV_settable [60]
+                0.00    0.00    6024/11669       resize [1282]
+[46]     0.0    0.00    0.00   11669         luaH_set [46]
+                0.00    0.00    5635/6189        luaH_get [50]
+                0.00    0.00     141/287         luaH_getnum [87]
+-----------------------------------------------
+                0.00    0.00    9835/9835        log_rn [2]
+[47]     0.0    0.00    0.00    9835         p_accu [47]
+-----------------------------------------------
+                0.00    0.00    8621/8621        nbRunSystemPlain [14]
+[48]     0.0    0.00    0.00    8621         nbTimeToCheckpoint [48]
+-----------------------------------------------
+                0.00    0.00       9/7365        sweeplist [1451]
+                0.00    0.00      24/7365        markroot [999]
+                0.00    0.00     915/7365        luaC_step [123]
+                0.00    0.00    1539/7365        luaC_freeall [214]
+                0.00    0.00    2337/7365        propagatemark [1247]
+                0.00    0.00    2541/7365        singlestep [1383]
+[49]     0.0    0.00    0.00    7365         luaF_getlocalname [49]
+-----------------------------------------------
+                0.00    0.00      85/6189        lua_rawget [112]
+                0.00    0.00     469/6189        luaV_gettable [77]
+                0.00    0.00    5635/6189        luaH_set [46]
+[50]     0.0    0.00    0.00    6189         luaH_get [50]
+                0.00    0.00     179/365         luaO_rawequalObj [85]
+                0.00    0.00     156/12146       luaS_newudata [45]
+-----------------------------------------------
+                                6000             luaM_realloc_ <cycle 2> [52]
+                0.00    0.00       1/6009        nbSetup <cycle 3> [246]
+                0.00    0.00       2/6009        nbGetLikelihoodInfo [29]
+                0.00    0.00       3/6009        nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00       3/6009        lua_newstate <cycle 3> [231]
+                0.00    0.00       9/6009        registerSphericalKinds [268]
+                0.00    0.00      18/6009        registerPredefinedModelGenerators [266]
+                0.00    0.00      18/6009        registerDiskKinds [251]
+                0.00    0.00      18/6009        registerDwarfKinds [253]
+                0.00    0.00      36/6009        registerHaloKinds [261]
+[51]     0.0    0.00    0.00    6108         setModelTableItem <cycle 2> [51]
+                                  99             lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                                 726             luaF_newCclosure <cycle 2> [68]
+                0.00    0.00       3/6009        luaD_protectedparser <cycle 3> [215]
+                0.00    0.00       3/6009        save [1285]
+                0.00    0.00       3/6009        luaX_setinput [224]
+                0.00    0.00       6/6009        stack_init [1407]
+                0.00    0.00      12/6009        close_state [469]
+                0.00    0.00      15/6009        luaF_newLclosure [161]
+                0.00    0.00      15/6009        luaF_newproto [162]
+                0.00    0.00      30/6009        luaS_resize [163]
+                0.00    0.00      85/6009        luaS_newudata [45]
+                0.00    0.00      90/6009        luaF_freeproto [160]
+                0.00    0.00      90/6009        close_func [468]
+                0.00    0.00     163/6009        luaH_new [97]
+                0.00    0.00     175/6009        setarrayvector [1353]
+                0.00    0.00     207/6009        luaM_growaux_ [93]
+                0.00    0.00     317/6009        luaH_free [96]
+                0.00    0.00     369/6009        newkey [1149]
+                0.00    0.00     523/6009        setnodevector [1356]
+                0.00    0.00    1082/6009        luaS_newlstr [56]
+                0.00    0.00    2086/6009        sweeplist [1451]
+[52]     0.0    0.00    0.00    6000         luaM_realloc_ <cycle 2> [52]
+                                6000             setModelTableItem <cycle 2> [51]
+-----------------------------------------------
+                0.00    0.00    5679/5679        exp_rn [6]
+[53]     0.0    0.00    0.00    5679         exp_td_accurate [53]
+-----------------------------------------------
+                0.00    0.00       3/4263        skip_sep [1396]
+                0.00    0.00       9/4263        check_next [459]
+                0.00    0.00     699/4263        read_numeral [1271]
+                0.00    0.00    3552/4263        llex [775]
+[54]     0.0    0.00    0.00    4263         luaC_linkupval [54]
+-----------------------------------------------
+                0.00    0.00       3/3279        lua_close <cycle 3> [229]
+                0.00    0.00       6/3279        singlestep [1383]
+                0.00    0.00    3270/3279        luaC_step [123]
+[55]     0.0    0.00    0.00    3279         luaC_separateudata [55]
+                0.00    0.00      15/30          luaT_gettm [150]
+-----------------------------------------------
+                0.00    0.00       3/2598        luaY_parser [164]
+                0.00    0.00       3/2598        f_luaopen [634]
+                0.00    0.00      51/2598        luaT_init [222]
+                0.00    0.00      63/2598        luaX_init [223]
+                0.00    0.00     225/2598        lua_pushlstring [91]
+                0.00    0.00     260/2598        lua_getfield <cycle 1> [88]
+                0.00    0.00     450/2598        luaX_newstring [59]
+                0.00    0.00     721/2598        lua_pushstring [70]
+                0.00    0.00     822/2598        lua_setfield <cycle 1> [66]
+[56]     0.0    0.00    0.00    2598         luaS_newlstr [56]
+                0.00    0.00    1082/6009        luaM_realloc_ <cycle 2> [52]
+                0.00    0.00      12/15          luaS_resize [163]
+-----------------------------------------------
+                0.00    0.00      57/1707        constructor [474]
+                0.00    0.00      57/1707        primaryexp [1225]
+                0.00    0.00      84/1707        funcargs [672]
+                0.00    0.00     252/1707        luaK_exp2anyreg [98]
+                0.00    0.00     288/1707        discharge2reg [559]
+                0.00    0.00     288/1707        exp2reg [615]
+                0.00    0.00     288/1707        luaK_exp2nextreg [86]
+                0.00    0.00     393/1707        luaK_exp2RK [82]
+[57]     0.0    0.00    0.00    1707         luaK_dischargevars [57]
+                0.00    0.00     159/1677        lua_setupvalue [58]
+-----------------------------------------------
+                0.00    0.00       3/1677        codearith [470]
+                0.00    0.00       3/1677        subexpr [1450]
+                0.00    0.00       9/1677        luaK_setlist [176]
+                0.00    0.00      12/1677        codecomp [471]
+                0.00    0.00      12/1677        chunk [460]
+                0.00    0.00      12/1677        body [439]
+                0.00    0.00      15/1677        close_func [468]
+                0.00    0.00      30/1677        exp2reg [615]
+                0.00    0.00      39/1677        constructor [474]
+                0.00    0.00      42/1677        luaK_storevar [141]
+                0.00    0.00      54/1677        funcargs [672]
+                0.00    0.00      69/1677        discharge2reg [559]
+                0.00    0.00     114/1677        luaK_exp2RK [82]
+                0.00    0.00     159/1677        luaK_dischargevars [57]
+                0.00    0.00     162/1677        recfield [1275]
+                0.00    0.00     369/1677        luaK_stringK [84]
+                0.00    0.00     573/1677        luaK_code [867]
+[58]     0.0    0.00    0.00    1677         lua_setupvalue [58]
+-----------------------------------------------
+                0.00    0.00       3/1629        body [439]
+                0.00    0.00     174/1629        luaX_lookahead [95]
+                0.00    0.00     447/1629        llex [775]
+                0.00    0.00    1005/1629        luaX_next [63]
+[59]     0.0    0.00    0.00    1629         luaX_newstring [59]
+                0.00    0.00     450/2598        luaS_newlstr [56]
+                0.00    0.00     450/450         luaH_setstr [78]
+                0.00    0.00      15/72          luaC_step [123]
+-----------------------------------------------
+                0.00    0.00     109/1561        luaV_execute <cycle 3> [183]
+                0.00    0.00     630/1561        lua_settable [71]
+                0.00    0.00     822/1561        lua_setfield <cycle 1> [66]
+[60]     0.0    0.00    0.00    1561         luaV_settable [60]
+                0.00    0.00    3740/11669       luaH_set [46]
+                0.00    0.00       3/30          luaT_gettm [150]
+-----------------------------------------------
+                0.00    0.00       9/1503        luaY_parser [164]
+                0.00    0.00      39/1503        assignment [414]
+                0.00    0.00      54/1503        body [439]
+                0.00    0.00     102/1503        chunk [460]
+                0.00    0.00     111/1503        funcargs [672]
+                0.00    0.00     156/1503        subexpr [1450]
+                0.00    0.00     222/1503        constructor [474]
+                0.00    0.00     228/1503        singlevaraux [1384]
+                0.00    0.00     258/1503        primaryexp [1225]
+                0.00    0.00     324/1503        recfield [1275]
+[61]     0.0    0.00    0.00    1503         luaO_chunkid [61]
+-----------------------------------------------
+                                  42             lua_insert <cycle 1> [142]
+                                  90             lua_rawset <cycle 1> [106]
+                                 126             lua_remove <cycle 1> [100]
+                                 260             lua_getfield <cycle 1> [88]
+                                 822             lua_setfield <cycle 1> [66]
+                0.00    0.00       3/550         nbLuaOpen <cycle 3> [242]
+                0.00    0.00       8/550         luaD_rawrunprotected <cycle 3> [158]
+                0.00    0.00      64/550         lua_rawseti [132]
+[62]     0.0    0.00    0.00    1415         mwRegisterTypes <cycle 1> [62]
+                                   3             lua_setfield <cycle 1> [66]
+                                   3             registerMilkywayMath <cycle 1> [199]
+                                   3             registerVector <cycle 1> [180]
+-----------------------------------------------
+                0.00    0.00       3/1179        luaY_parser [164]
+                0.00    0.00      30/1179        assignment [414]
+                0.00    0.00      45/1179        body [439]
+                0.00    0.00      51/1179        chunk [460]
+                0.00    0.00      78/1179        field [644]
+                0.00    0.00      81/1179        funcargs [672]
+                0.00    0.00     162/1179        str_checkname [1413]
+                0.00    0.00     162/1179        recfield [1275]
+                0.00    0.00     168/1179        primaryexp [1225]
+                0.00    0.00     177/1179        subexpr [1450]
+                0.00    0.00     222/1179        constructor [474]
+[63]     0.0    0.00    0.00    1179         luaX_next [63]
+                0.00    0.00    1005/1629        luaX_newstring [59]
+-----------------------------------------------
+                0.00    0.00     560/1158        sin_rn [76]
+                0.00    0.00     598/1158        cos_rn [72]
+[64]     0.0    0.00    0.00    1158         rem_pio2_scs [64]
+-----------------------------------------------
+                0.00    0.00      15/919         luaF_newLclosure [161]
+                0.00    0.00      15/919         luaF_newproto [162]
+                0.00    0.00     163/919         luaH_new [97]
+                0.00    0.00     726/919         luaF_newCclosure <cycle 2> [68]
+[65]     0.0    0.00    0.00     919         luaC_link [65]
+-----------------------------------------------
+                                   3             mwRegisterTypes <cycle 1> [62]
+                                  30             luaL_newmetatable <cycle 1> [149]
+                                 141             registerMilkywayMath <cycle 1> [199]
+                                 408             luaL_openlib <cycle 1> [124]
+                0.00    0.00       6/550         mwBindBOINCStatus [235]
+                0.00    0.00       6/550         luaopen_string [233]
+                0.00    0.00       9/550         nbLuaOpen <cycle 3> [242]
+                0.00    0.00      12/550         registerSphericalKinds [268]
+                0.00    0.00      15/550         nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00      15/550         nbRegisterUtilityFunctions [245]
+                0.00    0.00      15/550         registerUtilityFunctions [269]
+                0.00    0.00      18/550         luaopen_base [232]
+                0.00    0.00      21/550         registerModelFunctions [202]
+                0.00    0.00      21/550         registerDiskKinds [251]
+                0.00    0.00      24/550         registerDwarfKinds [253]
+                0.00    0.00      36/550         registerPredefinedModelGenerators [266]
+                0.00    0.00      42/550         registerHaloKinds [261]
+[66]     0.0    0.00    0.00     822         lua_setfield <cycle 1> [66]
+                0.00    0.00     822/2598        luaS_newlstr [56]
+                0.00    0.00     822/1561        luaV_settable [60]
+                                 822             mwRegisterTypes <cycle 1> [62]
+-----------------------------------------------
+                0.00    0.00     741/741         sweeplist [1451]
+[67]     0.0    0.00    0.00     741         luaF_freeclosure [67]
+-----------------------------------------------
+                                 726             lua_pushcclosure <cycle 2> [69]
+[68]     0.0    0.00    0.00     726         luaF_newCclosure <cycle 2> [68]
+                0.00    0.00     726/919         luaC_link [65]
+                                 726             luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                                  99             setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/6009        registerGenerateIsotropic [255]
+                0.00    0.00       3/6009        registerGenerateMixedDwarf [257]
+                0.00    0.00       3/6009        registerGenerateManualBodies [256]
+                0.00    0.00       3/6009        registerGeneratePlummer [259]
+                0.00    0.00       3/6009        registerGenerateNFW [258]
+                0.00    0.00       3/6009        registerGenerateHernq [254]
+                0.00    0.00       9/6009        mw_lua_openlibs <cycle 3> [241]
+                0.00    0.00      15/6009        registerUtilityFunctions [269]
+                0.00    0.00      15/6009        luaopen_base [232]
+                0.00    0.00      18/6009        nbRegisterUtilityFunctions [245]
+                0.00    0.00      24/6009        registerModelFunctions [202]
+                0.00    0.00      60/6009        registerStruct <cycle 1> [151]
+                0.00    0.00     102/6009        registerMilkywayMath <cycle 1> [199]
+                0.00    0.00     366/6009        luaL_openlib <cycle 1> [124]
+[69]     0.0    0.00    0.00     726         lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      24/72          luaC_step [123]
+                                 726             luaF_newCclosure <cycle 2> [68]
+-----------------------------------------------
+                0.00    0.00       1/721         readEnum [332]
+                0.00    0.00       3/721         nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00       3/721         doWithArgs [31]
+                0.00    0.00       9/721         mw_lua_openlibs <cycle 3> [241]
+                0.00    0.00     117/721         handleNamedArgumentTable [159]
+                0.00    0.00     588/721         registerStruct <cycle 1> [151]
+[70]     0.0    0.00    0.00     721         lua_pushstring [70]
+                0.00    0.00     721/2598        luaS_newlstr [56]
+                0.00    0.00      21/72          luaC_step [123]
+-----------------------------------------------
+                0.00    0.00      42/630         luaL_findtable <cycle 1> [113]
+                0.00    0.00     588/630         registerStruct <cycle 1> [151]
+[71]     0.0    0.00    0.00     630         lua_settable [71]
+                0.00    0.00     630/1561        luaV_settable [60]
+-----------------------------------------------
+                0.00    0.00       3/598         lbrToCartesian [303]
+                0.00    0.00       3/598         nbGetHistTrig [320]
+                0.00    0.00      37/598         nbVXVYVZtomuRA [33]
+                0.00    0.00     111/598         findLatUnitVec [145]
+                0.00    0.00     444/598         cartesianalign [99]
+[72]     0.0    0.00    0.00     598         cos_rn [72]
+                0.00    0.00     598/1158        rem_pio2_scs [64]
+-----------------------------------------------
+                0.00    0.00     588/588         registerStruct <cycle 1> [151]
+[73]     0.0    0.00    0.00     588         lua_pushlightuserdata [73]
+-----------------------------------------------
+                0.00    0.00       1/581         Xet_call [288]
+                0.00    0.00       1/581         readEnum [332]
+                0.00    0.00       2/581         nbSetup <cycle 3> [246]
+                0.00    0.00       2/581         createNBodyCtx [510]
+                0.00    0.00       2/581         createHistogramParams [506]
+                0.00    0.00       3/581         nbReadMinVersion [244]
+                0.00    0.00       3/581         luaopen_table [234]
+                0.00    0.00       6/581         luaopen_base [232]
+                0.00    0.00       8/581         luaL_checkudata [182]
+                0.00    0.00       9/581         luaopen_string [233]
+                0.00    0.00      30/581         luaL_newmetatable <cycle 1> [149]
+                0.00    0.00      42/581         luaL_findtable <cycle 1> [113]
+                0.00    0.00      42/581         luaL_openlib <cycle 1> [124]
+                0.00    0.00      66/581         readModels [333]
+                0.00    0.00      78/581         mw_lua_equal_userdata_name [1094]
+                0.00    0.00      90/581         registerStruct <cycle 1> [151]
+                0.00    0.00     196/581         handleNamedArgumentTable [159]
+[74]     0.0    0.00    0.00     581         lua_settop [74]
+-----------------------------------------------
+                0.00    0.00      48/571         mainposition [997]
+                0.00    0.00     523/571         setnodevector [1356]
+[75]     0.0    0.00    0.00     571         luaO_log2 [75]
+-----------------------------------------------
+                0.00    0.00       2/560         lbrToCartesian [303]
+                0.00    0.00       3/560         nbGetHistTrig [320]
+                0.00    0.00      37/560         nbVXVYVZtomuRA [33]
+                0.00    0.00      74/560         findLatUnitVec [145]
+                0.00    0.00     444/560         cartesianalign [99]
+[76]     0.0    0.00    0.00     560         sin_rn [76]
+                0.00    0.00     560/1158        rem_pio2_scs [64]
+-----------------------------------------------
+                0.00    0.00      93/470         luaV_execute <cycle 3> [183]
+                0.00    0.00     117/470         handleNamedArgumentTable [159]
+                0.00    0.00     260/470         lua_getfield <cycle 1> [88]
+[77]     0.0    0.00    0.00     470         luaV_gettable [77]
+                0.00    0.00     469/6189        luaH_get [50]
+                0.00    0.00       3/287         luaH_getnum [87]
+                0.00    0.00       1/31          luaH_getstr [147]
+                0.00    0.00       1/1           luaT_gettmbyobj [306]
+                0.00    0.00       1/1           luaU_header [307]
+-----------------------------------------------
+                0.00    0.00     450/450         luaX_newstring [59]
+[78]     0.0    0.00    0.00     450         luaH_setstr [78]
+                0.00    0.00     528/11669       luaH_set [46]
+-----------------------------------------------
+                0.00    0.00       1/423         mw_lua_typecheck [315]
+                0.00    0.00       1/423         indexHandler [302]
+                0.00    0.00       1/423         luaL_checktype [305]
+                0.00    0.00       2/423         nbEvaluateLikelihoodMethod [284]
+                0.00    0.00       2/423         nbGetPotentialTyped [321]
+                0.00    0.00       2/423         mw_lua_optboolean [282]
+                0.00    0.00       3/423         luaL_optlstring [221]
+                0.00    0.00       3/423         luaL_optinteger [220]
+                0.00    0.00       4/423         createHistogramParams [506]
+                0.00    0.00       6/423         luaL_checkany [189]
+                0.00    0.00      10/423         mw_lua_getglobalfunction [196]
+                0.00    0.00      30/423         luaL_newmetatable <cycle 1> [149]
+                0.00    0.00      42/423         luaL_openlib <cycle 1> [124]
+                0.00    0.00     126/423         luaL_findtable <cycle 1> [113]
+                0.00    0.00     190/423         handleNamedArgumentTable [159]
+[79]     0.0    0.00    0.00     423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       1/418         luaReverseOrbit [21]
+                0.00    0.00       1/418         luaCalculateTimestepPlummerTest [841]
+                0.00    0.00       1/418         luaLbrToCartesian [898]
+                0.00    0.00       1/418         createNBodyCtx [510]
+                0.00    0.00       1/418         createPotential [522]
+                0.00    0.00       1/418         readEnum [332]
+                0.00    0.00       2/418         nbGeneratePlummer [27]
+                0.00    0.00       2/418         nbEvaluateLikelihoodMethod [284]
+                0.00    0.00       2/418         nbEvaluateHistogramParams [34]
+                0.00    0.00       2/418         createHistogramParams [506]
+                0.00    0.00       2/418         createVector [527]
+                0.00    0.00       3/418         registerPredefinedModelGenerators [266]
+                0.00    0.00       3/418         registerHaloKinds [261]
+                0.00    0.00       3/418         registerDiskKinds [251]
+                0.00    0.00       3/418         registerSphericalKinds [268]
+                0.00    0.00       3/418         registerDwarfKinds [253]
+                0.00    0.00       3/418         createDSFMT [499]
+                0.00    0.00       4/418         nbSetup <cycle 3> [246]
+                0.00    0.00       6/418         luaD_precall <cycle 3> [26]
+                0.00    0.00      10/418         oneTableArgument [173]
+                0.00    0.00      60/418         registerStruct <cycle 1> [151]
+                0.00    0.00      66/418         readModels [333]
+                0.00    0.00     238/418         handleNamedArgumentTable [159]
+[80]     0.0    0.00    0.00     418         lua_gettop [80]
+-----------------------------------------------
+                0.00    0.00       1/418         indexHandler [302]
+                0.00    0.00       6/418         luaopen_base [232]
+                0.00    0.00       6/418         luaopen_string [233]
+                0.00    0.00      30/418         luaL_newmetatable <cycle 1> [149]
+                0.00    0.00      42/418         luaL_openlib <cycle 1> [124]
+                0.00    0.00      90/418         registerStruct <cycle 1> [151]
+                0.00    0.00     117/418         handleNamedArgumentTable [159]
+                0.00    0.00     126/418         luaL_findtable <cycle 1> [113]
+[81]     0.0    0.00    0.00     418         lua_pushvalue [81]
+-----------------------------------------------
+                0.00    0.00       6/414         codearith [470]
+                0.00    0.00       6/414         luaK_posfix [175]
+                0.00    0.00      12/414         codecomp [471]
+                0.00    0.00      12/414         luaK_prefix [168]
+                0.00    0.00      12/414         subexpr [1450]
+                0.00    0.00      42/414         luaK_indexed [139]
+                0.00    0.00     324/414         recfield [1275]
+[82]     0.0    0.00    0.00     414         luaK_exp2RK [82]
+                0.00    0.00     393/1707        luaK_dischargevars [57]
+                0.00    0.00     114/1677        lua_setupvalue [58]
+                0.00    0.00      21/42          luaK_setoneret [140]
+-----------------------------------------------
+                0.00    0.00     402/402         llex [775]
+[83]     0.0    0.00    0.00     402         luaX_lexerror [83]
+-----------------------------------------------
+                0.00    0.00       9/369         subexpr [1450]
+                0.00    0.00      12/369         chunk [460]
+                0.00    0.00      39/369         field [644]
+                0.00    0.00     147/369         primaryexp [1225]
+                0.00    0.00     162/369         recfield [1275]
+[84]     0.0    0.00    0.00     369         luaK_stringK [84]
+                0.00    0.00     369/1677        lua_setupvalue [58]
+-----------------------------------------------
+                0.00    0.00       8/365         luaL_checkudata [182]
+                0.00    0.00      78/365         mw_lua_equal_userdata_name [1094]
+                0.00    0.00     100/365         luaH_next [107]
+                0.00    0.00     179/365         luaH_get [50]
+[85]     0.0    0.00    0.00     365         luaO_rawequalObj [85]
+-----------------------------------------------
+                0.00    0.00      54/288         primaryexp [1225]
+                0.00    0.00      57/288         constructor [474]
+                0.00    0.00      84/288         funcargs [672]
+                0.00    0.00      93/288         luaK_exp2anyreg [98]
+[86]     0.0    0.00    0.00     288         luaK_exp2nextreg [86]
+                0.00    0.00     288/1707        luaK_dischargevars [57]
+-----------------------------------------------
+                0.00    0.00       3/287         luaV_gettable [77]
+                0.00    0.00      70/287         lua_rawgeti [126]
+                0.00    0.00      73/287         luaH_setnum [121]
+                0.00    0.00     141/287         luaH_set [46]
+[87]     0.0    0.00    0.00     287         luaH_getnum [87]
+-----------------------------------------------
+                                  30             luaL_newmetatable <cycle 1> [149]
+                                  42             luaL_openlib <cycle 1> [124]
+                0.00    0.00       2/550         nbEvaluateLikelihoodMethod [284]
+                0.00    0.00       2/550         createNBodyCtx [510]
+                0.00    0.00       2/550         createHistogramParams [506]
+                0.00    0.00       2/550         createVector [527]
+                0.00    0.00       3/550         nbReadMinVersion [244]
+                0.00    0.00       3/550         pushVector [247]
+                0.00    0.00       3/550         luaopen_string [233]
+                0.00    0.00       5/550         mw_lua_getglobalfunction [196]
+                0.00    0.00       8/550         luaL_checkudata [182]
+                0.00    0.00      78/550         mw_lua_equal_userdata_name [1094]
+                0.00    0.00      80/550         pushType [115]
+[88]     0.0    0.00    0.00     260         lua_getfield <cycle 1> [88]
+                0.00    0.00     260/2598        luaS_newlstr [56]
+                0.00    0.00     260/470         luaV_gettable [77]
+                                 260             mwRegisterTypes <cycle 1> [62]
+-----------------------------------------------
+                0.00    0.00       3/258         subexpr [1450]
+                0.00    0.00      39/258         constructor [474]
+                0.00    0.00      54/258         funcargs [672]
+                0.00    0.00     162/258         recfield [1275]
+[89]     0.0    0.00    0.00     258         luaK_codeABC [89]
+-----------------------------------------------
+                0.00    0.00     236/236         nbGeneratePlummer [27]
+[90]     0.0    0.00    0.00     236         mwRandomUnitPoint [90]
+                0.00    0.00       1/3           dsfmt_gen_rand_all [207]
+-----------------------------------------------
+                0.00    0.00       3/225         luaopen_string [233]
+                0.00    0.00       6/225         luaopen_base [232]
+                0.00    0.00      90/225         registerStruct <cycle 1> [151]
+                0.00    0.00     126/225         luaL_findtable <cycle 1> [113]
+[91]     0.0    0.00    0.00     225         lua_pushlstring [91]
+                0.00    0.00     225/2598        luaS_newlstr [56]
+                0.00    0.00       9/72          luaC_step [123]
+-----------------------------------------------
+                0.00    0.00      81/213         luaV_tonumber [114]
+                0.00    0.00     132/213         read_numeral [1271]
+[92]     0.0    0.00    0.00     213         luaO_str2d [92]
+-----------------------------------------------
+                0.00    0.00       3/207         new_localvar [1148]
+                0.00    0.00       3/207         body [439]
+                0.00    0.00      63/207         addk [392]
+                0.00    0.00     138/207         luaK_code [867]
+[93]     0.0    0.00    0.00     207         luaM_growaux_ [93]
+                0.00    0.00     207/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       1/180         invokeCallbacksPRE [738]
+                0.00    0.00       1/180         invokeCallbacksPOST [737]
+                0.00    0.00       1/180         poptGetContext [329]
+                0.00    0.00       1/180         poptFreeContext [327]
+                0.00    0.00      52/180         poptGetNextOpt [287]
+                0.00    0.00     124/180         findOption [646]
+[94]     0.0    0.00    0.00     180         dsfmt_chk_init_by_array [94]
+-----------------------------------------------
+                0.00    0.00     174/174         constructor [474]
+[95]     0.0    0.00    0.00     174         luaX_lookahead [95]
+                0.00    0.00     174/1629        luaX_newstring [59]
+-----------------------------------------------
+                0.00    0.00     163/163         sweeplist [1451]
+[96]     0.0    0.00    0.00     163         luaH_free [96]
+                0.00    0.00     317/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       6/163         f_luaopen [634]
+                0.00    0.00      15/163         open_func [1157]
+                0.00    0.00      18/163         luaV_execute <cycle 3> [183]
+                0.00    0.00     124/163         lua_createtable [101]
+[97]     0.0    0.00    0.00     163         luaH_new [97]
+                0.00    0.00     326/12146       luaS_newudata [45]
+                0.00    0.00     163/6009        luaM_realloc_ <cycle 2> [52]
+                0.00    0.00     163/919         luaC_link [65]
+-----------------------------------------------
+                0.00    0.00       3/159         codearith [470]
+                0.00    0.00       3/159         primaryexp [1225]
+                0.00    0.00       6/159         codecomp [471]
+                0.00    0.00       9/159         subexpr [1450]
+                0.00    0.00      39/159         field [644]
+                0.00    0.00      42/159         luaK_storevar [141]
+                0.00    0.00      57/159         recfield [1275]
+[98]     0.0    0.00    0.00     159         luaK_exp2anyreg [98]
+                0.00    0.00     252/1707        luaK_dischargevars [57]
+                0.00    0.00      93/288         luaK_exp2nextreg [86]
+-----------------------------------------------
+                0.00    0.00      74/148         nbVXVYVZtomuRA [33]
+                0.00    0.00      74/148         nbVXVYVZtomuDec [32]
+[99]     0.0    0.00    0.00     148         cartesianalign [99]
+                0.00    0.00     444/598         cos_rn [72]
+                0.00    0.00     444/560         sin_rn [76]
+-----------------------------------------------
+                                  42             luaL_openlib <cycle 1> [124]
+                                  84             luaL_findtable <cycle 1> [113]
+[100]    0.0    0.00    0.00     126         lua_remove <cycle 1> [100]
+                                 126             mwRegisterTypes <cycle 1> [62]
+-----------------------------------------------
+                0.00    0.00       1/124         nbGeneratePlummer [27]
+                0.00    0.00       3/124         registerPredefinedModelGenerators [266]
+                0.00    0.00       3/124         registerHaloKinds [261]
+                0.00    0.00       3/124         registerDiskKinds [251]
+                0.00    0.00       3/124         registerSphericalKinds [268]
+                0.00    0.00       3/124         registerDwarfKinds [253]
+                0.00    0.00       3/124         luaopen_base [232]
+                0.00    0.00       3/124         luaopen_string [233]
+                0.00    0.00      30/124         registerStruct <cycle 1> [151]
+                0.00    0.00      30/124         luaL_newmetatable <cycle 1> [149]
+                0.00    0.00      42/124         luaL_findtable <cycle 1> [113]
+[101]    0.0    0.00    0.00     124         lua_createtable [101]
+                0.00    0.00     124/163         luaH_new [97]
+-----------------------------------------------
+                0.00    0.00     117/117         handleNamedArgumentTable [159]
+[102]    0.0    0.00    0.00     117         lua_gettable [102]
+-----------------------------------------------
+                0.00    0.00       2/98          Xet_call [288]
+                0.00    0.00       4/98          expectType [200]
+                0.00    0.00       8/98          luaL_checkudata [182]
+                0.00    0.00      20/98          handleNamedArgumentTable [159]
+                0.00    0.00      64/98          mw_tonamedudata [133]
+[103]    0.0    0.00    0.00      98         lua_touserdata [103]
+-----------------------------------------------
+                0.00    0.00       1/92          setInitialNBodyState [334]
+                0.00    0.00       3/92          mwCallocA [236]
+                0.00    0.00      88/92          nbMakeTree [16]
+[104]    0.0    0.00    0.00      92         mwMallocA [104]
+-----------------------------------------------
+                0.00    0.00       2/91          createVector [527]
+                0.00    0.00       3/91          pushVector [247]
+                0.00    0.00       3/91          luaopen_base [232]
+                0.00    0.00       3/91          luaopen_string [233]
+                0.00    0.00      80/91          pushType [115]
+[105]    0.0    0.00    0.00      91         lua_setmetatable [105]
+-----------------------------------------------
+                                  90             registerStruct <cycle 1> [151]
+[106]    0.0    0.00    0.00      90         lua_rawset <cycle 1> [106]
+                0.00    0.00     252/11669       luaH_set [46]
+                                  90             mwRegisterTypes <cycle 1> [62]
+-----------------------------------------------
+                0.00    0.00      89/89          lua_next [108]
+[107]    0.0    0.00    0.00      89         luaH_next [107]
+                0.00    0.00     100/365         luaO_rawequalObj [85]
+                0.00    0.00      73/12146       luaS_newudata [45]
+-----------------------------------------------
+                0.00    0.00      89/89          handleNamedArgumentTable [159]
+[108]    0.0    0.00    0.00      89         lua_next [108]
+                0.00    0.00      89/89          luaH_next [107]
+-----------------------------------------------
+                0.00    0.00       8/86          luaL_checkudata [182]
+                0.00    0.00      78/86          mw_lua_equal_userdata_name [1094]
+[109]    0.0    0.00    0.00      86         lua_getmetatable [109]
+-----------------------------------------------
+                0.00    0.00       8/86          luaL_checkudata [182]
+                0.00    0.00      78/86          mw_lua_equal_userdata_name [1094]
+[110]    0.0    0.00    0.00      86         lua_rawequal [110]
+-----------------------------------------------
+                0.00    0.00       2/85          createVector [527]
+                0.00    0.00       3/85          pushVector [247]
+                0.00    0.00      80/85          pushType [115]
+[111]    0.0    0.00    0.00      85         lua_newuserdata [111]
+                0.00    0.00      85/12146       luaS_newudata [45]
+-----------------------------------------------
+                0.00    0.00       1/85          indexHandler [302]
+                0.00    0.00      84/85          luaL_findtable <cycle 1> [113]
+[112]    0.0    0.00    0.00      85         lua_rawget [112]
+                0.00    0.00      85/6189        luaH_get [50]
+-----------------------------------------------
+                                  84             luaL_openlib <cycle 1> [124]
+[113]    0.0    0.00    0.00      84         luaL_findtable <cycle 1> [113]
+                0.00    0.00     126/418         lua_pushvalue [81]
+                0.00    0.00     126/225         lua_pushlstring [91]
+                0.00    0.00     126/423         lua_type [79]
+                0.00    0.00      84/85          lua_rawget [112]
+                0.00    0.00      42/581         lua_settop [74]
+                0.00    0.00      42/124         lua_createtable [101]
+                0.00    0.00      42/630         lua_settable [71]
+                                  84             lua_remove <cycle 1> [100]
+-----------------------------------------------
+                0.00    0.00       1/81          lua_tonumber [127]
+                0.00    0.00       6/81          lua_tointeger [171]
+                0.00    0.00      74/81          lua_isnumber [120]
+[114]    0.0    0.00    0.00      81         luaV_tonumber [114]
+                0.00    0.00      81/213         luaO_str2d [92]
+-----------------------------------------------
+                0.00    0.00       1/80          createNBodyCtx [510]
+                0.00    0.00       1/80          createNFWHalo [513]
+                0.00    0.00       1/80          createNoDisk [516]
+                0.00    0.00       1/80          createFreemanDisk [502]
+                0.00    0.00       1/80          createHernquistSpherical [505]
+                0.00    0.00       1/80          createPotential [522]
+                0.00    0.00       2/80          nbSetup <cycle 3> [246]
+                0.00    0.00       2/80          createHistogramParams [506]
+                0.00    0.00       3/80          createPlummerDwarf [519]
+                0.00    0.00       3/80          toStringDSFMT [1473]
+                0.00    0.00      64/80          nbGeneratePlummer [27]
+[115]    0.0    0.00    0.00      80         pushType [115]
+                0.00    0.00      80/85          lua_newuserdata [111]
+                0.00    0.00      80/550         lua_getfield <cycle 1> [88]
+                0.00    0.00      80/91          lua_setmetatable [105]
+-----------------------------------------------
+                0.00    0.00       4/78          expectType [200]
+                0.00    0.00      10/78          handleNamedArgumentTable [159]
+                0.00    0.00      64/78          mw_tonamedudata [133]
+[116]    0.0    0.00    0.00      78         cr_lgamma [116]
+-----------------------------------------------
+                0.00    0.00      78/78          constructor [474]
+[117]    0.0    0.00    0.00      78         luaO_int2fb [117]
+-----------------------------------------------
+                0.00    0.00       1/75          luaL_checklstring [304]
+                0.00    0.00      74/75          handleNamedArgumentTable [159]
+[118]    0.0    0.00    0.00      75         lua_tolstring [118]
+-----------------------------------------------
+                0.00    0.00      37/74          nbVXVYVZtomuRA [33]
+                0.00    0.00      37/74          nbVXVYVZtomuDec [32]
+[119]    0.0    0.00    0.00      74         cartesianToLbr_rad [119]
+-----------------------------------------------
+                0.00    0.00      74/74          handleNamedArgumentTable [159]
+[120]    0.0    0.00    0.00      74         lua_isnumber [120]
+                0.00    0.00      74/81          luaV_tonumber [114]
+-----------------------------------------------
+                0.00    0.00       9/73          luaV_execute <cycle 3> [183]
+                0.00    0.00      64/73          lua_rawseti [132]
+[121]    0.0    0.00    0.00      73         luaH_setnum [121]
+                0.00    0.00      73/287         luaH_getnum [87]
+-----------------------------------------------
+                0.00    0.00      73/73          handleNamedArgumentTable [159]
+[122]    0.0    0.00    0.00      73         lua_isstring [122]
+-----------------------------------------------
+                0.00    0.00       3/72          f_parser [635]
+                0.00    0.00       9/72          lua_pushlstring [91]
+                0.00    0.00      15/72          luaX_newstring [59]
+                0.00    0.00      21/72          lua_pushstring [70]
+                0.00    0.00      24/72          lua_pushcclosure <cycle 2> [69]
+[123]    0.0    0.00    0.00      72         luaC_step [123]
+                0.00    0.00    3270/3279        luaC_separateudata [55]
+                0.00    0.00     915/7365        luaF_getlocalname [49]
+-----------------------------------------------
+                                  60             registerStruct <cycle 1> [151]
+                0.00    0.00       3/550         luaopen_table [234]
+                0.00    0.00       3/550         luaopen_string [233]
+                0.00    0.00       6/550         luaopen_base [232]
+[124]    0.0    0.00    0.00      72         luaL_openlib <cycle 1> [124]
+                0.00    0.00     366/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      42/423         lua_type [79]
+                0.00    0.00      42/581         lua_settop [74]
+                0.00    0.00      42/418         lua_pushvalue [81]
+                                 408             lua_setfield <cycle 1> [66]
+                                  84             luaL_findtable <cycle 1> [113]
+                                  42             lua_getfield <cycle 1> [88]
+                                  42             lua_remove <cycle 1> [100]
+                                  42             lua_insert <cycle 1> [142]
+-----------------------------------------------
+                0.00    0.00       3/72          luaopen_table [234]
+                0.00    0.00       3/72          luaopen_string [233]
+                0.00    0.00       6/72          luaopen_base [232]
+                0.00    0.00      60/72          registerStruct <cycle 1> [151]
+[125]    0.0    0.00    0.00      72         luaL_register [125]
+-----------------------------------------------
+                0.00    0.00       6/70          handleNamedArgumentTable [159]
+                0.00    0.00      64/70          readModels [333]
+[126]    0.0    0.00    0.00      70         lua_rawgeti [126]
+                0.00    0.00      70/287         luaH_getnum [87]
+-----------------------------------------------
+                0.00    0.00       8/70          luaL_checknumber [181]
+                0.00    0.00      62/70          handleNamedArgumentTable [159]
+[127]    0.0    0.00    0.00      70         lua_tonumber [127]
+                0.00    0.00       1/81          luaV_tonumber [114]
+-----------------------------------------------
+                0.00    0.00      12/66          chunk [460]
+                0.00    0.00      54/66          funcargs [672]
+[128]    0.0    0.00    0.00      66         luaK_fixline [128]
+-----------------------------------------------
+                0.00    0.00      66/66          asin_rn [130]
+[129]    0.0    0.00    0.00      66         tanpi_rz [129]
+-----------------------------------------------
+                0.00    0.00      64/64          nbXYZToLambdaBeta [134]
+[130]    0.0    0.00    0.00      64         asin_rn [130]
+                0.00    0.00      66/66          tanpi_rz [129]
+-----------------------------------------------
+                0.00    0.00      64/64          readModels [333]
+[131]    0.0    0.00    0.00      64         expectBody [131]
+                0.00    0.00      64/64          mw_tonamedudata [133]
+-----------------------------------------------
+                0.00    0.00      64/64          nbGeneratePlummer [27]
+[132]    0.0    0.00    0.00      64         lua_rawseti [132]
+                0.00    0.00      64/550         mwRegisterTypes <cycle 1> [62]
+                0.00    0.00      64/73          luaH_setnum [121]
+-----------------------------------------------
+                0.00    0.00      64/64          expectBody [131]
+[133]    0.0    0.00    0.00      64         mw_tonamedudata [133]
+                0.00    0.00      64/98          lua_touserdata [103]
+                0.00    0.00      64/78          cr_lgamma [116]
+-----------------------------------------------
+                0.00    0.00      64/64          nbCreateHistogram [30]
+[134]    0.0    0.00    0.00      64         nbXYZToLambdaBeta [134]
+                0.00    0.00      64/64          asin_rn [130]
+-----------------------------------------------
+                0.00    0.00      64/64          nbGeneratePlummer [27]
+[135]    0.0    0.00    0.00      64         pushBody [135]
+-----------------------------------------------
+                0.00    0.00       1/59          luaCalculateTimestepPlummerTest [841]
+                0.00    0.00       1/59          getNumber [300]
+                0.00    0.00       3/59          registerHaloKinds [261]
+                0.00    0.00       3/59          registerDwarfKinds [253]
+                0.00    0.00       9/59          luaCalculateEps2Dwarf [37]
+                0.00    0.00      42/59          registerMilkywayMath <cycle 1> [199]
+[136]    0.0    0.00    0.00      59         lua_pushnumber [136]
+-----------------------------------------------
+                0.00    0.00       8/47          luaV_execute <cycle 3> [183]
+                0.00    0.00      39/47          luaD_precall <cycle 3> [26]
+[137]    0.0    0.00    0.00      47         luaD_poscall [137]
+-----------------------------------------------
+                0.00    0.00       3/45          constructor [474]
+                0.00    0.00       6/45          new_localvar [1148]
+                0.00    0.00      12/45          chunk [460]
+                0.00    0.00      24/45          funcargs [672]
+[138]    0.0    0.00    0.00      45         luaK_setreturns [138]
+-----------------------------------------------
+                0.00    0.00       3/42          primaryexp [1225]
+                0.00    0.00      39/42          field [644]
+[139]    0.0    0.00    0.00      42         luaK_indexed [139]
+                0.00    0.00      42/414         luaK_exp2RK [82]
+-----------------------------------------------
+                0.00    0.00      21/42          luaK_exp2RK [82]
+                0.00    0.00      21/42          assignment [414]
+[140]    0.0    0.00    0.00      42         luaK_setoneret [140]
+-----------------------------------------------
+                0.00    0.00      12/42          chunk [460]
+                0.00    0.00      30/42          assignment [414]
+[141]    0.0    0.00    0.00      42         luaK_storevar [141]
+                0.00    0.00      42/159         luaK_exp2anyreg [98]
+                0.00    0.00      42/1677        lua_setupvalue [58]
+-----------------------------------------------
+                                  42             luaL_openlib <cycle 1> [124]
+[142]    0.0    0.00    0.00      42         lua_insert <cycle 1> [142]
+                                  42             mwRegisterTypes <cycle 1> [62]
+-----------------------------------------------
+                0.00    0.00      37/37          nbCreateHistogram [30]
+[143]    0.0    0.00    0.00      37         calc_distance [143]
+-----------------------------------------------
+                0.00    0.00      37/37          nbCreateHistogram [30]
+[144]    0.0    0.00    0.00      37         calc_vLOS [144]
+-----------------------------------------------
+                0.00    0.00      37/37          nbVXVYVZtomuDec [32]
+[145]    0.0    0.00    0.00      37         findLatUnitVec [145]
+                0.00    0.00     111/598         cos_rn [72]
+                0.00    0.00      74/560         sin_rn [76]
+-----------------------------------------------
+                0.00    0.00      36/36          luaV_execute <cycle 3> [183]
+[146]    0.0    0.00    0.00      36         luaO_fb2int [146]
+-----------------------------------------------
+                0.00    0.00       1/31          luaV_gettable [77]
+                0.00    0.00      30/31          luaT_gettm [150]
+[147]    0.0    0.00    0.00      31         luaH_getstr [147]
+-----------------------------------------------
+                0.00    0.00       1/31          emdCalc [295]
+                0.00    0.00       2/31          nbResolveCheckpoint [286]
+                0.00    0.00       2/31          nbMatchEMD [38]
+                0.00    0.00       7/31          nbReadHistogram [323]
+                0.00    0.00      19/31          nbCreateHistogram [30]
+[148]    0.0    0.00    0.00      31         mwCalloc [148]
+-----------------------------------------------
+                                  30             registerStruct <cycle 1> [151]
+[149]    0.0    0.00    0.00      30         luaL_newmetatable <cycle 1> [149]
+                0.00    0.00      30/423         lua_type [79]
+                0.00    0.00      30/581         lua_settop [74]
+                0.00    0.00      30/124         lua_createtable [101]
+                0.00    0.00      30/418         lua_pushvalue [81]
+                                  30             lua_getfield <cycle 1> [88]
+                                  30             lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                0.00    0.00       3/30          luaV_settable [60]
+                0.00    0.00      12/30          propagatemark [1247]
+                0.00    0.00      15/30          luaC_separateudata [55]
+[150]    0.0    0.00    0.00      30         luaT_gettm [150]
+                0.00    0.00      30/31          luaH_getstr [147]
+-----------------------------------------------
+                                   3             registerVector <cycle 1> [180]
+                0.00    0.00       3/550         registerNBodyCtx [263]
+                0.00    0.00       3/550         registerBody [248]
+                0.00    0.00       3/550         registerHalo [260]
+                0.00    0.00       3/550         registerDisk [250]
+                0.00    0.00       3/550         registerSpherical [267]
+                0.00    0.00       3/550         registerDwarf [252]
+                0.00    0.00       3/550         registerPotential [265]
+                0.00    0.00       3/550         registerHistogramParams [262]
+                0.00    0.00       3/550         registerDSFMT [249]
+[151]    0.0    0.00    0.00      30         registerStruct <cycle 1> [151]
+                0.00    0.00     588/721         lua_pushstring [70]
+                0.00    0.00     588/588         lua_pushlightuserdata [73]
+                0.00    0.00     588/630         lua_settable [71]
+                0.00    0.00      90/581         lua_settop [74]
+                0.00    0.00      90/225         lua_pushlstring [91]
+                0.00    0.00      90/418         lua_pushvalue [81]
+                0.00    0.00      60/72          luaL_register [125]
+                0.00    0.00      60/418         lua_gettop [80]
+                0.00    0.00      60/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      30/124         lua_createtable [101]
+                                  90             lua_rawset <cycle 1> [106]
+                                  60             luaL_openlib <cycle 1> [124]
+                                  30             luaL_newmetatable <cycle 1> [149]
+-----------------------------------------------
+                0.00    0.00      12/27          chunk [460]
+                0.00    0.00      15/27          close_func [468]
+[152]    0.0    0.00    0.00      27         luaK_ret [152]
+-----------------------------------------------
+                0.00    0.00       3/19          nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00      16/19          handleNamedArgumentTable [159]
+[153]    0.0    0.00    0.00      19         lua_pushnil [153]
+-----------------------------------------------
+                0.00    0.00      18/18          newkey [1149]
+[154]    0.0    0.00    0.00      18         luaC_barrierback [154]
+-----------------------------------------------
+                                   8             luaD_rawrunprotected <cycle 3> [158]
+                                   9             lua_call <cycle 3> [178]
+                0.00    0.00       1/11          callTMres [35]
+[155]    0.0    0.00    0.00      18         luaD_call <cycle 3> [155]
+                                  18             luaD_precall <cycle 3> [26]
+                                   8             luaV_execute <cycle 3> [183]
+-----------------------------------------------
+                0.00    0.00       6/18          codecomp [471]
+                0.00    0.00      12/18          exp2reg [615]
+[156]    0.0    0.00    0.00      18         luaK_concat [156]
+-----------------------------------------------
+                0.00    0.00       3/18          chunk [460]
+                0.00    0.00       3/18          assignment [414]
+                0.00    0.00      12/18          body [439]
+[157]    0.0    0.00    0.00      18         luaK_reserveregs [157]
+-----------------------------------------------
+                                   3             lua_newstate <cycle 3> [231]
+                                   3             lua_close <cycle 3> [229]
+                                  11             luaD_pcall <cycle 3> [170]
+[158]    0.0    0.00    0.00      17         luaD_rawrunprotected <cycle 3> [158]
+                0.00    0.00       8/550         mwRegisterTypes <cycle 1> [62]
+                0.00    0.00       6/15          luaY_parser [164]
+                0.00    0.00       3/3           luaC_callGCTM [213]
+                0.00    0.00       3/3           luaD_reallocstack [216]
+                                   8             luaD_call <cycle 3> [155]
+-----------------------------------------------
+                0.00    0.00       1/16          nbGeneratePlummer [27]
+                0.00    0.00       1/16          luaReverseOrbit [21]
+                0.00    0.00       1/16          createNBodyCtx [510]
+                0.00    0.00       1/16          createPotential [522]
+                0.00    0.00       2/16          createHistogramParams [506]
+                0.00    0.00      10/16          oneTableArgument [173]
+[159]    0.0    0.00    0.00      16         handleNamedArgumentTable [159]
+                0.00    0.00     238/418         lua_gettop [80]
+                0.00    0.00     196/581         lua_settop [74]
+                0.00    0.00     190/423         lua_type [79]
+                0.00    0.00     117/721         lua_pushstring [70]
+                0.00    0.00     117/418         lua_pushvalue [81]
+                0.00    0.00     117/470         luaV_gettable [77]
+                0.00    0.00     117/117         lua_gettable [102]
+                0.00    0.00      89/89          lua_next [108]
+                0.00    0.00      74/74          lua_isnumber [120]
+                0.00    0.00      74/75          lua_tolstring [118]
+                0.00    0.00      73/73          lua_isstring [122]
+                0.00    0.00      62/70          lua_tonumber [127]
+                0.00    0.00      20/98          lua_touserdata [103]
+                0.00    0.00      16/19          lua_pushnil [153]
+                0.00    0.00      10/78          cr_lgamma [116]
+                0.00    0.00       6/70          lua_rawgeti [126]
+                0.00    0.00       2/8           lua_toboolean [185]
+                0.00    0.00       2/6           lua_objlen [193]
+                0.00    0.00       2/11          lua_tointeger [171]
+-----------------------------------------------
+                0.00    0.00      15/15          sweeplist [1451]
+[160]    0.0    0.00    0.00      15         luaF_freeproto [160]
+                0.00    0.00      90/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       3/15          f_parser [635]
+                0.00    0.00      12/15          luaV_execute <cycle 3> [183]
+[161]    0.0    0.00    0.00      15         luaF_newLclosure [161]
+                0.00    0.00      15/6009        luaM_realloc_ <cycle 2> [52]
+                0.00    0.00      15/919         luaC_link [65]
+-----------------------------------------------
+                0.00    0.00      15/15          open_func [1157]
+[162]    0.0    0.00    0.00      15         luaF_newproto [162]
+                0.00    0.00      15/6009        luaM_realloc_ <cycle 2> [52]
+                0.00    0.00      15/919         luaC_link [65]
+-----------------------------------------------
+                0.00    0.00       3/15          f_luaopen [634]
+                0.00    0.00      12/15          luaS_newlstr [56]
+[163]    0.0    0.00    0.00      15         luaS_resize [163]
+                0.00    0.00      30/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       1/15          nbSetup <cycle 3> [246]
+                0.00    0.00       2/15          nbGetLikelihoodInfo [29]
+                0.00    0.00       3/15          f_parser [635]
+                0.00    0.00       3/15          f_luaopen [634]
+                0.00    0.00       6/15          luaD_rawrunprotected <cycle 3> [158]
+[164]    0.0    0.00    0.00      15         luaY_parser [164]
+                0.00    0.00       9/1503        luaO_chunkid [61]
+                0.00    0.00       3/2598        luaS_newlstr [56]
+                0.00    0.00       3/3           luaX_setinput [224]
+                0.00    0.00       3/1179        luaX_next [63]
+-----------------------------------------------
+                0.00    0.00      14/14          nbCreateHistogram [30]
+[165]    0.0    0.00    0.00      14         nbCalcDisp [165]
+-----------------------------------------------
+                0.00    0.00      12/12          first_derivative [208]
+[166]    0.0    0.00    0.00      12         get_potential [166]
+-----------------------------------------------
+                0.00    0.00      12/12          body [439]
+[167]    0.0    0.00    0.00      12         luaK_codeABx [167]
+-----------------------------------------------
+                0.00    0.00      12/12          subexpr [1450]
+[168]    0.0    0.00    0.00      12         luaK_prefix [168]
+                0.00    0.00      12/414         luaK_exp2RK [82]
+-----------------------------------------------
+                0.00    0.00      12/12          nbCreateHistogram [30]
+[169]    0.0    0.00    0.00      12         nbRemoveOutliers [169]
+-----------------------------------------------
+                                   3             luaD_protectedparser <cycle 3> [215]
+                                   8             lua_pcall <cycle 3> [184]
+[170]    0.0    0.00    0.00      11         luaD_pcall <cycle 3> [170]
+                                  11             luaD_rawrunprotected <cycle 3> [158]
+-----------------------------------------------
+                0.00    0.00       2/11          handleNamedArgumentTable [159]
+                0.00    0.00       9/11          luaL_checkinteger [177]
+[171]    0.0    0.00    0.00      11         lua_tointeger [171]
+                0.00    0.00       6/81          luaV_tonumber [114]
+-----------------------------------------------
+                0.00    0.00       4/10          checkDiskConstants [272]
+                0.00    0.00       6/10          checkSphericalConstants [204]
+[172]    0.0    0.00    0.00      10         mwCheckNormalPosNum [172]
+-----------------------------------------------
+                0.00    0.00       1/10          createNFWHalo [513]
+                0.00    0.00       1/10          createNoDisk [516]
+                0.00    0.00       1/10          createFreemanDisk [502]
+                0.00    0.00       1/10          createHernquistSpherical [505]
+                0.00    0.00       6/10          createPlummerDwarf [519]
+[173]    0.0    0.00    0.00      10         oneTableArgument [173]
+                0.00    0.00      10/418         lua_gettop [80]
+                0.00    0.00      10/16          handleNamedArgumentTable [159]
+-----------------------------------------------
+                0.00    0.00       9/9           subexpr [1450]
+[174]    0.0    0.00    0.00       9         luaK_infix [174]
+-----------------------------------------------
+                0.00    0.00       9/9           subexpr [1450]
+[175]    0.0    0.00    0.00       9         luaK_posfix [175]
+                0.00    0.00       6/414         luaK_exp2RK [82]
+-----------------------------------------------
+                0.00    0.00       9/9           constructor [474]
+[176]    0.0    0.00    0.00       9         luaK_setlist [176]
+                0.00    0.00       9/1677        lua_setupvalue [58]
+-----------------------------------------------
+                0.00    0.00       3/9           toStringDSFMT [1473]
+                0.00    0.00       6/9           luaCalculateEps2Dwarf [37]
+[177]    0.0    0.00    0.00       9         luaL_checkinteger [177]
+                0.00    0.00       9/11          lua_tointeger [171]
+-----------------------------------------------
+                                   9             mw_lua_openlibs <cycle 3> [241]
+[178]    0.0    0.00    0.00       9         lua_call <cycle 3> [178]
+                                   9             luaD_call <cycle 3> [155]
+-----------------------------------------------
+                0.00    0.00       9/9           nbOpenLuaStateWithScript <cycle 3> [243]
+[179]    0.0    0.00    0.00       9         lua_pushinteger [179]
+-----------------------------------------------
+                                   3             mwRegisterTypes <cycle 1> [62]
+                0.00    0.00       3/550         createDSFMT [499]
+                0.00    0.00       3/550         luaD_precall <cycle 3> [26]
+[180]    0.0    0.00    0.00       9         registerVector <cycle 1> [180]
+                                   3             registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       2/8           luaCalculateTimestepPlummerTest [841]
+                0.00    0.00       6/8           createVector [527]
+[181]    0.0    0.00    0.00       8         luaL_checknumber [181]
+                0.00    0.00       8/70          lua_tonumber [127]
+-----------------------------------------------
+                0.00    0.00       8/8           mw_checknamedudata [186]
+[182]    0.0    0.00    0.00       8         luaL_checkudata [182]
+                0.00    0.00       8/98          lua_touserdata [103]
+                0.00    0.00       8/86          lua_getmetatable [109]
+                0.00    0.00       8/550         lua_getfield <cycle 1> [88]
+                0.00    0.00       8/365         luaO_rawequalObj [85]
+                0.00    0.00       8/86          lua_rawequal [110]
+                0.00    0.00       8/581         lua_settop [74]
+-----------------------------------------------
+                                   8             luaD_call <cycle 3> [155]
+[183]    0.0    0.00    0.00       8         luaV_execute <cycle 3> [183]
+                0.00    0.00     109/1561        luaV_settable [60]
+                0.00    0.00      93/470         luaV_gettable [77]
+                0.00    0.00      36/36          luaO_fb2int [146]
+                0.00    0.00      18/163         luaH_new [97]
+                0.00    0.00      12/15          luaF_newLclosure [161]
+                0.00    0.00       9/73          luaH_setnum [121]
+                0.00    0.00       8/47          luaD_poscall [137]
+                0.00    0.00       3/11669       luaH_set [46]
+                0.00    0.00       3/3           luaH_resizearray [217]
+                                  29             luaD_precall <cycle 3> [26]
+-----------------------------------------------
+                                   3             nbSetup <cycle 3> [246]
+                0.00    0.00       2/11          nbEvaluateHistogramParams [34]
+                0.00    0.00       3/11          doWithArgs [31]
+[184]    0.0    0.00    0.00       8         lua_pcall <cycle 3> [184]
+                                   8             luaD_pcall <cycle 3> [170]
+-----------------------------------------------
+                0.00    0.00       2/8           handleNamedArgumentTable [159]
+                0.00    0.00       6/8           luaB_assert [804]
+[185]    0.0    0.00    0.00       8         lua_toboolean [185]
+-----------------------------------------------
+                0.00    0.00       2/8           luaLbrToCartesian [898]
+                0.00    0.00       6/8           luaCalculateEps2Dwarf [37]
+[186]    0.0    0.00    0.00       8         mw_checknamedudata [186]
+                0.00    0.00       8/8           luaL_checkudata [182]
+-----------------------------------------------
+                0.00    0.00       3/6           close_state [469]
+                0.00    0.00       3/6           lua_close <cycle 3> [229]
+[187]    0.0    0.00    0.00       6         luaF_close [187]
+-----------------------------------------------
+                0.00    0.00       6/6           lua_objlen [193]
+[188]    0.0    0.00    0.00       6         luaH_getn [188]
+-----------------------------------------------
+                0.00    0.00       6/6           luaB_assert [804]
+[189]    0.0    0.00    0.00       6         luaL_checkany [189]
+                0.00    0.00       6/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       6/6           luaD_precall <cycle 3> [26]
+[190]    0.0    0.00    0.00       6         luaL_newstate [190]
+-----------------------------------------------
+                0.00    0.00       3/6           inclinenumber [734]
+                0.00    0.00       3/6           luaZ_lookahead [226]
+[191]    0.0    0.00    0.00       6         luaZ_fill [191]
+                0.00    0.00       6/6           luaZ_openspace [192]
+-----------------------------------------------
+                0.00    0.00       6/6           luaZ_fill [191]
+[192]    0.0    0.00    0.00       6         luaZ_openspace [192]
+-----------------------------------------------
+                0.00    0.00       2/6           readModels [333]
+                0.00    0.00       2/6           createNBodyCtx [510]
+                0.00    0.00       2/6           handleNamedArgumentTable [159]
+[193]    0.0    0.00    0.00       6         lua_objlen [193]
+                0.00    0.00       6/6           luaH_getn [188]
+-----------------------------------------------
+                0.00    0.00       6/6           mwBindBOINCStatus [235]
+[194]    0.0    0.00    0.00       6         lua_pushboolean [194]
+-----------------------------------------------
+                0.00    0.00       5/5           checkNBodyCtxConstants [290]
+[195]    0.0    0.00    0.00       5         mwCheckNormalPosNumEps [195]
+-----------------------------------------------
+                0.00    0.00       2/5           nbEvaluateHistogramParams [34]
+                0.00    0.00       3/5           nbSetup <cycle 3> [246]
+[196]    0.0    0.00    0.00       5         mw_lua_getglobalfunction [196]
+                0.00    0.00      10/423         lua_type [79]
+                0.00    0.00       5/550         lua_getfield <cycle 1> [88]
+-----------------------------------------------
+                0.00    0.00       5/5           poptParseArgvString [198]
+[197]    0.0    0.00    0.00       5         poptDupArgv [197]
+-----------------------------------------------
+                0.00    0.00       5/5           poptCalculator [1192]
+[198]    0.0    0.00    0.00       5         poptParseArgvString [198]
+                0.00    0.00       5/5           poptDupArgv [197]
+-----------------------------------------------
+                                   3             mwRegisterTypes <cycle 1> [62]
+                0.00    0.00       2/550         luaD_precall <cycle 3> [26]
+[199]    0.0    0.00    0.00       5         registerMilkywayMath <cycle 1> [199]
+                0.00    0.00     102/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      42/59          lua_pushnumber [136]
+                                 141             lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                0.00    0.00       1/4           nbSetup <cycle 3> [246]
+                0.00    0.00       1/4           nbGetPotentialTyped [321]
+                0.00    0.00       2/4           nbEvaluateHistogramParams [34]
+[200]    0.0    0.00    0.00       4         expectType [200]
+                0.00    0.00       4/98          lua_touserdata [103]
+                0.00    0.00       4/78          cr_lgamma [116]
+-----------------------------------------------
+                0.00    0.00       1/4           mwGetForwardedArguments [312]
+                0.00    0.00       3/4           nbCalculateEps2_NEW [36]
+[201]    0.0    0.00    0.00       4         mwMalloc [201]
+-----------------------------------------------
+                0.00    0.00       1/4           luaD_precall <cycle 3> [26]
+                0.00    0.00       3/4           nbLuaOpen <cycle 3> [242]
+[202]    0.0    0.00    0.00       4         registerModelFunctions [202]
+                0.00    0.00      24/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      21/550         lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                0.00    0.00       1/3           luaReverseOrbit [21]
+                0.00    0.00       1/3           nbGetPotentialTyped [321]
+                0.00    0.00       1/3           createNFWHalo [513]
+[203]    0.0    0.00    0.00       3         checkHaloConstants [203]
+-----------------------------------------------
+                0.00    0.00       1/3           createHernquistSpherical [505]
+                0.00    0.00       2/3           checkPotentialConstants [274]
+[204]    0.0    0.00    0.00       3         checkSphericalConstants [204]
+                0.00    0.00       6/10          mwCheckNormalPosNum [172]
+-----------------------------------------------
+                                   3             nbOpenLuaStateWithScript <cycle 3> [243]
+[205]    0.0    0.00    0.00       3         dostringWithArgs <cycle 3> [205]
+                                   3             luaL_loadstring <cycle 3> [219]
+-----------------------------------------------
+                0.00    0.00       3/3           toStringDSFMT [1473]
+[206]    0.0    0.00    0.00       3         dsfmt_chk_init_gen_rand [206]
+-----------------------------------------------
+                0.00    0.00       1/3           mwRandomUnitPoint [90]
+                0.00    0.00       2/3           nbGeneratePlummer [27]
+[207]    0.0    0.00    0.00       3         dsfmt_gen_rand_all [207]
+-----------------------------------------------
+                0.00    0.00       3/3           nbCalculateEps2_NEW [36]
+[208]    0.0    0.00    0.00       3         first_derivative [208]
+                0.00    0.00      12/12          get_potential [166]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_precall <cycle 3> [26]
+[209]    0.0    0.00    0.00       3         getDwarfT [209]
+-----------------------------------------------
+                0.00    0.00       3/3           nbCalculateEps2_NEW [36]
+[210]    0.0    0.00    0.00       3         get_density [210]
+-----------------------------------------------
+                0.00    0.00       3/3           nbCalculateEps2_NEW [36]
+[211]    0.0    0.00    0.00       3         get_vel_disp_radius [211]
+-----------------------------------------------
+                0.00    0.00       3/3           addk [392]
+[212]    0.0    0.00    0.00       3         luaC_barrierf [212]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_rawrunprotected <cycle 3> [158]
+[213]    0.0    0.00    0.00       3         luaC_callGCTM [213]
+-----------------------------------------------
+                0.00    0.00       3/3           close_state [469]
+[214]    0.0    0.00    0.00       3         luaC_freeall [214]
+                0.00    0.00    1539/7365        luaF_getlocalname [49]
+-----------------------------------------------
+                                   3             lua_load <cycle 3> [230]
+[215]    0.0    0.00    0.00       3         luaD_protectedparser <cycle 3> [215]
+                0.00    0.00       3/6009        luaM_realloc_ <cycle 2> [52]
+                                   3             luaD_pcall <cycle 3> [170]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_rawrunprotected <cycle 3> [158]
+[216]    0.0    0.00    0.00       3         luaD_reallocstack [216]
+-----------------------------------------------
+                0.00    0.00       3/3           luaV_execute <cycle 3> [183]
+[217]    0.0    0.00    0.00       3         luaH_resizearray [217]
+-----------------------------------------------
+                0.00    0.00       3/3           primaryexp [1225]
+[218]    0.0    0.00    0.00       3         luaK_exp2val [218]
+-----------------------------------------------
+                                   3             dostringWithArgs <cycle 3> [205]
+[219]    0.0    0.00    0.00       3         luaL_loadstring <cycle 3> [219]
+                                   3             lua_load <cycle 3> [230]
+-----------------------------------------------
+                0.00    0.00       3/3           toStringDSFMT [1473]
+[220]    0.0    0.00    0.00       3         luaL_optinteger [220]
+                0.00    0.00       3/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       3/3           nbReadMinVersion [244]
+[221]    0.0    0.00    0.00       3         luaL_optlstring [221]
+                0.00    0.00       3/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       3/3           f_luaopen [634]
+[222]    0.0    0.00    0.00       3         luaT_init [222]
+                0.00    0.00      51/2598        luaS_newlstr [56]
+-----------------------------------------------
+                0.00    0.00       3/3           f_luaopen [634]
+[223]    0.0    0.00    0.00       3         luaX_init [223]
+                0.00    0.00      63/2598        luaS_newlstr [56]
+-----------------------------------------------
+                0.00    0.00       3/3           luaY_parser [164]
+[224]    0.0    0.00    0.00       3         luaX_setinput [224]
+                0.00    0.00       3/6009        luaM_realloc_ <cycle 2> [52]
+-----------------------------------------------
+                0.00    0.00       3/3           lua_load <cycle 3> [230]
+[225]    0.0    0.00    0.00       3         luaZ_init [225]
+-----------------------------------------------
+                0.00    0.00       3/3           f_parser [635]
+[226]    0.0    0.00    0.00       3         luaZ_lookahead [226]
+                0.00    0.00       3/6           luaZ_fill [191]
+-----------------------------------------------
+                0.00    0.00       3/3           mw_lua_newstate <cycle 3> [240]
+[227]    0.0    0.00    0.00       3         lua_atpanic [227]
+-----------------------------------------------
+                0.00    0.00       3/3           doWithArgs [31]
+[228]    0.0    0.00    0.00       3         lua_checkstack [228]
+-----------------------------------------------
+                                   1             nbSetup <cycle 3> [246]
+                0.00    0.00       2/11          nbGetLikelihoodInfo [29]
+[229]    0.0    0.00    0.00       3         lua_close <cycle 3> [229]
+                0.00    0.00       3/6           luaF_close [187]
+                0.00    0.00       3/3279        luaC_separateudata [55]
+                                   3             luaD_rawrunprotected <cycle 3> [158]
+-----------------------------------------------
+                                   3             luaL_loadstring <cycle 3> [219]
+[230]    0.0    0.00    0.00       3         lua_load <cycle 3> [230]
+                0.00    0.00       3/3           luaZ_init [225]
+                                   3             luaD_protectedparser <cycle 3> [215]
+-----------------------------------------------
+                                   3             mw_lua_newstate <cycle 3> [240]
+[231]    0.0    0.00    0.00       3         lua_newstate <cycle 3> [231]
+                0.00    0.00       3/6009        setModelTableItem <cycle 2> [51]
+                                   3             luaD_rawrunprotected <cycle 3> [158]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_precall <cycle 3> [26]
+[232]    0.0    0.00    0.00       3         luaopen_base [232]
+                0.00    0.00      18/550         lua_setfield <cycle 1> [66]
+                0.00    0.00      15/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00       6/418         lua_pushvalue [81]
+                0.00    0.00       6/581         lua_settop [74]
+                0.00    0.00       6/550         luaL_openlib <cycle 1> [124]
+                0.00    0.00       6/72          luaL_register [125]
+                0.00    0.00       6/225         lua_pushlstring [91]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/91          lua_setmetatable [105]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_precall <cycle 3> [26]
+[233]    0.0    0.00    0.00       3         luaopen_string [233]
+                0.00    0.00       9/581         lua_settop [74]
+                0.00    0.00       6/550         lua_setfield <cycle 1> [66]
+                0.00    0.00       6/418         lua_pushvalue [81]
+                0.00    0.00       3/550         luaL_openlib <cycle 1> [124]
+                0.00    0.00       3/72          luaL_register [125]
+                0.00    0.00       3/550         lua_getfield <cycle 1> [88]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/225         lua_pushlstring [91]
+                0.00    0.00       3/91          lua_setmetatable [105]
+-----------------------------------------------
+                0.00    0.00       3/3           luaD_precall <cycle 3> [26]
+[234]    0.0    0.00    0.00       3         luaopen_table [234]
+                0.00    0.00       3/581         lua_settop [74]
+                0.00    0.00       3/550         luaL_openlib <cycle 1> [124]
+                0.00    0.00       3/72          luaL_register [125]
+-----------------------------------------------
+                0.00    0.00       3/3           nbOpenLuaStateWithScript <cycle 3> [243]
+[235]    0.0    0.00    0.00       3         mwBindBOINCStatus [235]
+                0.00    0.00       6/6           lua_pushboolean [194]
+                0.00    0.00       6/550         lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                0.00    0.00       1/3           readModels [333]
+                0.00    0.00       2/3           setInitialNBodyState [334]
+[236]    0.0    0.00    0.00       3         mwCallocA [236]
+                0.00    0.00       3/92          mwMallocA [104]
+-----------------------------------------------
+                0.00    0.00       3/3           nbOpenLuaStateWithScript <cycle 3> [243]
+[237]    0.0    0.00    0.00       3         mwFreadFileWithSize [237]
+-----------------------------------------------
+                0.00    0.00       3/3           nbOpenLuaStateWithScript <cycle 3> [243]
+[238]    0.0    0.00    0.00       3         mwReadFile [238]
+-----------------------------------------------
+                0.00    0.00       3/3           nbOpenLuaStateWithScript <cycle 3> [243]
+[239]    0.0    0.00    0.00       3         mwReadFileResolved [239]
+-----------------------------------------------
+                                   3             nbLuaOpen <cycle 3> [242]
+[240]    0.0    0.00    0.00       3         mw_lua_newstate <cycle 3> [240]
+                0.00    0.00       3/3           lua_atpanic [227]
+                                   3             lua_newstate <cycle 3> [231]
+-----------------------------------------------
+                                   3             nbLuaOpen <cycle 3> [242]
+[241]    0.0    0.00    0.00       3         mw_lua_openlibs <cycle 3> [241]
+                0.00    0.00       9/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00       9/721         lua_pushstring [70]
+                                   9             lua_call <cycle 3> [178]
+-----------------------------------------------
+                                   3             nbOpenLuaStateWithScript <cycle 3> [243]
+[242]    0.0    0.00    0.00       3         nbLuaOpen <cycle 3> [242]
+                0.00    0.00       9/550         lua_setfield <cycle 1> [66]
+                0.00    0.00       3/3           registerHistogramParams [262]
+                0.00    0.00       3/3           registerNBodyTypes [264]
+                0.00    0.00       3/3           registerDSFMT [249]
+                0.00    0.00       3/550         mwRegisterTypes <cycle 1> [62]
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+                0.00    0.00       3/3           registerSphericalKinds [268]
+                0.00    0.00       3/3           registerDiskKinds [251]
+                0.00    0.00       3/3           registerHaloKinds [261]
+                0.00    0.00       3/3           registerDwarfKinds [253]
+                0.00    0.00       3/4           registerModelFunctions [202]
+                0.00    0.00       3/3           registerUtilityFunctions [269]
+                0.00    0.00       3/3           nbRegisterUtilityFunctions [245]
+                                   3             mw_lua_newstate <cycle 3> [240]
+                                   3             mw_lua_openlibs <cycle 3> [241]
+-----------------------------------------------
+                                   1             nbSetup <cycle 3> [246]
+                0.00    0.00       2/11          nbGetLikelihoodInfo [29]
+[243]    0.0    0.00    0.00       3         nbOpenLuaStateWithScript <cycle 3> [243]
+                0.00    0.00      15/550         lua_setfield <cycle 1> [66]
+                0.00    0.00       9/9           lua_pushinteger [179]
+                0.00    0.00       3/721         lua_pushstring [70]
+                0.00    0.00       3/19          lua_pushnil [153]
+                0.00    0.00       3/3           mwBindBOINCStatus [235]
+                0.00    0.00       3/3           mwFreadFileWithSize [237]
+                0.00    0.00       3/3           mwReadFile [238]
+                0.00    0.00       3/3           mwReadFileResolved [239]
+                0.00    0.00       3/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/3           nbReadMinVersion [244]
+                                   3             nbLuaOpen <cycle 3> [242]
+                                   3             dostringWithArgs <cycle 3> [205]
+-----------------------------------------------
+                0.00    0.00       3/3           nbOpenLuaStateWithScript <cycle 3> [243]
+[244]    0.0    0.00    0.00       3         nbReadMinVersion [244]
+                0.00    0.00       3/550         lua_getfield <cycle 1> [88]
+                0.00    0.00       3/3           luaL_optlstring [221]
+                0.00    0.00       3/581         lua_settop [74]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[245]    0.0    0.00    0.00       3         nbRegisterUtilityFunctions [245]
+                0.00    0.00      18/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      15/550         lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                                   2             luaD_precall <cycle 3> [26]
+                0.00    0.00       1/11          nbMain [13]
+[246]    0.0    0.00    0.00       3         nbSetup <cycle 3> [246]
+                0.00    0.00       4/418         lua_gettop [80]
+                0.00    0.00       3/5           mw_lua_getglobalfunction [196]
+                0.00    0.00       2/581         lua_settop [74]
+                0.00    0.00       2/80          pushType [115]
+                0.00    0.00       1/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       1/15          luaY_parser [164]
+                0.00    0.00       1/4           expectType [200]
+                0.00    0.00       1/1           expectNBodyCtx [296]
+                0.00    0.00       1/1           checkNBodyCtxConstants [290]
+                0.00    0.00       1/1           nbGetPotentialTyped [321]
+                0.00    0.00       1/1           pushNBodyCtx [330]
+                0.00    0.00       1/1           pushPotential [331]
+                0.00    0.00       1/1           readModels [333]
+                0.00    0.00       1/1           setInitialNBodyState [334]
+                0.00    0.00       1/1           nbCacheEps2Indices [317]
+                                   3             lua_pcall <cycle 3> [184]
+                                   1             nbOpenLuaStateWithScript <cycle 3> [243]
+                                   1             lua_close <cycle 3> [229]
+-----------------------------------------------
+                0.00    0.00       1/3           luaLbrToCartesian [898]
+                0.00    0.00       2/3           luaReverseOrbit [21]
+[247]    0.0    0.00    0.00       3         pushVector [247]
+                0.00    0.00       3/85          lua_newuserdata [111]
+                0.00    0.00       3/550         lua_getfield <cycle 1> [88]
+                0.00    0.00       3/91          lua_setmetatable [105]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[248]    0.0    0.00    0.00       3         registerBody [248]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[249]    0.0    0.00    0.00       3         registerDSFMT [249]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[250]    0.0    0.00    0.00       3         registerDisk [250]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[251]    0.0    0.00    0.00       3         registerDiskKinds [251]
+                0.00    0.00      21/550         lua_setfield <cycle 1> [66]
+                0.00    0.00      18/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/418         lua_gettop [80]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[252]    0.0    0.00    0.00       3         registerDwarf [252]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[253]    0.0    0.00    0.00       3         registerDwarfKinds [253]
+                0.00    0.00      24/550         lua_setfield <cycle 1> [66]
+                0.00    0.00      18/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/418         lua_gettop [80]
+                0.00    0.00       3/59          lua_pushnumber [136]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[254]    0.0    0.00    0.00       3         registerGenerateHernq [254]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[255]    0.0    0.00    0.00       3         registerGenerateIsotropic [255]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[256]    0.0    0.00    0.00       3         registerGenerateManualBodies [256]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[257]    0.0    0.00    0.00       3         registerGenerateMixedDwarf [257]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[258]    0.0    0.00    0.00       3         registerGenerateNFW [258]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerPredefinedModelGenerators [266]
+[259]    0.0    0.00    0.00       3         registerGeneratePlummer [259]
+                0.00    0.00       3/6009        lua_pushcclosure <cycle 2> [69]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[260]    0.0    0.00    0.00       3         registerHalo [260]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[261]    0.0    0.00    0.00       3         registerHaloKinds [261]
+                0.00    0.00      42/550         lua_setfield <cycle 1> [66]
+                0.00    0.00      36/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/418         lua_gettop [80]
+                0.00    0.00       3/59          lua_pushnumber [136]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[262]    0.0    0.00    0.00       3         registerHistogramParams [262]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[263]    0.0    0.00    0.00       3         registerNBodyCtx [263]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[264]    0.0    0.00    0.00       3         registerNBodyTypes [264]
+                0.00    0.00       3/3           registerBody [248]
+                0.00    0.00       3/3           registerNBodyCtx [263]
+                0.00    0.00       3/3           registerHalo [260]
+                0.00    0.00       3/3           registerDisk [250]
+                0.00    0.00       3/3           registerSpherical [267]
+                0.00    0.00       3/3           registerDwarf [252]
+                0.00    0.00       3/3           registerPotential [265]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[265]    0.0    0.00    0.00       3         registerPotential [265]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[266]    0.0    0.00    0.00       3         registerPredefinedModelGenerators [266]
+                0.00    0.00      36/550         lua_setfield <cycle 1> [66]
+                0.00    0.00      18/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/3           registerGeneratePlummer [259]
+                0.00    0.00       3/3           registerGenerateNFW [258]
+                0.00    0.00       3/3           registerGenerateHernq [254]
+                0.00    0.00       3/3           registerGenerateIsotropic [255]
+                0.00    0.00       3/3           registerGenerateMixedDwarf [257]
+                0.00    0.00       3/3           registerGenerateManualBodies [256]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/418         lua_gettop [80]
+-----------------------------------------------
+                0.00    0.00       3/3           registerNBodyTypes [264]
+[267]    0.0    0.00    0.00       3         registerSpherical [267]
+                0.00    0.00       3/550         registerStruct <cycle 1> [151]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[268]    0.0    0.00    0.00       3         registerSphericalKinds [268]
+                0.00    0.00      12/550         lua_setfield <cycle 1> [66]
+                0.00    0.00       9/6009        setModelTableItem <cycle 2> [51]
+                0.00    0.00       3/124         lua_createtable [101]
+                0.00    0.00       3/418         lua_gettop [80]
+-----------------------------------------------
+                0.00    0.00       3/3           nbLuaOpen <cycle 3> [242]
+[269]    0.0    0.00    0.00       3         registerUtilityFunctions [269]
+                0.00    0.00      15/6009        lua_pushcclosure <cycle 2> [69]
+                0.00    0.00      15/550         lua_setfield <cycle 1> [66]
+-----------------------------------------------
+                0.00    0.00       3/3           createPlummerDwarf [519]
+[270]    0.0    0.00    0.00       3         set_model_params [270]
+-----------------------------------------------
+                0.00    0.00       3/3           nbWriteCheckpointWithTmpFile [324]
+[271]    0.0    0.00    0.00       3         showNBodyLikelihoodMethod [271]
+-----------------------------------------------
+                0.00    0.00       2/2           checkPotentialConstants [274]
+[272]    0.0    0.00    0.00       2         checkDiskConstants [272]
+                0.00    0.00       4/10          mwCheckNormalPosNum [172]
+-----------------------------------------------
+                0.00    0.00       1/2           luaLbrToCartesian [898]
+                0.00    0.00       1/2           luaD_precall <cycle 3> [26]
+[273]    0.0    0.00    0.00       2         checkNBodyCtx [273]
+-----------------------------------------------
+                0.00    0.00       1/2           luaReverseOrbit [21]
+                0.00    0.00       1/2           nbGetPotentialTyped [321]
+[274]    0.0    0.00    0.00       2         checkPotentialConstants [274]
+                0.00    0.00       2/3           checkSphericalConstants [204]
+                0.00    0.00       2/2           checkDiskConstants [272]
+-----------------------------------------------
+                0.00    0.00       2/2           nbMain [13]
+[275]    0.0    0.00    0.00       2         destroyNBodyState [275]
+-----------------------------------------------
+                0.00    0.00       2/2           nbEvaluateHistogramParams [34]
+[276]    0.0    0.00    0.00       2         expectHistogramParams [276]
+-----------------------------------------------
+                0.00    0.00       2/2           luaD_precall <cycle 3> [26]
+[277]    0.0    0.00    0.00       2         getDiskT [277]
+-----------------------------------------------
+                0.00    0.00       2/2           luaD_precall <cycle 3> [26]
+[278]    0.0    0.00    0.00       2         getEMDRange [278]
+-----------------------------------------------
+                0.00    0.00       2/2           nbMain [13]
+[279]    0.0    0.00    0.00       2         mwGetTime [279]
+-----------------------------------------------
+                0.00    0.00       1/2           nbWriteFinalCheckpoint [325]
+                0.00    0.00       1/2           main [12]
+[280]    0.0    0.00    0.00       2         mwLocalTime [280]
+-----------------------------------------------
+                0.00    0.00       1/2           nbWriteHistogram [326]
+                0.00    0.00       1/2           nbReadHistogram [323]
+[281]    0.0    0.00    0.00       2         mwOpenResolved [281]
+-----------------------------------------------
+                0.00    0.00       2/2           luaLbrToCartesian [898]
+[282]    0.0    0.00    0.00       2         mw_lua_optboolean [282]
+                0.00    0.00       2/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       2/2           nbResolveCheckpoint [286]
+[283]    0.0    0.00    0.00       2         mw_resolve_filename [283]
+-----------------------------------------------
+                0.00    0.00       2/2           nbGetLikelihoodInfo [29]
+[284]    0.0    0.00    0.00       2         nbEvaluateLikelihoodMethod [284]
+                0.00    0.00       2/550         lua_getfield <cycle 1> [88]
+                0.00    0.00       2/418         lua_gettop [80]
+                0.00    0.00       2/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       1/2           nbReportResults.constprop.0 [28]
+                0.00    0.00       1/2           nbWriteHistogram [326]
+[285]    0.0    0.00    0.00       2         nbPrintHistogram [285]
+-----------------------------------------------
+                0.00    0.00       2/2           nbMain [13]
+[286]    0.0    0.00    0.00       2         nbResolveCheckpoint [286]
+                0.00    0.00       2/31          mwCalloc [148]
+                0.00    0.00       2/2           mw_resolve_filename [283]
+-----------------------------------------------
+                0.00    0.00       2/2           mwReadArguments [314]
+[287]    0.0    0.00    0.00       2         poptGetNextOpt [287]
+                0.00    0.00      52/180         dsfmt_chk_init_by_array [94]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[288]    0.0    0.00    0.00       1         Xet_call [288]
+                0.00    0.00       2/98          lua_touserdata [103]
+                0.00    0.00       1/581         lua_settop [74]
+                0.00    0.00       1/1           luaL_checktype [305]
+-----------------------------------------------
+                0.00    0.00       1/1           readEnum [332]
+[289]    0.0    0.00    0.00       1         checkEnum [289]
+                0.00    0.00       1/1           luaL_checklstring [304]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[290]    0.0    0.00    0.00       1         checkNBodyCtxConstants [290]
+                0.00    0.00       5/5           mwCheckNormalPosNumEps [195]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[291]    0.0    0.00    0.00       1         checkPotential [291]
+-----------------------------------------------
+                0.00    0.00       1/1           luaLbrToCartesian [898]
+[292]    0.0    0.00    0.00       1         checkVector [292]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[293]    0.0    0.00    0.00       1         crlibm_init [293]
+-----------------------------------------------
+                0.00    0.00       1/1           nbMain [13]
+[294]    0.0    0.00    0.00       1         dynamicalFriction_LMC [294]
+-----------------------------------------------
+                0.00    0.00       1/1           nbMatchEMD [38]
+[295]    0.0    0.00    0.00       1         emdCalc [295]
+                0.00    0.00       1/31          mwCalloc [148]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[296]    0.0    0.00    0.00       1         expectNBodyCtx [296]
+-----------------------------------------------
+                0.00    0.00       1/1           nbGetPotentialTyped [321]
+[297]    0.0    0.00    0.00       1         expectPotential [297]
+-----------------------------------------------
+                0.00    0.00       1/1           readModels [333]
+[298]    0.0    0.00    0.00       1         expectTable [298]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[299]    0.0    0.00    0.00       1         getHaloT [299]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[300]    0.0    0.00    0.00       1         getNumber [300]
+                0.00    0.00       1/59          lua_pushnumber [136]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[301]    0.0    0.00    0.00       1         getSphericalT [301]
+-----------------------------------------------
+                0.00    0.00       1/1           luaD_precall <cycle 3> [26]
+[302]    0.0    0.00    0.00       1         indexHandler [302]
+                0.00    0.00       1/418         lua_pushvalue [81]
+                0.00    0.00       1/85          lua_rawget [112]
+                0.00    0.00       1/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       1/1           luaLbrToCartesian [898]
+[303]    0.0    0.00    0.00       1         lbrToCartesian [303]
+                0.00    0.00       3/598         cos_rn [72]
+                0.00    0.00       2/560         sin_rn [76]
+-----------------------------------------------
+                0.00    0.00       1/1           checkEnum [289]
+[304]    0.0    0.00    0.00       1         luaL_checklstring [304]
+                0.00    0.00       1/75          lua_tolstring [118]
+-----------------------------------------------
+                0.00    0.00       1/1           Xet_call [288]
+[305]    0.0    0.00    0.00       1         luaL_checktype [305]
+                0.00    0.00       1/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       1/1           luaV_gettable [77]
+[306]    0.0    0.00    0.00       1         luaT_gettmbyobj [306]
+-----------------------------------------------
+                0.00    0.00       1/1           luaV_gettable [77]
+[307]    0.0    0.00    0.00       1         luaU_header [307]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[308]    0.0    0.00    0.00       1         mwBoincInit [308]
+-----------------------------------------------
+                0.00    0.00       1/1           nbReadHistogram [323]
+[309]    0.0    0.00    0.00       1         mwCountLinesInFile [309]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[310]    0.0    0.00    0.00       1         mwDisableErrorBoxes [310]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[311]    0.0    0.00    0.00       1         mwGetBoincNumCPU [311]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[312]    0.0    0.00    0.00       1         mwGetForwardedArguments [312]
+                0.00    0.00       1/4           mwMalloc [201]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteHistogram [326]
+[313]    0.0    0.00    0.00       1         mwLocalTimeFull [313]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[314]    0.0    0.00    0.00       1         mwReadArguments [314]
+                0.00    0.00       2/2           poptGetNextOpt [287]
+-----------------------------------------------
+                0.00    0.00       1/1           readModels [333]
+[315]    0.0    0.00    0.00       1         mw_lua_typecheck [315]
+                0.00    0.00       1/423         lua_type [79]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteCheckpointWithTmpFile [324]
+[316]    0.0    0.00    0.00       1         mw_rename [316]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[317]    0.0    0.00    0.00       1         nbCacheEps2Indices [317]
+-----------------------------------------------
+                0.00    0.00       1/1           createNBodyCtx [510]
+[318]    0.0    0.00    0.00       1         nbCorrectTimestep [318]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSystemLikelihood [39]
+[319]    0.0    0.00    0.00       1         nbCostComponent [319]
+-----------------------------------------------
+                0.00    0.00       1/1           nbCreateHistogram [30]
+[320]    0.0    0.00    0.00       1         nbGetHistTrig [320]
+                0.00    0.00       3/598         cos_rn [72]
+                0.00    0.00       3/560         sin_rn [76]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[321]    0.0    0.00    0.00       1         nbGetPotentialTyped [321]
+                0.00    0.00       2/423         lua_type [79]
+                0.00    0.00       1/4           expectType [200]
+                0.00    0.00       1/1           expectPotential [297]
+                0.00    0.00       1/3           checkHaloConstants [203]
+                0.00    0.00       1/2           checkPotentialConstants [274]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSystemLikelihood [39]
+[322]    0.0    0.00    0.00       1         nbLikelihood [322]
+-----------------------------------------------
+                0.00    0.00       1/1           nbReportResults.constprop.0 [28]
+[323]    0.0    0.00    0.00       1         nbReadHistogram [323]
+                0.00    0.00       7/31          mwCalloc [148]
+                0.00    0.00       1/2           mwOpenResolved [281]
+                0.00    0.00       1/1           mwCountLinesInFile [309]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteFinalCheckpoint [325]
+[324]    0.0    0.00    0.00       1         nbWriteCheckpointWithTmpFile [324]
+                0.00    0.00       3/3           showNBodyLikelihoodMethod [271]
+                0.00    0.00       1/1           mw_rename [316]
+-----------------------------------------------
+                0.00    0.00       1/1           nbRunSystemPlain [14]
+[325]    0.0    0.00    0.00       1         nbWriteFinalCheckpoint [325]
+                0.00    0.00       1/2           mwLocalTime [280]
+                0.00    0.00       1/1           nbWriteCheckpointWithTmpFile [324]
+-----------------------------------------------
+                0.00    0.00       1/1           nbReportResults.constprop.0 [28]
+[326]    0.0    0.00    0.00       1         nbWriteHistogram [326]
+                0.00    0.00       1/1           mwLocalTimeFull [313]
+                0.00    0.00       1/1           showBool [335]
+                0.00    0.00       1/1           showCriterionT [336]
+                0.00    0.00       1/1           showExternalPotentialType [337]
+                0.00    0.00       1/2           nbPrintHistogram [285]
+                0.00    0.00       1/2           mwOpenResolved [281]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[327]    0.0    0.00    0.00       1         poptFreeContext [327]
+                0.00    0.00       1/180         dsfmt_chk_init_by_array [94]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[328]    0.0    0.00    0.00       1         poptGetArgs [328]
+-----------------------------------------------
+                0.00    0.00       1/1           main [12]
+[329]    0.0    0.00    0.00       1         poptGetContext [329]
+                0.00    0.00       1/180         dsfmt_chk_init_by_array [94]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[330]    0.0    0.00    0.00       1         pushNBodyCtx [330]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[331]    0.0    0.00    0.00       1         pushPotential [331]
+-----------------------------------------------
+                0.00    0.00       1/1           createNBodyCtx [510]
+[332]    0.0    0.00    0.00       1         readEnum [332]
+                0.00    0.00       1/721         lua_pushstring [70]
+                0.00    0.00       1/418         lua_gettop [80]
+                0.00    0.00       1/1           checkEnum [289]
+                0.00    0.00       1/581         lua_settop [74]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[333]    0.0    0.00    0.00       1         readModels [333]
+                0.00    0.00      66/418         lua_gettop [80]
+                0.00    0.00      66/581         lua_settop [74]
+                0.00    0.00      64/70          lua_rawgeti [126]
+                0.00    0.00      64/64          expectBody [131]
+                0.00    0.00       2/6           lua_objlen [193]
+                0.00    0.00       1/1           mw_lua_typecheck [315]
+                0.00    0.00       1/1           expectTable [298]
+                0.00    0.00       1/3           mwCallocA [236]
+-----------------------------------------------
+                0.00    0.00       1/1           nbSetup <cycle 3> [246]
+[334]    0.0    0.00    0.00       1         setInitialNBodyState [334]
+                0.00    0.00       2/3           mwCallocA [236]
+                0.00    0.00       1/92          mwMallocA [104]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteHistogram [326]
+[335]    0.0    0.00    0.00       1         showBool [335]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteHistogram [326]
+[336]    0.0    0.00    0.00       1         showCriterionT [336]
+-----------------------------------------------
+                0.00    0.00       1/1           nbWriteHistogram [326]
+[337]    0.0    0.00    0.00       1         showExternalPotentialType [337]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2026 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [10] LMCAcceleration       [304] luaL_checklstring      [62] mwRegisterTypes
+ [288] Xet_call              [181] luaL_checknumber      [186] mw_checknamedudata
+   [5] __fentry__            [305] luaL_checktype        [196] mw_lua_getglobalfunction
+   [3] _mcount_private       [182] luaL_checkudata       [240] mw_lua_newstate
+ [130] asin_rn               [113] luaL_findtable        [241] mw_lua_openlibs
+  [23] atan2                 [219] luaL_loadstring       [282] mw_lua_optboolean
+ [143] calc_distance         [149] luaL_newmetatable     [315] mw_lua_typecheck
+ [144] calc_vLOS             [190] luaL_newstate         [316] mw_rename
+ [119] cartesianToLbr_rad    [124] luaL_openlib          [283] mw_resolve_filename
+  [99] cartesianalign        [220] luaL_optinteger       [133] mw_tonamedudata
+ [272] checkDiskConstants    [221] luaL_optlstring       [317] nbCacheEps2Indices
+ [289] checkEnum             [125] luaL_register          [44] nbCalcChisq
+ [203] checkHaloConstants     [93] luaM_growaux_         [165] nbCalcDisp
+ [273] checkNBodyCtx          [52] luaM_realloc_          [36] nbCalculateEps2_NEW
+ [290] checkNBodyCtxConstants [61] luaO_chunkid          [318] nbCorrectTimestep
+ [291] checkPotential        [146] luaO_fb2int           [319] nbCostComponent
+ [274] checkPotentialConstants [117] luaO_int2fb          [30] nbCreateHistogram
+ [204] checkSphericalConstants [75] luaO_log2             [34] nbEvaluateHistogramParams
+ [292] checkVector            [85] luaO_rawequalObj      [284] nbEvaluateLikelihoodMethod
+  [72] cos_rn                 [92] luaO_str2d              [9] nbExtAcceleration
+ [116] cr_lgamma              [56] luaS_newlstr           [27] nbGeneratePlummer
+ [293] crlibm_init            [45] luaS_newudata         [320] nbGetHistTrig
+ [275] destroyNBodyState     [163] luaS_resize            [29] nbGetLikelihoodInfo
+ [205] dostringWithArgs      [150] luaT_gettm            [321] nbGetPotentialTyped
+  [94] dsfmt_chk_init_by_array [306] luaT_gettmbyobj      [15] nbGravMap
+ [206] dsfmt_chk_init_gen_rand [222] luaT_init             [7] nbGravity (nbody_grav.c)
+ [207] dsfmt_gen_rand_all    [307] luaU_header           [322] nbLikelihood
+ [294] dynamicalFriction_LMC [183] luaV_execute          [242] nbLuaOpen
+ [295] emdCalc                [77] luaV_gettable          [13] nbMain
+  [43] equalNBodyCtx          [60] luaV_settable          [16] nbMakeTree
+   [6] exp_rn                [114] luaV_tonumber          [38] nbMatchEMD
+  [53] exp_td_accurate       [223] luaX_init             [243] nbOpenLuaStateWithScript
+ [131] expectBody             [83] luaX_lexerror         [285] nbPrintHistogram
+ [276] expectHistogramParams  [95] luaX_lookahead         [42] nbPrintReverseOrbit
+ [296] expectNBodyCtx         [59] luaX_newstring        [323] nbReadHistogram
+ [297] expectPotential        [63] luaX_next             [244] nbReadMinVersion
+ [298] expectTable           [224] luaX_setinput         [245] nbRegisterUtilityFunctions
+ [200] expectType            [164] luaY_parser           [169] nbRemoveOutliers
+ [145] findLatUnitVec        [191] luaZ_fill             [286] nbResolveCheckpoint
+ [208] first_derivative      [225] luaZ_init              [20] nbReverseOrbit
+ [277] getDiskT              [226] luaZ_lookahead         [14] nbRunSystemPlain
+ [209] getDwarfT             [192] luaZ_openspace        [246] nbSetup
+ [278] getEMDRange           [227] lua_atpanic            [17] nbStepSystemPlain
+ [299] getHaloT              [178] lua_call               [39] nbSystemLikelihood
+ [300] getNumber             [228] lua_checkstack         [48] nbTimeToCheckpoint
+ [301] getSphericalT         [229] lua_close              [32] nbVXVYVZtomuDec
+ [210] get_density           [101] lua_createtable        [33] nbVXVYVZtomuRA
+ [166] get_potential          [88] lua_getfield          [324] nbWriteCheckpointWithTmpFile
+ [211] get_vel_disp_radius   [109] lua_getmetatable      [325] nbWriteFinalCheckpoint
+  [18] hackCofM (nbody_tree.c) [102] lua_gettable        [326] nbWriteHistogram
+  [19] hackQuad (nbody_tree.c) [80] lua_gettop           [134] nbXYZToLambdaBeta
+ [159] handleNamedArgumentTable [142] lua_insert         [173] oneTableArgument
+ [302] indexHandler          [120] lua_isnumber           [47] p_accu
+ [303] lbrToCartesian        [122] lua_isstring          [197] poptDupArgv
+   [1] leg_pol (nbody_potential.c) [230] lua_load        [327] poptFreeContext
+   [2] log_rn                [231] lua_newstate          [328] poptGetArgs
+ [154] luaC_barrierback      [111] lua_newuserdata       [329] poptGetContext
+ [212] luaC_barrierf         [108] lua_next              [287] poptGetNextOpt
+ [213] luaC_callGCTM         [193] lua_objlen            [198] poptParseArgvString
+ [214] luaC_freeall          [184] lua_pcall              [11] pow_120
+  [65] luaC_link             [194] lua_pushboolean         [8] pow_exact_rn
+  [54] luaC_linkupval         [69] lua_pushcclosure        [4] pow_rn
+  [55] luaC_separateudata    [179] lua_pushinteger       [135] pushBody
+ [123] luaC_step              [73] lua_pushlightuserdata [330] pushNBodyCtx
+ [155] luaD_call              [91] lua_pushlstring       [331] pushPotential
+ [170] luaD_pcall            [153] lua_pushnil           [115] pushType
+ [137] luaD_poscall          [136] lua_pushnumber        [247] pushVector
+  [26] luaD_precall           [70] lua_pushstring        [332] readEnum
+ [215] luaD_protectedparser   [81] lua_pushvalue         [333] readModels
+ [158] luaD_rawrunprotected  [110] lua_rawequal          [248] registerBody
+ [216] luaD_reallocstack     [112] lua_rawget            [249] registerDSFMT
+ [187] luaF_close            [126] lua_rawgeti           [250] registerDisk
+  [67] luaF_freeclosure      [106] lua_rawset            [251] registerDiskKinds
+ [160] luaF_freeproto        [132] lua_rawseti           [252] registerDwarf
+  [49] luaF_getlocalname     [100] lua_remove            [253] registerDwarfKinds
+  [68] luaF_newCclosure       [66] lua_setfield          [254] registerGenerateHernq
+ [161] luaF_newLclosure      [105] lua_setmetatable      [255] registerGenerateIsotropic
+ [162] luaF_newproto          [71] lua_settable          [256] registerGenerateManualBodies
+  [96] luaH_free              [74] lua_settop            [257] registerGenerateMixedDwarf
+  [50] luaH_get               [58] lua_setupvalue        [258] registerGenerateNFW
+ [188] luaH_getn             [185] lua_toboolean         [259] registerGeneratePlummer
+  [87] luaH_getnum           [171] lua_tointeger         [260] registerHalo
+ [147] luaH_getstr           [118] lua_tolstring         [261] registerHaloKinds
+  [97] luaH_new              [127] lua_tonumber          [262] registerHistogramParams
+ [107] luaH_next             [103] lua_touserdata        [199] registerMilkywayMath
+ [217] luaH_resizearray       [79] lua_type              [202] registerModelFunctions
+  [46] luaH_set              [232] luaopen_base          [263] registerNBodyCtx
+ [121] luaH_setnum           [233] luaopen_string        [264] registerNBodyTypes
+  [78] luaH_setstr           [234] luaopen_table         [265] registerPotential
+  [89] luaK_codeABC          [235] mwBindBOINCStatus     [266] registerPredefinedModelGenerators
+ [167] luaK_codeABx          [308] mwBoincInit           [267] registerSpherical
+ [156] luaK_concat           [148] mwCalloc              [268] registerSphericalKinds
+  [57] luaK_dischargevars    [236] mwCallocA             [151] registerStruct
+  [82] luaK_exp2RK           [172] mwCheckNormalPosNum   [269] registerUtilityFunctions
+  [98] luaK_exp2anyreg       [195] mwCheckNormalPosNumEps [180] registerVector
+  [86] luaK_exp2nextreg      [309] mwCountLinesInFile     [64] rem_pio2_scs
+ [218] luaK_exp2val          [310] mwDisableErrorBoxes   [334] setInitialNBodyState
+ [128] luaK_fixline           [22] mwFixArgv              [51] setModelTableItem
+ [139] luaK_indexed          [237] mwFreadFileWithSize   [270] set_model_params
+ [174] luaK_infix            [311] mwGetBoincNumCPU      [335] showBool
+ [175] luaK_posfix           [312] mwGetForwardedArguments [336] showCriterionT
+ [168] luaK_prefix           [279] mwGetTime             [337] showExternalPotentialType
+ [157] luaK_reserveregs      [280] mwLocalTime           [271] showNBodyLikelihoodMethod
+ [152] luaK_ret              [313] mwLocalTimeFull        [76] sin_rn
+ [176] luaK_setlist          [201] mwMalloc              [129] tanpi_rz
+ [140] luaK_setoneret        [104] mwMallocA              [24] threadTree (nbody_tree.c)
+ [138] luaK_setreturns       [281] mwOpenResolved         [41] <cycle 1>
+ [141] luaK_storevar          [90] mwRandomUnitPoint      [40] <cycle 2>
+  [84] luaK_stringK          [314] mwReadArguments        [25] <cycle 3>
+ [189] luaL_checkany         [238] mwReadFile
+ [177] luaL_checkinteger     [239] mwReadFileResolved

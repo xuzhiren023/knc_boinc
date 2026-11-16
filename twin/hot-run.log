@@ -1,0 +1,19 @@
+Captured host x87 control word: 0x27f
+Disambiguated duplicate local symbols: 3
+function log_rn: 1333 instructions, 6 padding nops, 1 with two-cycle prefixes; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+validation: ok
+kernel is well-formed: 1 stream(s), normalized-records
+result: twin/hot/validate\result.json
+summary: twin/hot/validate\summary.md
+functional: functional_mismatch
+1 mismatch(es) against expected outputs; first: {"where": "ctx0.zmm0[0]", "got": "0x43c628b76e3a7b61", "want": "0x0000000000000000"}
+result: twin/hot/functional\result.json
+summary: twin/hot/functional\summary.md
+timing_prediction: functional_mismatch
+candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+result: twin/hot/simulate\result.json
+summary: twin/hot/simulate\summary.md
+analytical_bound: functional_mismatch
+candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+result: twin/hot/bounds\result.json
+summary: twin/hot/bounds\summary.md
