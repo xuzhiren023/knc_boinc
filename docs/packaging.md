@@ -129,7 +129,7 @@ launcher for a prepared task and uses the same built wrapper; it contacts the
 card only when the lead invokes it with
 real configuration.
 
-Before enabling work, resolve the task-contract limitation below. After that,
+Before enabling work, verify the remaining task-contract details below. After that,
 restart BOINC and inspect its event log for anonymous-platform recognition,
 missing files and version/platform errors. Limit the project to **one task at
 a time** in the owner's `app_config.xml` (`project_max_concurrent` 1); otherwise
@@ -144,20 +144,17 @@ applications. Keep backups until the client is working normally.
 
 ## Compatibility limits and owner risk
 
-**S2-02 is not yet a general server-task adapter.** It accepts no production
-command-line arguments, resolves fixed logical inputs `params.lua` and
-`input.hist`, fixes seed 670828913 and a configured body count, and returns
-`histogram.txt`, `nbody_stdout.txt`, and `nbody_stderr.txt`. The historical
-public task above uses different input names and passes per-task parameters;
-its input histogram even collides with the wrapper's output name. An
-app_info.xml cannot translate these inputs or preserve ignored scientific
-parameters. No file aliases, dummy task inputs or guessed arguments are added
-here. A current standard task's actual arguments, seed, logical inputs and
-required result/stderr mapping must be reconciled in the wrapper before a
-live production trial can be considered functional. No change to S2-02's
-science or task parsing is attempted in this packaging ticket.
+S2-04 adds task argument pass-through and file staging by the pinned option
+table; see [wrapper.md](wrapper.md) for the exact rules and limitations.
+Laptop tests cover a historical-forum-shaped command and the sample workunit
+with resolved input/output names. No scientific seed or Lua parameters are
+substituted for supplied task arguments. Current standard task arguments,
+logical file declarations and required result/stderr mapping still need a
+current task definition and an integration run. In particular the wrapper's
+captured logs use `nbody_stdout.txt` and `nbody_stderr.txt`; packaging alone
+cannot establish that these are the server's required results.
 
-Even with that adapter corrected, the server may refuse this anonymous
+The server may refuse this anonymous
 platform/version or the scientific validator may reject its results. The
 pinned 1.97 code is newer than advertised standard 1.96; patched standalone
 behavior, compiler numerics, remote checkpoints, stdout/stderr routing and

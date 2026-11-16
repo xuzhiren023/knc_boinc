@@ -65,7 +65,8 @@ int main(int argc, char** argv) {
         char command[4096];
         if (argc==4) {
             const char* fake=getenv("KNC_FAKE_CARD"); require(fake,"KNC_FAKE_CARD missing");
-            snprintf(command,sizeof(command),"\"%s\" --fake-card \"%s\"",argv[1],fake);
+            const char* task=getenv("KNC_TASK_ARGS");
+            snprintf(command,sizeof(command),"\"%s\" --fake-card \"%s\" %s",argv[1],fake,task?task:"");
         } else snprintf(command,sizeof(command),"\"%s\"",argv[1]);
         require(CreateProcessA(NULL, command, NULL, NULL, FALSE, CREATE_NO_WINDOW,
             NULL, NULL, &si, &pi), "CreateProcess");

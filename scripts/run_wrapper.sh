@@ -2,7 +2,7 @@
 # Lead's standalone wrapper launcher; real transport uses the slot config/key.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
-slot=${1:?usage: run_wrapper.sh SLOT [--fake-card DIR]}
+slot=${1:?usage: run_wrapper.sh SLOT [--fake-card DIR] [TASK_ARGS...]}
 shift
 slot=$(cd "$slot" && pwd)
 cd "$root"
