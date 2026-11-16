@@ -1,12 +1,14 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\bounds",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\bounds\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\bounds\\summary.md"
   },
   "assumptions": [
     "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
-    "OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged"
+    "OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged",
+    "bound under line_tracking: each line costs its cold level once and L1 afterwards (capacity and prefetch timing ignored)",
+    "memory concurrency bound: distinct missing lines x level latency / 8 outstanding misses per core; ignores the L2 hardware prefetcher"
   ],
   "calibration_status": {
     "held_out_validation_cases": 160,
@@ -73,21 +75,14 @@
       }
     }
   },
-  "engine_version": "0.3.1",
-  "error_details": "{\"first\": {\"got\": \"0x43c628b76e3a7b61\", \"want\": \"0x0000000000000000\", \"where\": \"ctx0.zmm0[0]\"}}",
+  "engine_version": "0.4.0",
   "functional_check": {
     "checked": 1,
-    "mismatches": [
-      {
-        "got": "0x43c628b76e3a7b61",
-        "want": "0x0000000000000000",
-        "where": "ctx0.zmm0[0]"
-      }
-    ],
-    "status": "mismatch"
+    "mismatches": [],
+    "status": "ok"
   },
   "input": {
-    "hash_sha256": "21e6c240e39d823a0019ef74adaa9bd1986b13581de0da085908f3500edfad9e",
+    "hash_sha256": "67c25b73695ea4aa61ecb2f5b6b56e171f6c94da497bf73b333a84f6c27d4211",
     "kernel": {
       "contexts": [
         0
@@ -128,7 +123,7 @@
         "description": "one log_rn call, first real small input"
       }
     },
-    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-kernel.json"
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-kernel.json"
   },
   "invocation": {
     "argv": [
@@ -142,13 +137,152 @@
       "--force"
     ],
     "command": "bounds",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
-  "message": "candidate produced wrong results (1 mismatches); its timing is not reported as a valid result",
-  "parameters_used": {},
-  "prediction": null,
+  "message": "trace lower bound: 2597 cycles (binding term: dependency_critical_path); conditional_bound",
+  "parameters_used": {
+    "core.min_issue_gap_same_context": {
+      "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+      "status": "documented",
+      "unit": "cycles between two issue events of one context",
+      "value": 2
+    },
+    "l1.accesses_per_cycle": {
+      "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+      "status": "documented",
+      "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+      "value": 1
+    },
+    "l1.outstanding_demand_misses_per_core": {
+      "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+      "status": "documented",
+      "unit": "cache lines",
+      "value": 8
+    },
+    "latency.l2_hit": {
+      "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 24
+    },
+    "latency.mask_op": {
+      "source": "S6-03 kand.lat 2.08 bounds it at <=2; 1 assumed like scalar",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 1
+    },
+    "latency.memory": {
+      "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+      "status": "derived",
+      "unit": "cycles",
+      "value": 328
+    },
+    "latency.scalar_alu": {
+      "source": "R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound)",
+      "status": "documented",
+      "unit": "cycles",
+      "value": 1
+    },
+    "latency.scalar_extend_extra": {
+      "source": "evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15.",
+      "status": "assumed",
+      "unit": "cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto",
+      "value": 0
+    },
+    "latency.scalar_load_l1": {
+      "source": "S6-03 l1.load_lat 3.03 (one thread)",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.vector_load_l1": {
+      "source": "S6-03 spill_reload.lat 12.11 = store-to-load path (7, from c9.memory.u1) + load-to-use; R08 documents 3 for vector loads",
+      "status": "derived",
+      "unit": "cycles, L1 hit plain vector load to dependent use",
+      "value": 5
+    },
+    "latency.x87_add": {
+      "source": "S6-03 x87_add.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_compare": {
+      "source": "assumed equal to the measured x87 add latency",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_control": {
+      "source": "prior from the published Pentium (P5) instruction timings (FLDCW 7 clocks; FNSTCW and FNSTSW are 2). Not measured on KNC; all three are charged the FLDCW value.",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 7
+    },
+    "latency.x87_move": {
+      "source": "evidence E (estimate), inferred: same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02), no KNC source for fld/fst/fxch/fldz; fld from memory uses the load latency instead",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_mul": {
+      "source": "S6-03 x87_mul.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "occupancy.x87_mul": {
+      "source": "S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core)",
+      "status": "measured",
+      "unit": "core cycles",
+      "value": 2
+    },
+    "pairing.v_eligible_classes": {
+      "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+      "status": "documented",
+      "unit": "instruction classes that may issue on the V pipe",
+      "value": [
+        "scalar_alu",
+        "scalar_rmw",
+        "scalar_load",
+        "scalar_store",
+        "branch",
+        "mask_op",
+        "vector_store",
+        "vector_packstore",
+        "prefetch_l1",
+        "prefetch_l2"
+      ]
+    }
+  },
+  "prediction": {
+    "binding_term": "dependency_critical_path",
+    "kind": "trace_lower_bound",
+    "lower_bound_cycles": 2597,
+    "per_context": {
+      "0": {
+        "critical_path_cycles": 2597,
+        "dynamic_instructions": 136,
+        "min_issue_events": 102,
+        "spacing_bound_cycles": 203
+      }
+    },
+    "result_class": {
+      "class": "conditional_bound",
+      "conditions": "valid under the model's resource and latency assumptions listed in 'assumptions'; a bound on this model, not a hardware guarantee"
+    },
+    "statement": "No schedule of these dynamic instructions on this core model can complete in fewer cycles than the largest term; the terms are independent optimistic constraints (issue slots, same-context spacing, resource occupancy, dependency chains, memory concurrency).",
+    "terms": {
+      "core_issue_events": 102,
+      "dependency_critical_path": 2597,
+      "l1_port": 33,
+      "memory_concurrency": 287,
+      "per_context_issue_spacing": 203,
+      "x87_unit_occupancy": 92
+    }
+  },
   "profile": {
     "calibration": {
       "held_out_validation_cases": 160,
@@ -238,12 +372,12 @@
     "synthetic": false,
     "version": "0.3.0"
   },
-  "python_execution_seconds": 0.7273,
+  "python_execution_seconds": 0.5217,
   "representation_evaluated": "normalized-records",
   "result_type": "analytical_bound",
   "scale": "core",
   "schema": "knc-twin.result/1",
-  "status": "functional_mismatch",
-  "timestamp_utc": "2026-11-16T05:56:56Z",
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:49:02Z",
   "unsupported": []
 }

@@ -1,17 +1,123 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\validate",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\validate\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\validate\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\validate",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\validate\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\validate\\summary.md"
   },
   "assumptions": [],
-  "calibration_status": null,
-  "engine_version": "0.3.1",
-  "error_details": "{\"callee\": \"fprintf\", \"instruction\": \"a42f4b2\"}",
+  "calibration_status": {
+    "held_out_validation_cases": 160,
+    "not_validated_shapes": {
+      "x87_sparse_rows_l1": {
+        "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+        "median_abs_error_pct": 16.0,
+        "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+        "worst_abs_error_pct": 17.9
+      }
+    },
+    "note": "Simulated/analytical outputs are model results, never native measurements. ",
+    "state": "imported_microbenchmarks_with_compiled_heldout_check",
+    "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+    "synthetic": false,
+    "validated_shapes": {
+      "l1_l2_dependent_loads": {
+        "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+        "median_abs_error_pct": 2.0,
+        "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+        "worst_abs_error_pct": 14.0
+      },
+      "l1_resident_stores_prefetch_pairing": {
+        "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+        "median_abs_error_pct": 2.0,
+        "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+        "worst_abs_error_pct": 12.0
+      },
+      "register_vector_chain_l1": {
+        "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+        "median_abs_error_pct": 1.0,
+        "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+        "worst_abs_error_pct": 11.0
+      },
+      "scalar_mask_l1": {
+        "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+        "median_abs_error_pct": 1.0,
+        "note": "scalar integer and mask chains, pairing, address-generation interlock",
+        "worst_abs_error_pct": 5.0
+      },
+      "x87_register_chain": {
+        "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+        "median_abs_error_pct": 1.0,
+        "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+        "worst_abs_error_pct": 3.0
+      },
+      "x87_row_loop_l1": {
+        "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+        "median_abs_error_pct": 2.9,
+        "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+        "worst_abs_error_pct": 3.8
+      },
+      "x87_sparse_rows_l2": {
+        "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+        "median_abs_error_pct": 3.7,
+        "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+        "worst_abs_error_pct": 6.6
+      },
+      "x87_sparse_rows_memory_stream": {
+        "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+        "median_abs_error_pct": 3.7,
+        "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+        "worst_abs_error_pct": 4.1
+      }
+    }
+  },
+  "engine_version": "0.4.0",
   "functional_check": {
     "status": "not_run"
   },
-  "input": null,
+  "input": {
+    "hash_sha256": "eb85ac7097225196e777bb5d71876e660372a5ce2f0d882d3731601a07cd00ae",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 203
+      },
+      "loop": null,
+      "name": "milkyway_nbody__nbGravity",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "one nbGravity call, first body of first small tree"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\kernel.json"
+  },
   "invocation": {
     "argv": [
       "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
@@ -24,21 +130,107 @@
       "--force"
     ],
     "command": "validate",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
-  "message": "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
+  "message": "kernel is well-formed: 1 stream(s), normalized-records",
   "prediction": null,
-  "profile": null,
-  "python_execution_seconds": 0.0998,
-  "representation_evaluated": null,
+  "profile": {
+    "calibration": {
+      "held_out_validation_cases": 160,
+      "not_validated_shapes": {
+        "x87_sparse_rows_l1": {
+          "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+          "median_abs_error_pct": 16.0,
+          "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+          "worst_abs_error_pct": 17.9
+        }
+      },
+      "state": "imported_microbenchmarks_with_compiled_heldout_check",
+      "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+      "validated_shapes": {
+        "l1_l2_dependent_loads": {
+          "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+          "median_abs_error_pct": 2.0,
+          "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+          "worst_abs_error_pct": 14.0
+        },
+        "l1_resident_stores_prefetch_pairing": {
+          "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+          "median_abs_error_pct": 2.0,
+          "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+          "worst_abs_error_pct": 12.0
+        },
+        "register_vector_chain_l1": {
+          "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+          "median_abs_error_pct": 1.0,
+          "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+          "worst_abs_error_pct": 11.0
+        },
+        "scalar_mask_l1": {
+          "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+          "median_abs_error_pct": 1.0,
+          "note": "scalar integer and mask chains, pairing, address-generation interlock",
+          "worst_abs_error_pct": 5.0
+        },
+        "x87_register_chain": {
+          "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+          "median_abs_error_pct": 1.0,
+          "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+          "worst_abs_error_pct": 3.0
+        },
+        "x87_row_loop_l1": {
+          "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+          "median_abs_error_pct": 2.9,
+          "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+          "worst_abs_error_pct": 3.8
+        },
+        "x87_sparse_rows_l2": {
+          "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+          "median_abs_error_pct": 3.7,
+          "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+          "worst_abs_error_pct": 6.6
+        },
+        "x87_sparse_rows_memory_stream": {
+          "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+          "median_abs_error_pct": 3.7,
+          "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+          "worst_abs_error_pct": 4.1
+        }
+      }
+    },
+    "chain": [
+      "knc-common",
+      "core-x100-measured",
+      "card-7120-measured"
+    ],
+    "hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
+    "id": "card-7120-measured",
+    "kind": "card",
+    "native_measurement_ids": [
+      "S6-03: card_run jobs claude-0380b2ec, claude-7191652b, claude-b1f534af (2026-11-06), .work/_shared/S6-03/knc-char.mic, median of five group medians, spread <2% unless starred",
+      "S8-01: .work/_shared/tmp/claude-s8-01/job1..job19 (2026-11-07/08), one launch each",
+      "S8-10 C11: .work/_shared/tmp/claude-s8-10-out/c11-*.out (2026-11-09), three launches",
+      "S8-12 reruns: .work/_shared/tmp/claude-s8-12/job{1..6}-*.out (2026-11-08)",
+      "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
+    ],
+    "parameter_status_counts": {
+      "assumed": 15,
+      "derived": 15,
+      "documented": 40,
+      "measured": 32,
+      "unknown": 5
+    },
+    "synthetic": false,
+    "version": "0.3.0"
+  },
+  "python_execution_seconds": 0.2024,
+  "representation_evaluated": "normalized-records",
   "result_type": "validation",
   "scale": null,
   "schema": "knc-twin.result/1",
-  "status": "unsupported",
-  "timestamp_utc": "2026-11-16T06:09:50Z",
-  "unsupported": [
-    "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
-  ]
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:52:45Z",
+  "unsupported": []
 }

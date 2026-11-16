@@ -1,5 +1,3 @@
 {
-  "blockers": [
-    "undeclared_callees: ['fprintf']"
-  ]
+  "blockers": []
 }

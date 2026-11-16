@@ -1,29 +1,23 @@
 {
   "artifacts": {
     "final_state": "twin\\log-cases\\fixed-2\\final-state.json",
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-2",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-2\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-2\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-cases\\fixed-2",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-cases\\fixed-2\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-cases\\fixed-2\\summary.md"
   },
   "assumptions": [
     "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
     "OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged"
   ],
   "calibration_status": null,
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "functional_check": {
     "checked": 1,
-    "mismatches": [
-      {
-        "got": "0x43c628b76e93346d",
-        "want": "0xbfe62e42fefa39ef",
-        "where": "ctx0.zmm0[0]"
-      }
-    ],
-    "status": "mismatch"
+    "mismatches": [],
+    "status": "ok"
   },
   "input": {
-    "hash_sha256": "5d5dd49bfe07527862805feab5a7bcaaba9e4eb9c8d02455483cab9a8b1e9688",
+    "hash_sha256": "e21fc0cf6118236cf4eb46a0a0fcd847cb461d6e6a43f742636df77f48af9975",
     "kernel": {
       "contexts": [
         0
@@ -64,7 +58,7 @@
         "description": "one log_rn call, first real small input"
       }
     },
-    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-2.json"
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-cases\\fixed-2.json"
   },
   "invocation": {
     "argv": [
@@ -77,19 +71,25 @@
       "--force"
     ],
     "command": "functional",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
-  "message": "1 mismatch(es) against expected outputs; first: {\"where\": \"ctx0.zmm0[0]\", \"got\": \"0x43c628b76e93346d\", \"want\": \"0xbfe62e42fefa39ef\"}",
-  "prediction": null,
+  "message": "executed 136 dynamic instructions; all 1 expected items match",
+  "prediction": {
+    "checked_items": 1,
+    "contexts": 1,
+    "dynamic_instructions": 136,
+    "functional_check_status": "ok",
+    "mismatches": 0
+  },
   "profile": null,
-  "python_execution_seconds": 1.3758,
+  "python_execution_seconds": 1.2259,
   "representation_evaluated": "normalized-records",
   "result_type": "functional",
   "scale": "region",
   "schema": "knc-twin.result/1",
-  "status": "functional_mismatch",
-  "timestamp_utc": "2026-11-16T06:13:51Z",
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:48:29Z",
   "unsupported": []
 }

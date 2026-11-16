@@ -1,4 +1,102 @@
 {
+  "loops": [
+    {
+      "address": 4214432,
+      "end_address": 4214558,
+      "instruction_count": 47,
+      "label": ".A_404ea0",
+      "summary": {
+        "complete": {
+          "functional": true,
+          "isa": true,
+          "parser": true,
+          "timing": true
+        },
+        "functional_exact": 47,
+        "instructions": 47,
+        "isa_known": 47,
+        "memory_records": 15,
+        "mnemonics_unknown": [],
+        "parser_ok": 47,
+        "timing_only_or_missing": [],
+        "timing_params_known": 47,
+        "unsupported": []
+      },
+      "unsupported": []
+    },
+    {
+      "address": 4214496,
+      "end_address": 4214637,
+      "instruction_count": 48,
+      "label": ".A_404ee0",
+      "summary": {
+        "complete": {
+          "functional": true,
+          "isa": true,
+          "parser": true,
+          "timing": true
+        },
+        "functional_exact": 48,
+        "instructions": 48,
+        "isa_known": 48,
+        "memory_records": 18,
+        "mnemonics_unknown": [],
+        "parser_ok": 48,
+        "timing_only_or_missing": [],
+        "timing_params_known": 48,
+        "unsupported": []
+      },
+      "unsupported": []
+    },
+    {
+      "address": 4214517,
+      "end_address": 4214839,
+      "instruction_count": 114,
+      "label": ".A_404ef5",
+      "summary": {
+        "complete": {
+          "functional": true,
+          "isa": true,
+          "parser": true,
+          "timing": true
+        },
+        "functional_exact": 114,
+        "instructions": 114,
+        "isa_known": 114,
+        "memory_records": 43,
+        "mnemonics_unknown": [],
+        "parser_ok": 114,
+        "timing_only_or_missing": [],
+        "timing_params_known": 114,
+        "unsupported": []
+      },
+      "unsupported": []
+    },
+    {
+      "address": 4214854,
+      "end_address": 4214980,
+      "instruction_count": 34,
+      "label": ".A_405046",
+      "summary": {
+        "complete": {
+          "functional": true,
+          "isa": true,
+          "parser": true,
+          "timing": true
+        },
+        "functional_exact": 34,
+        "instructions": 34,
+        "isa_known": 34,
+        "memory_records": 12,
+        "mnemonics_unknown": [],
+        "parser_ok": 34,
+        "timing_only_or_missing": [],
+        "timing_params_known": 34,
+        "unsupported": []
+      },
+      "unsupported": []
+    }
+  ],
   "provenance": {
     "adapter": "from_binary.py",
     "coverage": {
@@ -8,20 +106,18 @@
         "parser": true,
         "timing": true
       },
-      "functional_exact": 243,
-      "instructions": 243,
-      "isa_known": 243,
-      "memory_records": 96,
+      "functional_exact": 207,
+      "instructions": 207,
+      "isa_known": 207,
+      "memory_records": 78,
       "mnemonics_unknown": [],
-      "parser_ok": 243,
+      "parser_ok": 207,
       "timing_only_or_missing": [],
-      "timing_params_known": 243,
+      "timing_params_known": 207,
       "unsupported": []
     },
     "function": "nbGravity",
-    "included_callees": [
-      "nbReportTreeIncest"
-    ],
+    "included_callees": [],
     "layout": true,
     "live_in_registers_placeholders": [
       "r11",
@@ -31,22 +127,22 @@
       "rdx",
       "rsi"
     ],
-    "notes": [
-      "0x42f4b2: tail call to fprintf converted to call plus ret",
-      "0x42f4e2: tail call to fprintf converted to call plus ret"
-    ],
-    "padding_nops": 8,
-    "slow_prefix_instructions": 5,
-    "source_file": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\build\\card\\milkyway_nbody.mic",
-    "source_sha256": "fb6713b55f3752d361174c2d1328c9d636ed1f2bc9eb871f5371332b95b9a24b",
+    "loop": null,
+    "notes": [],
+    "padding_nops": 6,
+    "slow_prefix_instructions": 4,
+    "source_file": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\build\\card\\milkyway_nbody.mic",
+    "source_sha256": "391d7f0b41499ef8b55c614cdc4bd17e8e90436684459c263a0e2e1c89ac5ab6",
     "undeclared_callees": [
-      "fprintf"
+      "nbReportTreeIncest"
     ],
     "unresolved_symbols": []
   },
   "rows": [
     {
+      "address": 4214336,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e40",
       "isa": true,
@@ -54,11 +150,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "push rbx",
+      "text": "push   %rbx",
       "timing": true
     },
     {
+      "address": 4214337,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e41",
       "isa": true,
@@ -66,11 +164,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "sub {\"imm\": 80}, rsp",
+      "text": "sub    $0x50,%rsp",
       "timing": true
     },
     {
+      "address": 4214341,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e45",
       "isa": true,
@@ -78,11 +178,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov rdx, rbx",
+      "text": "mov    %rdx,%rbx",
       "timing": true
     },
     {
+      "address": 4214344,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e48",
       "isa": true,
@@ -90,11 +192,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"base\": \"rdx\"}, rdx",
+      "text": "mov    (%rdx),%rdx",
       "timing": true
     },
     {
+      "address": 4214347,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e4b",
       "isa": true,
@@ -102,11 +206,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov rdi, r8",
+      "text": "mov    %rdi,%r8",
       "timing": true
     },
     {
+      "address": 4214350,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e4e",
       "isa": true,
@@ -114,11 +220,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "test rdx, rdx",
+      "text": "test   %rdx,%rdx",
       "timing": true
     },
     {
+      "address": 4214353,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e51",
       "isa": true,
@@ -126,11 +234,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov rsi, rdi",
+      "text": "mov    %rsi,%rdi",
       "timing": true
     },
     {
+      "address": 4214356,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e54",
       "isa": true,
@@ -138,11 +248,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_405098",
+      "text": "je     405098 <nbGravity+0x258>",
       "timing": true
     },
     {
+      "address": 4214362,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e5a",
       "isa": true,
@@ -150,11 +262,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"base\": \"rcx\"}",
+      "text": "fldl   (%rcx)",
       "timing": true
     },
     {
+      "address": 4214364,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e5c",
       "isa": true,
@@ -162,11 +276,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"base\": \"rsi\"}, r10",
+      "text": "mov    (%rsi),%r10",
       "timing": true
     },
     {
+      "address": 4214367,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e5f",
       "isa": true,
@@ -174,11 +290,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 24, \"base\": \"rsp\"}",
+      "text": "fstpl  0x18(%rsp)",
       "timing": true
     },
     {
+      "address": 4214371,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e63",
       "isa": true,
@@ -186,11 +304,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 16, \"base\": \"rsi\"}, r9d",
+      "text": "mov    0x10(%rsi),%r9d",
       "timing": true
     },
     {
+      "address": 4214375,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e67",
       "isa": true,
@@ -198,11 +318,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 8, \"base\": \"rcx\"}",
+      "text": "fldl   0x8(%rcx)",
       "timing": true
     },
     {
+      "address": 4214378,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e6a",
       "isa": true,
@@ -210,11 +332,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 0}, {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "movq   $0x0,0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214387,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e73",
       "isa": true,
@@ -222,11 +346,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 32, \"base\": \"rsp\"}",
+      "text": "fstpl  0x20(%rsp)",
       "timing": true
     },
     {
+      "address": 4214391,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e77",
       "isa": true,
@@ -234,11 +360,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 0}, {\"base\": \"rsp\"}",
+      "text": "movq   $0x0,(%rsp)",
       "timing": true
     },
     {
+      "address": 4214399,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e7f",
       "isa": true,
@@ -246,11 +374,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 16, \"base\": \"rcx\"}",
+      "text": "fldl   0x10(%rcx)",
       "timing": true
     },
     {
+      "address": 4214402,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e82",
       "isa": true,
@@ -258,11 +388,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "xor r11d, r11d",
+      "text": "xor    %r11d,%r11d",
       "timing": true
     },
     {
+      "address": 4214405,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e85",
       "isa": true,
@@ -270,11 +402,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 40, \"base\": \"rsp\"}",
+      "text": "fstpl  0x28(%rsp)",
       "timing": true
     },
     {
+      "address": 4214409,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e89",
       "isa": true,
@@ -282,11 +416,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 24, \"base\": \"rsi\"}",
+      "text": "fldl   0x18(%rsi)",
       "timing": true
     },
     {
+      "address": 4214412,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e8c",
       "isa": true,
@@ -294,11 +430,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 96, \"base\": \"rcx\"}, esi",
+      "text": "mov    0x60(%rcx),%esi",
       "timing": true
     },
     {
+      "address": 4214415,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e8f",
       "isa": true,
@@ -306,11 +444,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 72, \"base\": \"rsp\"}",
+      "text": "fstpl  0x48(%rsp)",
       "timing": true
     },
     {
+      "address": 4214419,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e93",
       "isa": true,
@@ -318,11 +458,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fldz ",
+      "text": "fldz",
       "timing": true
     },
     {
+      "address": 4214421,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e95",
       "isa": true,
@@ -330,11 +472,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_404ef5",
+      "text": "jmp    404ef5 <nbGravity+0xb5>",
       "timing": true
     },
     {
+      "address": 4214423,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404e97",
       "isa": true,
@@ -342,11 +486,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nopw   0x0(%rax,%rax,1)",
       "timing": true
     },
     {
+      "address": 4214432,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ea0",
       "isa": true,
@@ -354,11 +500,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "cmp rdx, rcx",
+      "text": "cmp    %rdx,%rcx",
       "timing": true
     },
     {
+      "address": 4214435,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ea3",
       "isa": true,
@@ -366,11 +514,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_405070",
+      "text": "je     405070 <nbGravity+0x230>",
       "timing": true
     },
     {
+      "address": 4214441,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ea9",
       "isa": true,
@@ -378,11 +528,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 96, \"base\": \"rdx\"}, eax",
+      "text": "mov    0x60(%rdx),%eax",
       "timing": true
     },
     {
+      "address": 4214444,
       "class": "scalar_imul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eac",
       "isa": true,
@@ -390,11 +542,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "imul r9d, eax",
+      "text": "imul   %r9d,%eax",
       "timing": true
     },
     {
+      "address": 4214448,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eb0",
       "isa": true,
@@ -402,11 +556,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "add esi, eax",
+      "text": "add    %esi,%eax",
       "timing": true
     },
     {
+      "address": 4214450,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eb2",
       "isa": true,
@@ -414,11 +570,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "cltq ",
+      "text": "cltq",
       "timing": true
     },
     {
+      "address": 4214452,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eb4",
       "isa": true,
@@ -426,11 +584,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"base\": \"r10\", \"index\": \"rax\", \"scale\": 8}",
+      "text": "faddl  (%r10,%rax,8)",
       "timing": true
     },
     {
+      "address": 4214456,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eb8",
       "isa": true,
@@ -438,11 +598,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(0)",
+      "text": "fld    %st(0)",
       "timing": true
     },
     {
+      "address": 4214458,
       "class": "x87_sqrt",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eba",
       "isa": true,
@@ -450,11 +612,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fsqrt ",
+      "text": "fsqrt",
       "timing": true
     },
     {
+      "address": 4214460,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ebc",
       "isa": true,
@@ -462,11 +626,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fdivrl {\"disp\": 40, \"base\": \"rdx\"}",
+      "text": "fdivrl 0x28(%rdx)",
       "timing": true
     },
     {
+      "address": 4214463,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ebf",
       "isa": true,
@@ -474,11 +640,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fdivp st, st(1)",
+      "text": "fdivp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214465,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ec1",
       "isa": true,
@@ -486,11 +654,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st, st(3)",
+      "text": "fmul   %st,%st(3)",
       "timing": true
     },
     {
+      "address": 4214467,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ec3",
       "isa": true,
@@ -498,11 +668,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fxch st(4)",
+      "text": "fxch   %st(4)",
       "timing": true
     },
     {
+      "address": 4214469,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ec5",
       "isa": true,
@@ -510,11 +682,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(3)",
+      "text": "faddp  %st,%st(3)",
       "timing": true
     },
     {
+      "address": 4214471,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ec7",
       "isa": true,
@@ -522,11 +696,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fxch st(1)",
+      "text": "fxch   %st(1)",
       "timing": true
     },
     {
+      "address": 4214473,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ec9",
       "isa": true,
@@ -534,11 +710,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(3), st",
+      "text": "fmul   %st(3),%st",
       "timing": true
     },
     {
+      "address": 4214475,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ecb",
       "isa": true,
@@ -546,11 +724,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"base\": \"rsp\"}",
+      "text": "faddl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214478,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ece",
       "isa": true,
@@ -558,11 +738,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"base\": \"rsp\"}",
+      "text": "fstpl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214481,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ed1",
       "isa": true,
@@ -570,11 +752,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmulp st, st(2)",
+      "text": "fmulp  %st,%st(2)",
       "timing": true
     },
     {
+      "address": 4214483,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ed3",
       "isa": true,
@@ -582,11 +766,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fxch st(1)",
+      "text": "fxch   %st(1)",
       "timing": true
     },
     {
+      "address": 4214485,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ed5",
       "isa": true,
@@ -594,11 +780,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "faddl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214489,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ed9",
       "isa": true,
@@ -606,11 +794,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "fstpl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214493,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404edd",
       "isa": true,
@@ -618,11 +808,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_404ee8",
+      "text": "jmp    404ee8 <nbGravity+0xa8>",
       "timing": true
     },
     {
+      "address": 4214495,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404edf",
       "isa": true,
@@ -630,11 +822,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nop",
       "timing": true
     },
     {
+      "address": 4214496,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ee0",
       "isa": true,
@@ -642,11 +836,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214498,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ee2",
       "isa": true,
@@ -654,11 +850,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214500,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ee4",
       "isa": true,
@@ -666,11 +864,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214502,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ee6",
       "isa": true,
@@ -678,11 +878,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214504,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ee8",
       "isa": true,
@@ -690,11 +892,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 32, \"base\": \"rdx\"}, rdx",
+      "text": "mov    0x20(%rdx),%rdx",
       "timing": true
     },
     {
+      "address": 4214508,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eec",
       "isa": true,
@@ -702,11 +906,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "test rdx, rdx",
+      "text": "test   %rdx,%rdx",
       "timing": true
     },
     {
+      "address": 4214511,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eef",
       "isa": true,
@@ -714,11 +920,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_40503d",
+      "text": "je     40503d <nbGravity+0x1fd>",
       "timing": true
     },
     {
+      "address": 4214517,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ef5",
       "isa": true,
@@ -726,11 +934,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 24, \"base\": \"rsp\"}",
+      "text": "fldl   0x18(%rsp)",
       "timing": true
     },
     {
+      "address": 4214521,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ef9",
       "isa": true,
@@ -738,11 +948,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fsubrl {\"base\": \"rdx\"}",
+      "text": "fsubrl (%rdx)",
       "timing": true
     },
     {
+      "address": 4214523,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404efb",
       "isa": true,
@@ -750,11 +962,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 32, \"base\": \"rsp\"}",
+      "text": "fldl   0x20(%rsp)",
       "timing": true
     },
     {
+      "address": 4214527,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404eff",
       "isa": true,
@@ -762,11 +976,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fsubrl {\"disp\": 8, \"base\": \"rdx\"}",
+      "text": "fsubrl 0x8(%rdx)",
       "timing": true
     },
     {
+      "address": 4214530,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f02",
       "isa": true,
@@ -774,11 +990,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 40, \"base\": \"rsp\"}",
+      "text": "fldl   0x28(%rsp)",
       "timing": true
     },
     {
+      "address": 4214534,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f06",
       "isa": true,
@@ -786,11 +1004,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fsubrl {\"disp\": 16, \"base\": \"rdx\"}",
+      "text": "fsubrl 0x10(%rdx)",
       "timing": true
     },
     {
+      "address": 4214537,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f09",
       "isa": true,
@@ -798,11 +1018,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(1)",
+      "text": "fld    %st(1)",
       "timing": true
     },
     {
+      "address": 4214539,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f0b",
       "isa": true,
@@ -810,11 +1032,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(2), st",
+      "text": "fmul   %st(2),%st",
       "timing": true
     },
     {
+      "address": 4214541,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f0d",
       "isa": true,
@@ -822,11 +1046,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(3)",
+      "text": "fld    %st(3)",
       "timing": true
     },
     {
+      "address": 4214543,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f0f",
       "isa": true,
@@ -834,11 +1060,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214545,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f11",
       "isa": true,
@@ -846,11 +1074,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214547,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f13",
       "isa": true,
@@ -858,11 +1088,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(1)",
+      "text": "fld    %st(1)",
       "timing": true
     },
     {
+      "address": 4214549,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f15",
       "isa": true,
@@ -870,11 +1102,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(2), st",
+      "text": "fmul   %st(2),%st",
       "timing": true
     },
     {
+      "address": 4214551,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f17",
       "isa": true,
@@ -882,11 +1116,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214553,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f19",
       "isa": true,
@@ -894,11 +1130,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "cmp {\"imm\": 0}, {\"disp\": 48, \"base\": \"rdx\"}",
+      "text": "cmpw   $0x0,0x30(%rdx)",
       "timing": true
     },
     {
+      "address": 4214558,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f1e",
       "isa": true,
@@ -906,11 +1144,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jne .A_404ea0",
+      "text": "jne    404ea0 <nbGravity+0x60>",
       "timing": true
     },
     {
+      "address": 4214560,
       "class": "x87_compare",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f20",
       "isa": true,
@@ -918,11 +1158,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fcoml {\"disp\": 64, \"base\": \"rdx\"}",
+      "text": "fcoml  0x40(%rdx)",
       "timing": true
     },
     {
+      "address": 4214563,
       "class": "x87_control",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f23",
       "isa": true,
@@ -930,11 +1172,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fnstsw ax",
+      "text": "fnstsw %ax",
       "timing": true
     },
     {
+      "address": 4214565,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f25",
       "isa": true,
@@ -942,11 +1186,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "test {\"imm\": 5}, ah",
+      "text": "test   $0x5,%ah",
       "timing": true
     },
     {
+      "address": 4214568,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f28",
       "isa": true,
@@ -954,11 +1200,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jne .A_405028",
+      "text": "jne    405028 <nbGravity+0x1e8>",
       "timing": true
     },
     {
+      "address": 4214574,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f2e",
       "isa": true,
@@ -966,11 +1214,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "cmp rdx, rcx",
+      "text": "cmp    %rdx,%rcx",
       "timing": true
     },
     {
+      "address": 4214577,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f31",
       "isa": true,
@@ -978,11 +1228,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_405080",
+      "text": "je     405080 <nbGravity+0x240>",
       "timing": true
     },
     {
+      "address": 4214583,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f37",
       "isa": true,
@@ -990,11 +1242,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"disp\": 72, \"base\": \"rsp\"}",
+      "text": "faddl  0x48(%rsp)",
       "timing": true
     },
     {
+      "address": 4214587,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f3b",
       "isa": true,
@@ -1002,11 +1256,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(0)",
+      "text": "fld    %st(0)",
       "timing": true
     },
     {
+      "address": 4214589,
       "class": "x87_sqrt",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f3d",
       "isa": true,
@@ -1014,11 +1270,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fsqrt ",
+      "text": "fsqrt",
       "timing": true
     },
     {
+      "address": 4214591,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f3f",
       "isa": true,
@@ -1026,11 +1284,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fstpl  0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214595,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f43",
       "isa": true,
@@ -1038,11 +1298,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fldl   0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214599,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f47",
       "isa": true,
@@ -1050,11 +1312,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fdivrl {\"disp\": 40, \"base\": \"rdx\"}",
+      "text": "fdivrl 0x28(%rdx)",
       "timing": true
     },
     {
+      "address": 4214602,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f4a",
       "isa": true,
@@ -1062,11 +1326,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fdiv st(1), st",
+      "text": "fdiv   %st(1),%st",
       "timing": true
     },
     {
+      "address": 4214604,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f4c",
       "isa": true,
@@ -1074,11 +1340,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(0)",
+      "text": "fld    %st(0)",
       "timing": true
     },
     {
+      "address": 4214606,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f4e",
       "isa": true,
@@ -1086,11 +1354,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(5), st",
+      "text": "fmul   %st(5),%st",
       "timing": true
     },
     {
+      "address": 4214608,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f50",
       "isa": true,
@@ -1098,11 +1368,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(6)",
+      "text": "faddp  %st,%st(6)",
       "timing": true
     },
     {
+      "address": 4214610,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f52",
       "isa": true,
@@ -1110,11 +1382,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(0)",
+      "text": "fld    %st(0)",
       "timing": true
     },
     {
+      "address": 4214612,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f54",
       "isa": true,
@@ -1122,11 +1396,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214614,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f56",
       "isa": true,
@@ -1134,11 +1410,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"base\": \"rsp\"}",
+      "text": "faddl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214617,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f59",
       "isa": true,
@@ -1146,11 +1424,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"base\": \"rsp\"}",
+      "text": "fstpl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214620,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f5c",
       "isa": true,
@@ -1158,11 +1438,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(2), st",
+      "text": "fmul   %st(2),%st",
       "timing": true
     },
     {
+      "address": 4214622,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f5e",
       "isa": true,
@@ -1170,11 +1452,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "faddl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214626,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f62",
       "isa": true,
@@ -1182,11 +1466,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "fstpl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214630,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f66",
       "isa": true,
@@ -1194,11 +1480,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "cmp {\"imm\": 0}, {\"disp\": 188, \"base\": \"rdi\"}",
+      "text": "cmpb   $0x0,0xbc(%rdi)",
       "timing": true
     },
     {
+      "address": 4214637,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f6d",
       "isa": true,
@@ -1206,11 +1494,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_404ee0",
+      "text": "je     404ee0 <nbGravity+0xa0>",
       "timing": true
     },
     {
+      "address": 4214643,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f73",
       "isa": true,
@@ -1218,11 +1508,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 96, \"base\": \"rdx\"}",
+      "text": "fldl   0x60(%rdx)",
       "timing": true
     },
     {
+      "address": 4214646,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f76",
       "isa": true,
@@ -1230,11 +1522,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 80, \"base\": \"rdx\"}",
+      "text": "fldl   0x50(%rdx)",
       "timing": true
     },
     {
+      "address": 4214649,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f79",
       "isa": true,
@@ -1242,11 +1536,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(5), st",
+      "text": "fmul   %st(5),%st",
       "timing": true
     },
     {
+      "address": 4214651,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f7b",
       "isa": true,
@@ -1254,11 +1550,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 88, \"base\": \"rdx\"}",
+      "text": "fldl   0x58(%rdx)",
       "timing": true
     },
     {
+      "address": 4214654,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f7e",
       "isa": true,
@@ -1266,11 +1564,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(5), st",
+      "text": "fmul   %st(5),%st",
       "timing": true
     },
     {
+      "address": 4214656,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f80",
       "isa": true,
@@ -1278,11 +1578,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214658,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f82",
       "isa": true,
@@ -1290,11 +1592,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(1)",
+      "text": "fld    %st(1)",
       "timing": true
     },
     {
+      "address": 4214660,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f84",
       "isa": true,
@@ -1302,11 +1606,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214662,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f86",
       "isa": true,
@@ -1314,11 +1620,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214664,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f88",
       "isa": true,
@@ -1326,11 +1634,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 48, \"base\": \"rsp\"}",
+      "text": "fstpl  0x30(%rsp)",
       "timing": true
     },
     {
+      "address": 4214668,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f8c",
       "isa": true,
@@ -1338,11 +1648,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 104, \"base\": \"rdx\"}",
+      "text": "fldl   0x68(%rdx)",
       "timing": true
     },
     {
+      "address": 4214671,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f8f",
       "isa": true,
@@ -1350,11 +1662,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214673,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f91",
       "isa": true,
@@ -1362,11 +1676,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 88, \"base\": \"rdx\"}",
+      "text": "fldl   0x58(%rdx)",
       "timing": true
     },
     {
+      "address": 4214676,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f94",
       "isa": true,
@@ -1374,11 +1690,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(6), st",
+      "text": "fmul   %st(6),%st",
       "timing": true
     },
     {
+      "address": 4214678,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f96",
       "isa": true,
@@ -1386,11 +1704,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214680,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f98",
       "isa": true,
@@ -1398,11 +1718,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 112, \"base\": \"rdx\"}",
+      "text": "fldl   0x70(%rdx)",
       "timing": true
     },
     {
+      "address": 4214683,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f9b",
       "isa": true,
@@ -1410,11 +1732,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214685,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f9d",
       "isa": true,
@@ -1422,11 +1746,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214687,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404f9f",
       "isa": true,
@@ -1434,11 +1760,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 56, \"base\": \"rsp\"}",
+      "text": "fstpl  0x38(%rsp)",
       "timing": true
     },
     {
+      "address": 4214691,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fa3",
       "isa": true,
@@ -1446,11 +1774,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214693,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fa5",
       "isa": true,
@@ -1458,11 +1788,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 112, \"base\": \"rdx\"}",
+      "text": "fldl   0x70(%rdx)",
       "timing": true
     },
     {
+      "address": 4214696,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fa8",
       "isa": true,
@@ -1470,11 +1802,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214698,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404faa",
       "isa": true,
@@ -1482,11 +1816,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214700,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fac",
       "isa": true,
@@ -1494,11 +1830,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 120, \"base\": \"rdx\"}",
+      "text": "fldl   0x78(%rdx)",
       "timing": true
     },
     {
+      "address": 4214703,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404faf",
       "isa": true,
@@ -1506,11 +1844,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(3), st",
+      "text": "fmul   %st(3),%st",
       "timing": true
     },
     {
+      "address": 4214705,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fb1",
       "isa": true,
@@ -1518,11 +1858,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214707,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fb3",
       "isa": true,
@@ -1530,11 +1872,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 64, \"base\": \"rsp\"}",
+      "text": "fstpl  0x40(%rsp)",
       "timing": true
     },
     {
+      "address": 4214711,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fb7",
       "isa": true,
@@ -1542,11 +1886,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld st(0)",
+      "text": "fld    %st(0)",
       "timing": true
     },
     {
+      "address": 4214713,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fb9",
       "isa": true,
@@ -1554,11 +1900,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(1), st",
+      "text": "fmul   %st(1),%st",
       "timing": true
     },
     {
+      "address": 4214715,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fbb",
       "isa": true,
@@ -1566,11 +1914,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fmull {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fmull  0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214719,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fbf",
       "isa": true,
@@ -1578,11 +1928,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fld1 ",
+      "text": "fld1",
       "timing": true
     },
     {
+      "address": 4214721,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fc1",
       "isa": true,
@@ -1590,11 +1942,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fdivp st, st(1)",
+      "text": "fdivp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214723,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fc3",
       "isa": true,
@@ -1602,11 +1956,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 48, \"base\": \"rsp\"}",
+      "text": "fldl   0x30(%rsp)",
       "timing": true
     },
     {
+      "address": 4214727,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fc7",
       "isa": true,
@@ -1614,11 +1970,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(5), st",
+      "text": "fmul   %st(5),%st",
       "timing": true
     },
     {
+      "address": 4214729,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fc9",
       "isa": true,
@@ -1626,11 +1984,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fstpl  0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214733,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fcd",
       "isa": true,
@@ -1638,11 +1998,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 56, \"base\": \"rsp\"}",
+      "text": "fldl   0x38(%rsp)",
       "timing": true
     },
     {
+      "address": 4214737,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fd1",
       "isa": true,
@@ -1650,11 +2012,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214739,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fd3",
       "isa": true,
@@ -1662,11 +2026,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fldl   0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214743,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fd7",
       "isa": true,
@@ -1674,11 +2040,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214745,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fd9",
       "isa": true,
@@ -1686,11 +2054,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 64, \"base\": \"rsp\"}",
+      "text": "fldl   0x40(%rsp)",
       "timing": true
     },
     {
+      "address": 4214749,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fdd",
       "isa": true,
@@ -1698,11 +2068,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214751,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fdf",
       "isa": true,
@@ -1710,11 +2082,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(1)",
+      "text": "faddp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214753,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fe1",
       "isa": true,
@@ -1722,11 +2096,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(1), st",
+      "text": "fmul   %st(1),%st",
       "timing": true
     },
     {
+      "address": 4214755,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fe3",
       "isa": true,
@@ -1734,11 +2110,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fmuls {\"disp\": 5017628, \"abs\": true}",
+      "text": "fmuls  0xc4373(%rip)        # 4c935c <__PRETTY_FUNCTION__.0+0x5c>",
       "timing": true
     },
     {
+      "address": 4214761,
       "class": "x87_div",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fe9",
       "isa": true,
@@ -1746,11 +2124,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fdivp st, st(2)",
+      "text": "fdivp  %st,%st(2)",
       "timing": true
     },
     {
+      "address": 4214763,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404feb",
       "isa": true,
@@ -1758,11 +2138,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fxch st(4)",
+      "text": "fxch   %st(4)",
       "timing": true
     },
     {
+      "address": 4214765,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fed",
       "isa": true,
@@ -1770,11 +2152,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(1), st",
+      "text": "fmul   %st(1),%st",
       "timing": true
     },
     {
+      "address": 4214767,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404fef",
       "isa": true,
@@ -1782,11 +2166,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "faddp st, st(5)",
+      "text": "faddp  %st,%st(5)",
       "timing": true
     },
     {
+      "address": 4214769,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ff1",
       "isa": true,
@@ -1794,11 +2180,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 48, \"base\": \"rsp\"}",
+      "text": "fldl   0x30(%rsp)",
       "timing": true
     },
     {
+      "address": 4214773,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ff5",
       "isa": true,
@@ -1806,11 +2194,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214775,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ff7",
       "isa": true,
@@ -1818,11 +2208,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fsubrp st, st(5)",
+      "text": "fsubrp %st,%st(5)",
       "timing": true
     },
     {
+      "address": 4214777,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ff9",
       "isa": true,
@@ -1830,11 +2222,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st, st(2)",
+      "text": "fmul   %st,%st(2)",
       "timing": true
     },
     {
+      "address": 4214779,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ffb",
       "isa": true,
@@ -1842,11 +2236,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fxch st(2)",
+      "text": "fxch   %st(2)",
       "timing": true
     },
     {
+      "address": 4214781,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a404ffd",
       "isa": true,
@@ -1854,11 +2250,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"base\": \"rsp\"}",
+      "text": "faddl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214784,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405000",
       "isa": true,
@@ -1866,11 +2264,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 56, \"base\": \"rsp\"}",
+      "text": "fldl   0x38(%rsp)",
       "timing": true
     },
     {
+      "address": 4214788,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405004",
       "isa": true,
@@ -1878,11 +2278,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmul st(4), st",
+      "text": "fmul   %st(4),%st",
       "timing": true
     },
     {
+      "address": 4214790,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405006",
       "isa": true,
@@ -1890,11 +2292,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fsubrp st, st(1)",
+      "text": "fsubrp %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214792,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405008",
       "isa": true,
@@ -1902,11 +2306,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"base\": \"rsp\"}",
+      "text": "fstpl  (%rsp)",
       "timing": true
     },
     {
+      "address": 4214795,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40500b",
       "isa": true,
@@ -1914,11 +2320,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmulp st, st(1)",
+      "text": "fmulp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214797,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40500d",
       "isa": true,
@@ -1926,11 +2334,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "faddl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "faddl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214801,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405011",
       "isa": true,
@@ -1938,11 +2348,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 64, \"base\": \"rsp\"}",
+      "text": "fldl   0x40(%rsp)",
       "timing": true
     },
     {
+      "address": 4214805,
       "class": "x87_mul",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405015",
       "isa": true,
@@ -1950,11 +2362,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fmulp st, st(2)",
+      "text": "fmulp  %st,%st(2)",
       "timing": true
     },
     {
+      "address": 4214807,
       "class": "x87_add",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405017",
       "isa": true,
@@ -1962,11 +2376,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fsubp st, st(1)",
+      "text": "fsubp  %st,%st(1)",
       "timing": true
     },
     {
+      "address": 4214809,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405019",
       "isa": true,
@@ -1974,11 +2390,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "fstpl  0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214813,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40501d",
       "isa": true,
@@ -1986,11 +2404,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_404ee8",
+      "text": "jmpq   404ee8 <nbGravity+0xa8>",
       "timing": true
     },
     {
+      "address": 4214818,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405022",
       "isa": true,
@@ -1998,11 +2418,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nopw   0x0(%rax,%rax,1)",
       "timing": true
     },
     {
+      "address": 4214824,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405028",
       "isa": true,
@@ -2010,11 +2432,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214826,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40502a",
       "isa": true,
@@ -2022,11 +2446,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214828,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40502c",
       "isa": true,
@@ -2034,11 +2460,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214830,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40502e",
       "isa": true,
@@ -2046,11 +2474,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214832,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405030",
       "isa": true,
@@ -2058,11 +2488,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 72, \"base\": \"rdx\"}, rdx",
+      "text": "mov    0x48(%rdx),%rdx",
       "timing": true
     },
     {
+      "address": 4214836,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405034",
       "isa": true,
@@ -2070,11 +2502,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "test rdx, rdx",
+      "text": "test   %rdx,%rdx",
       "timing": true
     },
     {
+      "address": 4214839,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405037",
       "isa": true,
@@ -2082,11 +2516,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jne .A_404ef5",
+      "text": "jne    404ef5 <nbGravity+0xb5>",
       "timing": true
     },
     {
+      "address": 4214845,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40503d",
       "isa": true,
@@ -2094,11 +2530,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fstpl  0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214849,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405041",
       "isa": true,
@@ -2106,11 +2544,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "test r11b, r11b",
+      "text": "test   %r11b,%r11b",
       "timing": true
     },
     {
+      "address": 4214852,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405044",
       "isa": true,
@@ -2118,11 +2558,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "je .A_4050b2",
+      "text": "je     4050b2 <nbGravity+0x272>",
       "timing": true
     },
     {
+      "address": 4214854,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405046",
       "isa": true,
@@ -2130,11 +2572,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "fldl   0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214858,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40504a",
       "isa": true,
@@ -2142,11 +2586,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov r8, rax",
+      "text": "mov    %r8,%rax",
       "timing": true
     },
     {
+      "address": 4214861,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40504d",
       "isa": true,
@@ -2154,11 +2600,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"base\": \"r8\"}",
+      "text": "fstpl  (%r8)",
       "timing": true
     },
     {
+      "address": 4214864,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405050",
       "isa": true,
@@ -2166,11 +2614,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"base\": \"rsp\"}",
+      "text": "fldl   (%rsp)",
       "timing": true
     },
     {
+      "address": 4214867,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405053",
       "isa": true,
@@ -2178,11 +2628,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 8, \"base\": \"r8\"}",
+      "text": "fstpl  0x8(%r8)",
       "timing": true
     },
     {
+      "address": 4214871,
       "class": "x87_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405057",
       "isa": true,
@@ -2190,11 +2642,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fldl {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "fldl   0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214875,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40505b",
       "isa": true,
@@ -2202,11 +2656,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 16, \"base\": \"r8\"}",
+      "text": "fstpl  0x10(%r8)",
       "timing": true
     },
     {
+      "address": 4214879,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40505f",
       "isa": true,
@@ -2214,11 +2670,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fldz ",
+      "text": "fldz",
       "timing": true
     },
     {
+      "address": 4214881,
       "class": "x87_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405061",
       "isa": true,
@@ -2226,11 +2684,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "fstpl {\"disp\": 24, \"base\": \"r8\"}",
+      "text": "fstpl  0x18(%r8)",
       "timing": true
     },
     {
+      "address": 4214885,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405065",
       "isa": true,
@@ -2238,11 +2698,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "add {\"imm\": 80}, rsp",
+      "text": "add    $0x50,%rsp",
       "timing": true
     },
     {
+      "address": 4214889,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405069",
       "isa": true,
@@ -2250,11 +2712,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "pop rbx",
+      "text": "pop    %rbx",
       "timing": true
     },
     {
+      "address": 4214890,
       "class": "ret",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40506a",
       "isa": true,
@@ -2262,11 +2726,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "ret ",
+      "text": "retq",
       "timing": true
     },
     {
+      "address": 4214891,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40506b",
       "isa": true,
@@ -2274,11 +2740,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nopl   0x0(%rax,%rax,1)",
       "timing": true
     },
     {
+      "address": 4214896,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405070",
       "isa": true,
@@ -2286,11 +2754,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214898,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405072",
       "isa": true,
@@ -2298,11 +2768,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214900,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405074",
       "isa": true,
@@ -2310,11 +2782,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214902,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405076",
       "isa": true,
@@ -2322,11 +2796,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214904,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405078",
       "isa": true,
@@ -2334,11 +2810,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_405088",
+      "text": "jmp    405088 <nbGravity+0x248>",
       "timing": true
     },
     {
+      "address": 4214906,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40507a",
       "isa": true,
@@ -2346,11 +2824,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nopw   0x0(%rax,%rax,1)",
       "timing": true
     },
     {
+      "address": 4214912,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405080",
       "isa": true,
@@ -2358,11 +2838,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214914,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405082",
       "isa": true,
@@ -2370,11 +2852,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214916,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405084",
       "isa": true,
@@ -2382,11 +2866,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214918,
       "class": "x87_move",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405086",
       "isa": true,
@@ -2394,11 +2880,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "fstp st(0)",
+      "text": "fstp   %st(0)",
       "timing": true
     },
     {
+      "address": 4214920,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405088",
       "isa": true,
@@ -2406,11 +2894,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 1}, r11d",
+      "text": "mov    $0x1,%r11d",
       "timing": true
     },
     {
+      "address": 4214926,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a40508e",
       "isa": true,
@@ -2418,11 +2908,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_404ee8",
+      "text": "jmpq   404ee8 <nbGravity+0xa8>",
       "timing": true
     },
     {
+      "address": 4214931,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405093",
       "isa": true,
@@ -2430,11 +2922,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "nop ",
+      "text": "nopl   0x0(%rax,%rax,1)",
       "timing": true
     },
     {
+      "address": 4214936,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a405098",
       "isa": true,
@@ -2442,11 +2936,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 0}, {\"disp\": 8, \"base\": \"rsp\"}",
+      "text": "movq   $0x0,0x8(%rsp)",
       "timing": true
     },
     {
+      "address": 4214945,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050a1",
       "isa": true,
@@ -2454,11 +2950,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 0}, {\"base\": \"rsp\"}",
+      "text": "movq   $0x0,(%rsp)",
       "timing": true
     },
     {
+      "address": 4214953,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050a9",
       "isa": true,
@@ -2466,11 +2964,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"imm\": 0}, {\"disp\": 16, \"base\": \"rsp\"}",
+      "text": "movq   $0x0,0x10(%rsp)",
       "timing": true
     },
     {
+      "address": 4214962,
       "class": "scalar_alu",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050b2",
       "isa": true,
@@ -2478,11 +2978,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "mov rbx, rsi",
+      "text": "mov    %rbx,%rsi",
       "timing": true
     },
     {
+      "address": 4214965,
       "class": "scalar_store",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050b5",
       "isa": true,
@@ -2490,11 +2992,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov r8, {\"disp\": 24, \"base\": \"rsp\"}",
+      "text": "mov    %r8,0x18(%rsp)",
       "timing": true
     },
     {
+      "address": 4214970,
       "class": "call",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050ba",
       "isa": true,
@@ -2502,11 +3006,13 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "call nbReportTreeIncest",
+      "text": "callq  42f600 <nbReportTreeIncest>",
       "timing": true
     },
     {
+      "address": 4214975,
       "class": "scalar_load",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050bf",
       "isa": true,
@@ -2514,11 +3020,13 @@
       "memory": true,
       "parser": true,
       "reason": null,
-      "text": "mov {\"disp\": 24, \"base\": \"rsp\"}, r8",
+      "text": "mov    0x18(%rsp),%r8",
       "timing": true
     },
     {
+      "address": 4214980,
       "class": "branch",
+      "function": "nbGravity",
       "functional": true,
       "id": "a4050c4",
       "isa": true,
@@ -2526,439 +3034,7 @@
       "memory": false,
       "parser": true,
       "reason": null,
-      "text": "jmp .A_405046",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f440",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"disp\": 212, \"base\": \"rsi\"}, eax",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f446",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "test eax, eax",
-      "timing": true
-    },
-    {
-      "class": "branch",
-      "functional": true,
-      "id": "a42f448",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "jne .A_42f4c0",
-      "timing": true
-    },
-    {
-      "class": "scalar_store",
-      "functional": true,
-      "id": "a42f44a",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"imm\": 1}, {\"disp\": 212, \"base\": \"rsi\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f454",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "cmp {\"imm\": 0}, {\"disp\": 190, \"base\": \"rdi\"}",
-      "timing": true
-    },
-    {
-      "class": "branch",
-      "functional": true,
-      "id": "a42f45b",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "jne .A_42f4c0",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f45d",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"disp\": 200, \"base\": \"rsi\"}, eax",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f463",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"disp\": 392, \"base\": \"rdi\"}, ecx",
-      "timing": true
-    },
-    {
-      "class": "scalar_store",
-      "functional": true,
-      "id": "a42f469",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov rax, {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f46e",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov rax, rdx",
-      "timing": true
-    },
-    {
-      "class": "x87_load",
-      "functional": true,
-      "id": "a42f471",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fildll {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f475",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov ecx, eax",
-      "timing": true
-    },
-    {
-      "class": "x87_mul",
-      "functional": true,
-      "id": "a42f477",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fmuls {\"disp\": 9202784, \"abs\": true}",
-      "timing": true
-    },
-    {
-      "class": "scalar_store",
-      "functional": true,
-      "id": "a42f47d",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov rax, {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f482",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "cmp {\"imm\": 0}, {\"disp\": 189, \"base\": \"rdi\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_load",
-      "functional": true,
-      "id": "a42f489",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"disp\": 11585568, \"abs\": true}, rdi",
-      "timing": true
-    },
-    {
-      "class": "x87_load",
-      "functional": true,
-      "id": "a42f490",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fildll {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "x87_div",
-      "functional": true,
-      "id": "a42f494",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "fdivrp st, st(1)",
-      "timing": true
-    },
-    {
-      "class": "branch",
-      "functional": true,
-      "id": "a42f496",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "je .A_42f4c8",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f498",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"imm\": 9228840}, esi",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f49d",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"imm\": 1}, eax",
-      "timing": true
-    },
-    {
-      "class": "x87_store",
-      "functional": true,
-      "id": "a42f4a2",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fstl {\"disp\": -16, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "x87_store",
-      "functional": true,
-      "id": "a42f4a6",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fstpl {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "vector_load",
-      "functional": true,
-      "id": "a42f4aa",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "vbroadcastsd {\"disp\": -32, \"base\": \"rsp\"}, zmm0",
-      "timing": true
-    },
-    {
-      "class": "call",
-      "functional": true,
-      "id": "a42f4b2",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "call fprintf",
-      "timing": true
-    },
-    {
-      "class": "ret",
-      "functional": true,
-      "id": "s247",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "ret ",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f4b7",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "nop ",
-      "timing": true
-    },
-    {
-      "class": "ret",
-      "functional": true,
-      "id": "a42f4c0",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "ret ",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f4c1",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "nop ",
-      "timing": true
-    },
-    {
-      "class": "x87_store",
-      "functional": true,
-      "id": "a42f4c8",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fstl {\"disp\": -24, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f4cc",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"imm\": 9228888}, esi",
-      "timing": true
-    },
-    {
-      "class": "x87_store",
-      "functional": true,
-      "id": "a42f4d1",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "fstpl {\"disp\": -32, \"base\": \"rsp\"}",
-      "timing": true
-    },
-    {
-      "class": "scalar_alu",
-      "functional": true,
-      "id": "a42f4d5",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "mov {\"imm\": 1}, eax",
-      "timing": true
-    },
-    {
-      "class": "vector_load",
-      "functional": true,
-      "id": "a42f4da",
-      "isa": true,
-      "line": null,
-      "memory": true,
-      "parser": true,
-      "reason": null,
-      "text": "vbroadcastsd {\"disp\": -32, \"base\": \"rsp\"}, zmm0",
-      "timing": true
-    },
-    {
-      "class": "call",
-      "functional": true,
-      "id": "a42f4e2",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "call fprintf",
-      "timing": true
-    },
-    {
-      "class": "ret",
-      "functional": true,
-      "id": "s259",
-      "isa": true,
-      "line": null,
-      "memory": false,
-      "parser": true,
-      "reason": null,
-      "text": "ret ",
+      "text": "jmp    405046 <nbGravity+0x206>",
       "timing": true
     }
   ],
@@ -2969,14 +3045,15 @@
       "parser": true,
       "timing": true
     },
-    "functional_exact": 243,
-    "instructions": 243,
-    "isa_known": 243,
-    "memory_records": 96,
+    "functional_exact": 207,
+    "instructions": 207,
+    "isa_known": 207,
+    "memory_records": 78,
     "mnemonics_unknown": [],
-    "parser_ok": 243,
+    "parser_ok": 207,
     "timing_only_or_missing": [],
-    "timing_params_known": 243,
+    "timing_params_known": 207,
     "unsupported": []
-  }
+  },
+  "unsupported": []
 }

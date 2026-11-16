@@ -1,4 +1,4 @@
-functional: functional_mismatch
-1 mismatch(es) against expected outputs; first: {"where": "ctx0.zmm0[0]", "got": "0x43c62ab540fd9258", "want": "0x3ff0000000000000"}
+functional: ok
+executed 136 dynamic instructions; all 1 expected items match
 result: twin\log-cases\fixed-3\result.json
 summary: twin\log-cases\fixed-3\summary.md

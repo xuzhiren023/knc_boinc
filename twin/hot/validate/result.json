@@ -1,8 +1,8 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\validate",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\validate\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\validate\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\validate",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\validate\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\hot\\validate\\summary.md"
   },
   "assumptions": [],
   "calibration_status": {
@@ -70,12 +70,12 @@
       }
     }
   },
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "functional_check": {
     "status": "not_run"
   },
   "input": {
-    "hash_sha256": "21e6c240e39d823a0019ef74adaa9bd1986b13581de0da085908f3500edfad9e",
+    "hash_sha256": "67c25b73695ea4aa61ecb2f5b6b56e171f6c94da497bf73b333a84f6c27d4211",
     "kernel": {
       "contexts": [
         0
@@ -116,7 +116,7 @@
         "description": "one log_rn call, first real small input"
       }
     },
-    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-kernel.json"
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\log-kernel.json"
   },
   "invocation": {
     "argv": [
@@ -130,7 +130,7 @@
       "--force"
     ],
     "command": "validate",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
@@ -225,12 +225,12 @@
     "synthetic": false,
     "version": "0.3.0"
   },
-  "python_execution_seconds": 0.4312,
+  "python_execution_seconds": 0.2399,
   "representation_evaluated": "normalized-records",
   "result_type": "validation",
   "scale": null,
   "schema": "knc-twin.result/1",
   "status": "ok",
-  "timestamp_utc": "2026-11-16T05:56:51Z",
+  "timestamp_utc": "2026-11-16T12:48:59Z",
   "unsupported": []
 }

@@ -1,19 +1,36 @@
 Captured host x87 control word: 0x27f
 Disambiguated duplicate local symbols: 3
-function log_rn: 1333 instructions, 6 padding nops, 1 with two-cycle prefixes; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+function log_rn: 1333 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+fixed-0 input=3ff0000000000000 expected=0000000000000000: ok
+fixed-1 input=4000000000000000 expected=3fe62e42fefa39ef: ok
+fixed-2 input=3fe0000000000000 expected=bfe62e42fefa39ef: ok
+fixed-3 input=4005bf0a8b145769 expected=3ff0000000000000: ok
+fixed-4 input=01a56e1fc2f8f359 expected=c085963447f87fb5: ok
+fixed-5 input=7e37e43c8800759c expected=4085963447f87fb5: ok
+fixed-6 input=0000000000000001 expected=c0874385446d71c3: ok
+seed-000 input=19da1f73ec6906a6 expected=c07a6545de94439c: ok
+seed-001 input=6e31af6fc6c8067d expected=4080083b8318a15c: ok
+seed-002 input=0e0122140689a848 expected=c0814e0ca441c4ed: ok
+seed-003 input=485848feb9fdcdf7 expected=40575322c86f0918: ok
+seed-004 input=6d8de8d3c6f53eba expected=407f9ee0cb5ce0ec: ok
+seed-005 input=2deb627b54e3ce01 expected=c068f90749b8da98: ok
+seed-006 input=15922e36193a367c expected=c07d5d3767eaa1f7: ok
+seed-007 input=2e442c5fcdd6991b expected=c0687db9608c87b8: ok
+captured input=3ff0000000000000 expected=0000000000000000: ok
+log_rn: all 16 cases match independent x86 expected bits
 validation: ok
 kernel is well-formed: 1 stream(s), normalized-records
 result: twin/hot/validate\result.json
 summary: twin/hot/validate\summary.md
-functional: functional_mismatch
-1 mismatch(es) against expected outputs; first: {"where": "ctx0.zmm0[0]", "got": "0x43c628b76e3a7b61", "want": "0x0000000000000000"}
+functional: ok
+executed 136 dynamic instructions; all 1 expected items match
 result: twin/hot/functional\result.json
 summary: twin/hot/functional\summary.md
-timing_prediction: functional_mismatch
-candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+timing_prediction: ok
+predicted 2778 core cycles (2778.000 per unit) for 136 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
 result: twin/hot/simulate\result.json
 summary: twin/hot/simulate\summary.md
-analytical_bound: functional_mismatch
-candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+analytical_bound: ok
+trace lower bound: 2597 cycles (binding term: dependency_critical_path); conditional_bound
 result: twin/hot/bounds\result.json
 summary: twin/hot/bounds\summary.md

@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 p=Path('twin/log-kernel.json');k=json.loads(p.read_text());k.pop('memory_default',None);p.write_text(json.dumps(k,indent=2)+'\n')
 PY
+python twin/rerun_log_cases.py
 failed=0
 for command in validate functional simulate bounds; do
  options=(); [[ "$command" == functional ]] || options+=(--profile card-7120-measured)

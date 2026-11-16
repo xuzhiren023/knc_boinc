@@ -1,16 +1,23 @@
-# knc-twin functional: FUNCTIONAL_MISMATCH
+# knc-twin functional: OK
 
-- Engine 0.3.1, 2026-11-16T06:14:54Z
-- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S1-04\twin\log-cases\seed-006.json (sha256 e560ef839c6a...)
+- Engine 0.4.0, 2026-11-16T12:48:54Z
+- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S1-05\twin\log-cases\seed-006.json (sha256 57f5aa9dfcd4...)
 - Scale: region; representation: normalized-records
-- Functional check: mismatch (1 mismatches)
+- Functional check: ok
 
-**1 mismatch(es) against expected outputs; first: {"where": "ctx0.zmm0[0]", "got": "0x43c62978e4a25c09", "want": "0xc07d5d3767eaa1f7"}**
+**executed 136 dynamic instructions; all 1 expected items match**
+
+## Result
+- dynamic_instructions: 136
+- contexts: 1
+- functional_check_status: ok
+- checked_items: 1
+- mismatches: 0
 
 ## Assumptions
 - x87 precision control is 53-bit: results round to that significand with the extended exponent range
 - OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged
 
 Invocation: `C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\log-cases\seed-006.json --trace --out twin\log-cases\seed-006 --force`
-Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S1-04\twin\log-cases\seed-006
-Python execution time: 1.235 s (not KNC time)
+Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S1-05\twin\log-cases\seed-006
+Python execution time: 1.158 s (not KNC time)

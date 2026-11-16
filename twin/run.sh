@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Re-extract the whole built function; preserve non-ok results as evidence.
+# Extract the built function, then end the region before its cold error block.
 set -euo pipefail
 export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")/.."
@@ -8,34 +8,37 @@ OBJDUMP=${KNC_OBJDUMP:-C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/
 function_name=${1:-nbGravity}
 capture=${2:-twin/capture.json}
 binary=build/card/milkyway_nbody.mic
+python twin/check_reference.py
 python "$TWIN_HOME/scripts/knc_twin.py" capabilities --out twin/capabilities --force
 "$OBJDUMP" -dr "$binary" > twin/card.disassembly.txt
 python "$TWIN_HOME/scripts/from_binary.py" "$binary" --function "$function_name" \
-    --with-callee nbReportTreeIncest --disassembly twin/card.disassembly.txt --init "$capture" \
-    --out twin/kernel.json --report twin/conversion.json
-# Include the PLT entries that actually exist in this build. In particular,
-# -fno-math-errno removes sqrt@plt; its absence must not mask the fprintf test.
-closure_callees=()
-for symbol in sqrt@plt fprintf@plt; do
-    if grep -Fq "<$symbol>:" twin/card.disassembly.txt; then
-        closure_callees+=(--with-callee "$symbol")
-    fi
-done
-set +e
-python "$TWIN_HOME/scripts/from_binary.py" "$binary" --function "$function_name" \
-    --with-callee nbReportTreeIncest "${closure_callees[@]}" \
     --disassembly twin/card.disassembly.txt --init "$capture" \
-    --out twin/closure.json --report twin/closure-conversion.json > twin/closure-attempt.txt 2>&1
-closure_status=$?
-set -e
-printf 'adapter_exit=%s\n' "$closure_status" >> twin/closure-attempt.txt
-# No branch deletion or invented cost for the unsupported closure.
+    --out twin/gravity-full.json --report twin/conversion.json
+python twin/cut_gravity.py
 python twin/check_kernel.py
 failed=0
 for command in validate functional simulate bounds; do
     options=()
+    if [[ "$command" == functional ]]; then options+=(--trace); fi
     if [[ "$command" != functional ]]; then options+=(--profile card-7120-measured); fi
     python "$TWIN_HOME/scripts/knc_twin.py" "$command" twin/kernel.json \
         "${options[@]}" --out "twin/$command" --force || failed=1
 done
+python - <<'PY_CHECK'
+import json
+from pathlib import Path
+trace = json.loads(Path('twin/functional/trace.json').read_text())
+rows = trace['0']
+assert all(row['id'] != 'cold_error_exit' for row in rows), 'captured input reached excluded error path'
+kernel = json.loads(Path('twin/kernel.json').read_text())
+label = kernel['provenance']['region_cut']['exit_label']
+branches = {row['id'] for row in kernel['streams'][0]['instructions'] if row['ops'] == [label]}
+observed = [row for row in rows if row['id'] in branches]
+assert observed and all(row['taken'] is False for row in observed)
+evidence = {'dynamic_instructions': len(rows), 'cold_exit_executed': False,
+            'error_branches': observed, 'normal_return_executed': any(row['op'] == 'ret' for row in rows)}
+assert evidence['normal_return_executed']
+Path('twin/gravity-execution.json').write_text(json.dumps(evidence, indent=2)+chr(10))
+print('Gravity trace: cold_error_exit absent; normal return/output stores retained')
+PY_CHECK
 exit "$failed"

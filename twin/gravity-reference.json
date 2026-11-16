@@ -1,0 +1,19 @@
+{
+  "command": "build/x86/milkyway_nbody.exe -f workunits/small/params.lua -h workunits/small/input.hist -z runs/x86/small-1/histogram.txt -c runs/x86/small-1/checkpoint --seed 670828913 --nthreads 1 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 64",
+  "exit": 0,
+  "capture_quietErrors": 0,
+  "capture_treeIncest": 0,
+  "streams": {
+    "stdout.txt": {
+      "bytes": 99,
+      "sha256": "0dec6358a043d71398a4d43b86da8de414d2721284fe45f7f37de91bc6424bb3",
+      "tree_incest_diagnostics": 0
+    },
+    "stderr.txt": {
+      "bytes": 6051,
+      "sha256": "7a960bc7a6580a94dcb4adc7dda9bbde23a8f74f4d6bf4a7a293c1ca1e1d7d9f",
+      "tree_incest_diagnostics": 0
+    }
+  },
+  "histogram_sha256": "adf380e5b20b8f237eca3797b2f888a7c15a60ae1942385ae5d1023dda7a2818"
+}

@@ -8,7 +8,7 @@
         4096
       ],
       "mask_bits": null,
-      "nbytes": 8,
+      "nbytes": 4,
       "op": "fildl",
       "taken": null,
       "x87": {

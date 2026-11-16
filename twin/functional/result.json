@@ -1,42 +1,95 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\functional",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\functional\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\functional\\summary.md"
+    "final_state": "twin/functional\\final-state.json",
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\functional",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\functional\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\functional\\summary.md"
   },
-  "assumptions": [],
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
+    "ZF/SF after imul are architecturally undefined; the model leaves them unchanged"
+  ],
   "calibration_status": null,
-  "engine_version": "0.3.1",
-  "error_details": "{\"callee\": \"fprintf\", \"instruction\": \"a42f4b2\"}",
+  "engine_version": "0.4.0",
   "functional_check": {
-    "status": "not_run"
+    "checked": 1,
+    "mismatches": [],
+    "status": "ok"
   },
-  "input": null,
+  "input": {
+    "hash_sha256": "eb85ac7097225196e777bb5d71876e660372a5ce2f0d882d3731601a07cd00ae",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 203
+      },
+      "loop": null,
+      "name": "milkyway_nbody__nbGravity",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "one nbGravity call, first body of first small tree"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\kernel.json"
+  },
   "invocation": {
     "argv": [
       "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
       "functional",
       "twin/kernel.json",
+      "--trace",
       "--out",
       "twin/functional",
       "--force"
     ],
     "command": "functional",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
-  "message": "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
-  "prediction": null,
+  "message": "executed 3040 dynamic instructions; all 1 expected items match",
+  "prediction": {
+    "checked_items": 1,
+    "contexts": 1,
+    "dynamic_instructions": 3040,
+    "functional_check_status": "ok",
+    "mismatches": 0
+  },
   "profile": null,
-  "python_execution_seconds": 0.0913,
-  "representation_evaluated": null,
+  "python_execution_seconds": 1.2172,
+  "representation_evaluated": "normalized-records",
   "result_type": "functional",
   "scale": "region",
   "schema": "knc-twin.result/1",
-  "status": "unsupported",
-  "timestamp_utc": "2026-11-16T06:09:51Z",
-  "unsupported": [
-    "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
-  ]
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:52:46Z",
+  "unsupported": []
 }
