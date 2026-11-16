@@ -26,3 +26,9 @@ Histogram capture uses upstream `--print-histogram`; no output patch is needed.
 - `boinc/cygwin-win32.patch` uses the compiler's `__CYGWIN__` guard consistently
   for its compatibility changes, including upstream header/CRT branches; no
   synthetic `__CYGWIN32__` build definition is required.
+
+- `nbody-force-chunk.patch` (S5-02): exposes `NBODY_FORCE_CHUNK` in the two
+  gravity loops, two integration loops and guided shared-memory loop. Each
+  translation unit retains its original `4096 / sizeof(...)` default; schedule
+  kinds and per-body calculations are unchanged. `mk/Makefile` selects 4 for
+  card builds and leaves x86 at the upstream default.
