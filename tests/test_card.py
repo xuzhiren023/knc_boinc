@@ -44,6 +44,9 @@ class CardTest(unittest.TestCase):
                     staged = binary.parent / name
                     self.assertEqual(staged.read_bytes(), source.read_bytes())
                     pending.append(staged)
+        recorded = {line.split(' <- ', 1)[0] for line in
+                    (binary.parent / 'runtime-manifest.txt').read_text().splitlines()}
+        self.assertEqual(recorded, seen - {binary.name}, 'runtime provenance must cover the actual ELF closure')
         import sys
         lint = subprocess.run([sys.executable, 'C:/Users/xuzhi/Documents/gcc_knc/tools/knc_lint', str(binary)], capture_output=True, text=True)
         self.assertEqual(lint.returncode, 0, lint.stdout + lint.stderr)

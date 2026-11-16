@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <filesystem>
+#include <chrono>
 static std::string contents(const std::string& file) {
     std::ifstream f(file); return {std::istreambuf_iterator<char>(f),{}};
 }
@@ -43,6 +44,30 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         require(exists("boinc_temporary_exit"),"temporary exit marker missing");
         require(trace("exhausted retry_limit=2"),"bounded retry diagnostic missing");
         puts("PASS wrapper unreachable"); return;
+    }
+    if (mode=="real") {
+        // Real tasks return only BOINC stderr, with no result.data declaration.
+        bool done=false;
+        auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(7200);
+        while (std::chrono::steady_clock::now()<deadline) {
+            heartbeat();
+            if (stopped()) {done=true;break;}
+            Sleep(100);
+        }
+        if (!done) {
+            std::string remote=contents("knc_remote");
+            while (!remote.empty() && (remote.back()=='\n' || remote.back()=='\r')) remote.pop_back();
+            for (const char* name:{"stderr.txt","stdout.txt","progress"}) {
+                std::ofstream saved(std::string("timeout-")+name,std::ios::binary);
+                saved<<contents(remote+"/"+name);
+            }
+            require(shm->process_control_request.send_msg("<abort/>"),"send bounded real-run abort");
+            wait(stopped,"real-run abort timeout",30);
+            throw std::runtime_error("real 117676 exceeded two hours; fake-card app aborted");
+        }
+        exited(0,true); cleaned();
+        require(contents("nbody_stderr.txt").find("search_likelihood")!=std::string::npos,"real N-body likelihood missing");
+        puts("PASS wrapper real 117676 completed; no declared output files"); return;
     }
     double fraction=0;
     wait([&] {

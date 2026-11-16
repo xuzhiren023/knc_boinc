@@ -289,11 +289,13 @@ struct Task {
                     auto rule=rules.find(key);
                     if (value_at!=arg.npos) {
                         if (rule!=rules.end()) arg=arg.substr(0,value_at)+file(arg.substr(value_at),rule->second);
+                        else if (key=="nthreads") arg=arg.substr(0,value_at)+std::to_string(c.threads);
                         args.push_back(arg);
                     } else {
                         args.push_back(arg);
                         if (++i==incoming.size()) throw std::runtime_error("missing operand: "+arg);
-                        args.push_back(rule==rules.end()?incoming[i]:file(incoming[i],rule->second));
+                        args.push_back(key=="nthreads"?std::to_string(c.threads):
+                            rule==rules.end()?incoming[i]:file(incoming[i],rule->second));
                     }
                     continue;
                 }
@@ -466,6 +468,17 @@ int main(int argc,char** argv) {
         card.copy(resolved("nbody_stderr.txt"),card.dir+"/stderr.txt",false);
         if (!s.exit) task.collect(card);
         card.clean();
+        // Real 196/mt results declare no output files. BOINC sends this
+        // process's stderr to the validator, not our private diagnostic file.
+        // Forward the complete stream, including all present/future science
+        // tags, without parsing, rounding or inventing a result on failure.
+        std::ifstream science(resolved("nbody_stderr.txt"),std::ios::binary);
+        if (!science) throw std::runtime_error("cannot read downloaded science stderr");
+        char buffer[8192];
+        while (science.read(buffer,sizeof(buffer)) || science.gcount())
+            std::cerr.write(buffer,science.gcount());
+        std::cerr.flush();
+        if (science.bad() || !std::cerr) throw std::runtime_error("cannot forward science stderr");
         if (s.exit) {log("card app exit "+std::to_string(s.exit)); return boinc_finish(s.exit);}
         fs::remove("knc_checkpoint"); boinc_fraction_done(1); log("finished"); return boinc_finish(0);
     } catch (const Unreachable& e) {
