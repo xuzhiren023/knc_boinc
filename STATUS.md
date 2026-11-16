@@ -21,7 +21,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 - knc_wrapper (S2-02) passes normal finish, suspend/resume, quit/checkpoint/restart, abort and card-unreachable flows
   through real BOINC Win32 IPC with a fake card running the x86 app; restarted output equals uninterrupted.
 - knc-twin (S1-03): gravity refused (PLT sqrt, no sourced cost); crlibm log_rn returns 0x43c628b76e3a7b61 for
-  log(1.0) in the twin (expected 0). S1-04: twin defect (fildl read 8 bytes, filds 4), confirmed by the knc-twin session; fix in engine 0.3.2 (gcc-knc S14-19), PLT cold-path support S14-20; rerun is S1-05.
+  log(1.0) in the twin (expected 0). S1-04: twin defect (fildl read 8 bytes, filds 4), confirmed by the knc-twin session; fix in engine 0.4.0 (gcc-knc S14-19), PLT cold-path support S14-20; rerun is S1-05.
 
 ## Not proven yet
 
