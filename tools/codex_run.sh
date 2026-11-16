@@ -13,6 +13,8 @@ if [ ! -d "$WT" ]; then
   if git -C "$MAIN" show-ref -q "refs/heads/ticket/$ID"; then git -C "$MAIN" worktree add -q "$WT" "ticket/$ID"
   else git -C "$MAIN" worktree add -q -b "ticket/$ID" "$WT" main; fi
 fi
+# Engineers have no network by default: give each worktree the lead-fetched pinned sources (scripts/fetch.sh in main).
+[ -d "$MAIN/third_party" ] && [ ! -d "$WT/third_party" ] && cp -r "$MAIN/third_party" "$WT/"
 ROOT="$(cd "$WT" && pwd -W 2>/dev/null || pwd)"
 CODEX="$(ls -t "$LOCALAPPDATA"/OpenAI/Codex/bin/*/codex.exe | head -1)"
 NET=false; grep -q 'Network: yes' "$WT/$TICKET" && NET=true
