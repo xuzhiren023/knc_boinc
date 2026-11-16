@@ -4,7 +4,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 | Sprint | State |
 |---|---|
-| 1 | S1-01..S1-05 merged; card run staged, waits for the gcc-knc lead's "go"; S1-06 merged incomplete (twin gaps; 1-ULP unit/ring gravity mismatch); S1-07 running |
+| 1 | Card run done 2026-11-16 (docs/sprints/sprint-1.md); S1-06/S1-07 merged, chunk scaling waits for knc-twin S14-37 |
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
@@ -26,9 +26,15 @@ Lead-maintained. Last update: 2026-11-16 EST.
   critical-path term (43,656) charges every first touch full cold latency, so it is a cold-start scenario, not a
   floor; the real bound term is memory_concurrency 5,658 (knc-twin session, fix as gcc-knc S14-27 after S14-20).
 
+- Card (7120, 240 threads) gives likelihoods bit-identical to x86 on small, medium and large (card run 2026-11-16);
+  crlibm 6,272/6,272 probe rows bit-identical. Card wall: small 336 s, medium 1,225 s, large 61 s (app's 128-body
+  OpenMP chunk limits small/medium to 1/8 busy threads).
+- S1-07: the 1-ULP twin gravity mismatch is a knc-twin x87 double-rounding defect (gcc-knc S14-37); native x87
+  PC=53 matches SSE bit for bit.
+
 ## Not proven yet
 
-- Card run and x86 agreement (likelihood |diff| < 1e-10, upstream rule).
+- End-to-end run on the card (S4-01): needs --benchmark admission and card_run's known_hosts first.
 - The real Windows BOINC client with the Cygwin-built API (Sprint 4, needs BOINC installed).
 - Live card graphics feed (screensaver tested offline with demo snapshots only).
 - The guide followed verbatim by the lead.
