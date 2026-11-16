@@ -47,6 +47,7 @@ the guide, after the offline check passes.
 | 4 | End to end and guide | S4-01 lead end-to-end card run (standalone BOINC API mode) and x86 comparison; S4-02 TRY-IT guide |
 | 5 | Speed on the card, twin first (owner 2026-11-16: card busy, use knc-twin) | S5-01 twin ranking of gravity compile flags; S5-02 KNC OpenMP chunk size (results unchanged) |
 | 6 | Vector gravity, bit-exact (owner 2026-11-16) | S6-01 one body per vector lane tree walk, twin first |
+| 7 | First validated MilkyWay@home result from the card (owner 2026-11-16) | S7-01 re-pin to N-body 1.96 (the server's standard app); S7-02 real task contract and stock-app comparison (after the owner captures a task); card A/B; long card window for the real task |
 
 Each ticket: acceptance written before work, red-then-green where a test can fail first, engineer report in the ticket,
 lead review against the acceptance (tests read, doubtful steps rerun), merge, sprint review note in `docs/sprints/`.
