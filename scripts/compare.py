@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Compare run directories containing stdout.txt, stderr.txt, histogram.txt.
+"""Compare run directories or stdout/stderr captures.
 
-Likelihood: upstream nbody/tests/RunTestUnits.lua:137-139, strict abs < 1e-10.
-Histogram: proposed extension of that absolute rule to every numeric field;
-no upstream end-to-end histogram acceptance rule was found. Relative errors
-are diagnostics only. This is a regression check, not a BOINC validator.
+Likelihood verdict: upstream nbody/tests/RunTestUnits.lua:137-139, abs < 1e-10.
+Histograms are diagnostics only. Captures use upstream --print-histogram.
 """
 import argparse
 import math
@@ -15,16 +13,48 @@ import sys
 TOLERANCE = 1e-10
 
 
+def printed_histogram(output):
+    blocks = re.findall(r'<histogram>\s*(.*?)</histogram>', output, re.S)
+    if len(blocks) > 1:
+        raise ValueError('ambiguous histogram capture')
+    if blocks:
+        return blocks[0]
+    # Standalone nbPrintHistogram suppresses the BOINC-only XML wrappers.
+    starts = list(re.finditer(r'(?m)^n\s*=\s*\d+\s*$', output))
+    if not starts:
+        return None
+    if len(starts) != 1:
+        raise ValueError('ambiguous standalone histogram capture')
+    tail = output[starts[0].start():]
+    dimensions = [re.search(r'(?m)^' + name + r'\s*=\s*(\d+)\s*$', tail)
+                  for name in ('lambdaBins', 'betaBins')]
+    if not all(dimensions):
+        raise ValueError('missing histogram dimensions')
+    expected = int(dimensions[0][1]) * int(dimensions[1][1])
+    lines, count = [], 0
+    for line in tail.splitlines():
+        lines.append(line)
+        if re.match(r'^[01]\s+', line):
+            count += 1
+            if count == expected:
+                return '\n'.join(lines)
+    raise ValueError('incomplete standalone histogram capture')
+
+
 def load_run(directory):
     directory = pathlib.Path(directory)
-    output = '\n'.join((directory / name).read_text() for name in
-                       ('stdout.txt', 'stderr.txt') if (directory / name).exists())
+    output = (directory.read_text() if directory.is_file() else '\n'.join(
+        (directory / name).read_text() for name in ('stdout.txt', 'stderr.txt')
+        if (directory / name).exists()))
     matches = re.findall(r'<search_likelihood>\s*([^<]+)\s*</search_likelihood>', output)
     if len(matches) != 1:
         raise ValueError('{}: expected exactly one search_likelihood'.format(directory))
     likelihood = float(matches[0])
     rows, metadata = [], {}
-    for line in (directory / 'histogram.txt').read_text().splitlines():
+    histogram = printed_histogram(output)
+    if histogram is None:
+        histogram = (directory / 'histogram.txt').read_text()
+    for line in histogram.splitlines():
         line = line.strip()
         if not line or line.startswith(('#', '<')) or line == '!':
             continue
@@ -57,24 +87,27 @@ def differences(a, b):
 def compare(a, b, tolerance):
     la, ra, ma = load_run(a)
     lb, rb, mb = load_run(b)
-    if [len(row) for row in ra] != [len(row) for row in rb] or ma.keys() != mb.keys():
-        raise ValueError('histogram shape/metadata mismatch')
+    schema_matches = ([len(row) for row in ra] == [len(row) for row in rb]
+                      and ma.keys() == mb.keys())
     pairs = []
     for i, (row_a, row_b) in enumerate(zip(ra, rb)):
-        # Bin mask and coordinates must match exactly: these define the schema.
+        # Bin identities are diagnostics as well; likelihood alone is the verdict.
         if row_a[:3] != row_b[:3]:
-            raise ValueError('histogram bin identity mismatch at row {}'.format(i))
+            schema_matches = False
+            continue
         pairs.extend(zip(row_a[3:], row_b[3:]))
-    for key in ma:
+    for key in ma.keys() & mb.keys():
         if len(ma[key]) != len(mb[key]):
-            raise ValueError('histogram metadata shape mismatch: ' + key)
+            schema_matches = False
         pairs.extend(zip(ma[key], mb[key]))
     ld = differences(la, lb)
     hd = [differences(x, y) for x, y in pairs]
     print('likelihood: A={:.17g} B={:.17g} abs={:.17g} rel={:.17g}'.format(la, lb, *ld))
-    print('histogram: rows={} max_abs={:.17g} max_rel={:.17g}'.format(len(ra), max(d[0] for d in hd), max(d[1] for d in hd)))
-    passed = ld[0] < tolerance and all(d[0] < tolerance for d in hd)
-    print('{} (strict absolute < {:g}; histogram tolerance is proposed)'.format('PASS' if passed else 'FAIL', tolerance))
+    print('histogram: rows={}/{} schema_matches={} max_abs={:.17g} max_rel={:.17g}'.format(
+        len(ra), len(rb), schema_matches, max((d[0] for d in hd), default=0.0),
+        max((d[1] for d in hd), default=0.0)))
+    passed = ld[0] < tolerance
+    print('{} (strict absolute < {:g}; likelihood verdict; histogram diagnostic only)'.format('PASS' if passed else 'FAIL', tolerance))
     return 0 if passed else 1
 
 

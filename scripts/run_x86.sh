@@ -8,21 +8,24 @@ for case_name in ${1:-small medium}; do
     case "$case_name" in
         small) bodies=64 ;;
         medium) bodies=1024 ;;
+        large) bodies=20000 ;;
         *) echo "Unknown workunit: $case_name" >&2; exit 2 ;;
     esac
-    for threads in ${2:-1 4}; do
-        [[ "$threads" == 1 || "$threads" == 4 ]] || exit 2
+    default_threads="1 4"
+    [[ "$case_name" != large ]] || default_threads="1 12"
+    for threads in ${2:-$default_threads}; do
+        [[ "$threads" == 1 || "$threads" == 4 || "$threads" == 12 ]] || exit 2
         out="runs/x86/$case_name-$threads"
         mkdir -p "$out"
         # Prevent a previous result from masking a run that produces no output.
-        rm -f "$out/histogram.txt"
+        rm -f "$out/histogram.txt" "$out/exit.txt"
         export OMP_NUM_THREADS="$threads"
         command=(build/x86/milkyway_nbody.exe
             -f "workunits/$case_name/params.lua"
             -h "workunits/$case_name/input.hist"
             -z "$out/histogram.txt" -c "$out/checkpoint"
             --seed 670828913 --nthreads "$threads"
-            --ignore-checkpoint --checkpoint-interval=-1 "$bodies")
+            --print-histogram --ignore-checkpoint --checkpoint-interval=-1 "$bodies")
         printf '%q ' "${command[@]}" > "$out/command.txt"
         printf '\n' >> "$out/command.txt"
         TIMEFORMAT='%3R'
@@ -37,7 +40,8 @@ for case_name in ${1:-small medium}; do
         echo "Elapsed $(cat "$out/seconds.txt") s"
     done
     if [[ -z "${2:-}" ]]; then
-        python scripts/compare.py "runs/x86/$case_name-1" "runs/x86/$case_name-4" > "runs/x86/$case_name-compare.txt"
+        last_threads=${default_threads##* }
+        python scripts/compare.py "runs/x86/$case_name-1" "runs/x86/$case_name-$last_threads" > "runs/x86/$case_name-compare.txt"
         cat "runs/x86/$case_name-compare.txt"
     fi
 done

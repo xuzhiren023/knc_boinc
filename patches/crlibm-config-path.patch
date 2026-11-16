@@ -1,0 +1,11 @@
+--- a/crlibm/scs_lib/scs.h
++++ b/crlibm/scs_lib/scs.h
+@@ -35,7 +35,7 @@
+ #ifndef DOXYGEN_SHOULD_SKIP_THIS /* because it is not very clean */
+ 
+ #ifdef HAVE_CONFIG_H
+-#include "../crlibm_config.h"
++#include "crlibm_config.h"
+ #endif
+ #ifdef HAVE_INTTYPES_H
+ #include <inttypes.h>

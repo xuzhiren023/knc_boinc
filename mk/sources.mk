@@ -62,3 +62,14 @@ COMMON_LDLIBS := -lm
 NBODY_LUA_CPPFLAGS := -DNBODY_LUA_TYPES_COMPILATION
 MW_LUA_CPPFLAGS := -DMILKYWAY_LUA_COMPILATION
 MW_MATH_CPPFLAGS := -DMILKYWAY_MATH_COMPILATION
+
+# Exact bundled crlibm source list from crlibm/CMakeLists.txt.
+CRLIBM_SOURCES := $(addprefix crlibm/,crlibm_private.c triple-double.c \
+ exp-td.c exp-td-standalone.c expm1-standalone.c expm1.c log.c log1p.c \
+ rem_pio2_accurate.c trigo_fast.c trigo_accurate.c trigpi.c asincos.c pow.c \
+ atan_fast.c atan_accurate.c csh_fast.c scs_lib/scs_private.c \
+ scs_lib/addition_scs.c scs_lib/division_scs.c scs_lib/print_scs.c \
+ scs_lib/double2scs.c scs_lib/zero_scs.c scs_lib/multiplication_scs.c scs_lib/scs2double.c)
+SOURCES += $(CRLIBM_SOURCES)
+INCLUDE_DIRS += crlibm
+COMMON_CPPFLAGS += -DSCS_NB_WORDS=8 -DSCS_NB_BITS=30

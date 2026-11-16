@@ -64,3 +64,67 @@ For byte identity of the scientific results, compare the likelihood token and
 histogram content after removing `#` comments and blank lines. Timings,
 OpenMP diagnostics and generated timestamps make full logs unsuitable for
 byte identity. The engineer report records both the numeric and byte checks.
+
+## S1-02 crlibm and card runs
+
+Both builds now enable the bundled crlibm production default. Histogram numeric
+and schema differences are diagnostics; the verdict is only the likelihood's
+strict absolute difference < 1e-10. Missing, malformed or non-finite result data
+still fails as invalid input. The earlier proposed histogram tolerance is retired.
+
+The runner now adds upstream `--print-histogram` (`main.c:354-356`), which writes
+a histogram to stderr. Standalone builds suppress the BOINC XML wrappers, so
+the comparator recognizes the `n =` header and consumes exactly lambdaBins *
+betaBins rows; it also accepts the tagged BOINC form. `compare.py` accepts a run directory or one file
+containing captured stdout/stderr. With captures present it compares that printed
+histogram in preference to histogram.txt. This is the final-state histogram;
+the saved file can instead describe the best-likelihood timestep. Comparisons
+must use the same representation on both sides. No output patch is needed.
+
+`large/` copies the same upstream model and input histogram, with 20,000 bodies
+passed on the command line. This is the ticket's fallback count: a current public
+production parameter file with a verifiable particle count was not located on
+2026-11-15. The official news archive
+<https://milkyway.cs.rpi.edu/milkyway/old_news.php> reports a historic reduction
+to 20k (12 May 2015), but also later 40k run names (16 June 2021); neither proves
+current production settings. Thus 20,000 is a stated fallback, not a verified
+current production count. The large model alone shortens `timeEvolve` from
+3.945 to 0.05 Gyr and reverse-orbit `tstop` from 4.0 to 0.05 Gyr to bound
+reference time while exercising the 20,000-body tree and force calculation
+and placing the dwarf in the observed histogram region. All other model
+settings remain the upstream test's. This bounded case does not establish
+long-term numerical agreement for a full production-duration workunit.
+
+Run the large x86 references at 1 and 12 threads:
+
+```bash
+bash scripts/run_x86.sh large '1 12'
+python scripts/compare.py runs/x86/large-1 runs/x86/large-12
+```
+
+Build and print the four lead-only card commands (small 240/60, medium 240,
+large 240 threads):
+
+```bash
+make -C mk card
+bash scripts/card-check.sh
+```
+
+The printer creates only `runs/card/` and prints quoted commands, never invokes
+card_run. Run the printed lines from the repository root. Each stages the ELF,
+all bundled runtime libraries and both inputs explicitly with --file. A staged
+shell launcher exports OMP_NUM_THREADS and OMP_DYNAMIC=FALSE, then execs the ELF;
+--threads reserves the corresponding runner layout and --nthreads configures
+upstream. Each line captures stdout/stderr together to `runs/card/CASE-THREADS.txt`
+and writes a separate JSON receipt. The 43,200-second timeout accommodates large
+unoptimized card runs; it is a deadline, not a runtime estimate. The package is
+below the runner's default 64 MiB staging cap, without copying card GCC 5 libs.
+
+After the lead verifies program exit zero in the receipt, compare for example:
+
+```bash
+python scripts/compare.py runs/x86/small-1 runs/card/small-240.txt
+python scripts/compare.py runs/x86/small-1 runs/card/small-60.txt
+python scripts/compare.py runs/x86/medium-1 runs/card/medium-240.txt
+python scripts/compare.py runs/x86/large-1 runs/card/large-240.txt
+```

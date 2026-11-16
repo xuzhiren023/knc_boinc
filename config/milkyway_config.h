@@ -199,7 +199,11 @@
   #define HAVE_OTHER_MATH_X87 1
 #endif
 
+#ifdef __CYGWIN__
 #define MILKYWAY_SYSTEM_NAME "CYGWIN"
+#else
+#define MILKYWAY_SYSTEM_NAME "Linux"
+#endif
 
 
 #if defined(__SUNPRO_C) || defined(__SUNPRO_CC)
