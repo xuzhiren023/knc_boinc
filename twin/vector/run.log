@@ -1,40 +1,150 @@
+capabilities: ok
+profiles: card-3120-documented, card-5110p-literature, card-7120-measured, core-x100-measured, knc-common, multicore-assumed, overlay-no-branch-bubble, overlay-vector-load-12, synthetic-demo
+result: build/s6-capabilities\result.json
+summary: build/s6-capabilities\summary.md
+{
+  "engine_version": "0.4.0",
+  "required_functional_support": true,
+  "instructions": {
+    "vrcp23ps": {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrcp23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal stands in for the hardware's 0.912-ulp result (R27 p.577), special values and flags per Table 6.26; results that depend on the exact bits are marked approximate; the characterization plan captures the 2^23-entry table that makes it exact",
+      "pipes": "U"
+    },
+    "vrsqrt23ps": {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrsqrt23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal square root stands in for the hardware's 0.775-ulp result (R27 p.588), special values and flags per Table 6.29",
+      "pipes": "U"
+    },
+    "vfmadd132pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfmadd213pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfmadd231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfmsub132pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfmsub213pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfmsub231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmsub231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmadd132pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmadd213pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmadd231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmsub132pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub132pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmsub213pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub213pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmsub231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmsub231pd",
+      "note": "",
+      "pipes": "U"
+    }
+  },
+  "seed_policy": "Native seed bit patterns need captured tables; default seed values are approximate.",
+  "scalar_baseline": "not rerun: installed handoff-prompt.md still names S14-37 as unfixed"
+}
 $ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-0.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-0-functional --force
-functional: functional_mismatch
-1 mismatch(es) against expected outputs; first: {"where": "mem[0x60000020]+16", "got": "d28d437ec0994740", "want": "d18d437ec0994740"}
+functional: ok
+executed 715391 dynamic instructions; all 9 expected items match
 result: twin/vector/vector-0-functional\result.json
 summary: twin/vector/vector-0-functional\summary.md
 $ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-0.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-0-simulate --force
-timing_prediction: functional_mismatch
-candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+timing_prediction: ok
+predicted 2273032 core cycles (284129.000 per unit) for 715391 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
 result: twin/vector/vector-0-simulate\result.json
 summary: twin/vector/vector-0-simulate\summary.md
-$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/scalar-0.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/scalar-0-functional --force
-functional: functional_mismatch
-2 mismatch(es) against expected outputs; first: {"where": "mem[0x60000020]+16", "got": "d28d437ec0994740", "want": "d18d437ec0994740"}
-result: twin/vector/scalar-0-functional\result.json
-summary: twin/vector/scalar-0-functional\summary.md
-$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/scalar-0.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/scalar-0-simulate --force
-timing_prediction: functional_mismatch
-candidate produced wrong results (2 mismatches); its timing is not reported as a valid result
-result: twin/vector/scalar-0-simulate\result.json
-summary: twin/vector/scalar-0-simulate\summary.md
 $ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-1024-functional --force
 functional: ok
-executed 654829 dynamic instructions; all 9 expected items match
+executed 703228 dynamic instructions; all 9 expected items match
 result: twin/vector/vector-1024-functional\result.json
 summary: twin/vector/vector-1024-functional\summary.md
 $ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-1024-simulate --force
 timing_prediction: ok
-predicted 3142632 core cycles (392829.000 per unit) for 654829 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+predicted 2347071 core cycles (293383.875 per unit) for 703228 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
 result: twin/vector/vector-1024-simulate\result.json
 summary: twin/vector/vector-1024-simulate\summary.md
-$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/scalar-1024.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/scalar-1024-functional --force
-functional: functional_mismatch
-2 mismatch(es) against expected outputs; first: {"where": "mem[0x60000000]+8", "got": "69ab9aa33d856240", "want": "6aab9aa33d856240"}
-result: twin/vector/scalar-1024-functional\result.json
-summary: twin/vector/scalar-1024-functional\summary.md
-$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/scalar-1024.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/scalar-1024-simulate --force
-timing_prediction: functional_mismatch
-candidate produced wrong results (2 mismatches); its timing is not reported as a valid result
-result: twin/vector/scalar-1024-simulate\result.json
-summary: twin/vector/scalar-1024-simulate\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-2048.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-2048-functional --force
+functional: ok
+executed 705562 dynamic instructions; all 9 expected items match
+result: twin/vector/vector-2048-functional\result.json
+summary: twin/vector/vector-2048-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-2048.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-2048-simulate --force
+timing_prediction: ok
+predicted 2283992 core cycles (285499.000 per unit) for 705562 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin/vector/vector-2048-simulate\result.json
+summary: twin/vector/vector-2048-simulate\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-4088.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-4088-functional --force
+functional: ok
+executed 654755 dynamic instructions; all 9 expected items match
+result: twin/vector/vector-4088-functional\result.json
+summary: twin/vector/vector-4088-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-4088.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-4088-simulate --force
+timing_prediction: ok
+predicted 2177989 core cycles (272248.625 per unit) for 654755 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin/vector/vector-4088-simulate\result.json
+summary: twin/vector/vector-4088-simulate\summary.md

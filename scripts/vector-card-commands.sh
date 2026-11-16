@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Print only: the lead decides whether this rejected prototype should run.
+# Print only: the lead runs the card A/B.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-printf '# S6-01: prototype is NOT accepted; macro stays off by default.\n'
+printf '# S6-03: card A/B pending; macro stays off by default.\n'
 printf 'mkdir -p runs/card/vector\n'
 for variant in off on; do
     for case_name in medium large; do
@@ -22,3 +22,4 @@ for variant in off on; do
         printf '> runs/card/vector/%s-%s.txt 2>&1\n' "$variant" "$case_name"
     done
 done
+printf '%s\n' 'python scripts/check_vector_card.py'

@@ -1,5 +1,6 @@
 """Faithful full vector kernel; scalar compiled chunk keeps S1-07's cold cut."""
 import copy
+import os
 import json
 from pathlib import Path
 root=Path('twin/vector')
@@ -25,7 +26,7 @@ for block in cap['init']['memory']:
     filtered.append({'addr':block['addr'],'hex':data.hex()})
 cap['init']['memory']=filtered
 body=int(cap['init']['registers']['rcx'],0)
-for variant in ('vector','scalar'):
+for variant in (('vector','scalar') if os.environ.get('TWIN_SCALAR_READY') == '1' else ('vector',)):
     full=json.loads((root/(variant+'-full.json')).read_text())
     records=full['streams'][0]['instructions']
     if variant=='scalar':
@@ -43,7 +44,7 @@ for variant in ('vector','scalar'):
     else:
         assert not any(r['op']=='call' for r in records)
         full['provenance']['full_compiled_function_retained']=True
-    for first in (0,1024):
+    for first in (0,1024,2048,4088):
         k=copy.deepcopy(full)
         k['init']=copy.deepcopy(cap['init'])
         k['init']['symbols']=full['init'].get('symbols',{})
@@ -57,4 +58,4 @@ for variant in ('vector','scalar'):
         k['unit_of_work']={'count':8,'description':'eight contiguous bodies, first large force step'}
         k['provenance']['first_body']=first
         (root/('%s-%d.json'%(variant,first))).write_text(json.dumps(k,indent=2)+'\n')
-print('Prepared full compiled 8-body kernels for bodies 0-7 and 1024-1031')
+print('Prepared compiled kernels for groups 0, 1024, 2048, 4088')

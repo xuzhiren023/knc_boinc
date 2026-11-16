@@ -6,5 +6,61 @@
     "medium-12",
     "large-12"
   ],
-  "all_exact": true
+  "all_exact": true,
+  "results": [
+    {
+      "case": "small-1",
+      "status": "exact",
+      "reference": "runs/force-chunk/small-chunkvector-off-t1",
+      "candidate": "runs/force-chunk/small-chunkvector-on-t1",
+      "likelihood": [
+        "-438.534790192227661"
+      ],
+      "saved_histogram_sha256_without_generated_timestamp": "39e95e19567482cd47ccc80578d0bcef9008724a095c9760c057d2ede40eab3e"
+    },
+    {
+      "case": "small-12",
+      "status": "exact",
+      "reference": "runs/force-chunk/small-chunkvector-off-t12",
+      "candidate": "runs/force-chunk/small-chunkvector-on-t12",
+      "likelihood": [
+        "-438.534790192227661"
+      ],
+      "saved_histogram_sha256_without_generated_timestamp": "39e95e19567482cd47ccc80578d0bcef9008724a095c9760c057d2ede40eab3e"
+    },
+    {
+      "case": "medium-1",
+      "status": "exact",
+      "reference": "runs/force-chunk/medium-chunkvector-off-t1",
+      "candidate": "runs/force-chunk/medium-chunkvector-on-t1",
+      "likelihood": [
+        "-450.772121584039894"
+      ],
+      "saved_histogram_sha256_without_generated_timestamp": "229083c59ea5acd3e48c13ed1f78a1a088033125fb6a2053302be767738fd654"
+    },
+    {
+      "case": "medium-12",
+      "status": "exact",
+      "reference": "runs/force-chunk/medium-chunkvector-off-t12",
+      "candidate": "runs/force-chunk/medium-chunkvector-on-t12",
+      "likelihood": [
+        "-450.772121584039894"
+      ],
+      "saved_histogram_sha256_without_generated_timestamp": "229083c59ea5acd3e48c13ed1f78a1a088033125fb6a2053302be767738fd654"
+    },
+    {
+      "case": "large-12",
+      "status": "exact",
+      "reference": "runs/force-chunk/large-chunkvector-off-t12",
+      "candidate": "runs/force-chunk/large-chunkvector-on-t12",
+      "likelihood": [
+        "-4894.200373110274995"
+      ],
+      "saved_histogram_sha256_without_generated_timestamp": "0fd65213779b437b23bccac9c361f7b9d00a95aa9783990bf392553c66c387d4"
+    }
+  ],
+  "binary_sha256": {
+    "build/x86/milkyway_nbody.exe": "8f15f58e41e6f5a581200b0e1b42fbc8b347f8c5f602460eaa97c0e669090101",
+    "build/vector/x86-on/milkyway_nbody.exe": "afa10ffe1b827113a4b4f3201c5e1e0c66d7c3a06fbe4cf1596c1a74cef880d9"
+  }
 }

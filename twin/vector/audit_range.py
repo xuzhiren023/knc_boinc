@@ -68,6 +68,6 @@ assert actual==expected
 result={'bodies':4096,'primitive_operations':count,'subnormal_results':subnormal,'nonfinite_results':nonfinite,
         'min_nonzero_abs':lo,'max_abs':hi,'expected_xyz_sha256':hashlib.sha256(actual).hexdigest(),
         'scope':'first large force step only; Python binary64 scalar order, independently matched to all captured XYZ bytes',
-        'group_visits':{str(first):visits[first:first+8] for first in (0,1024)}}
+        'group_visits':{str(first):visits[first:first+8] for first in (0,1024,2048,4088)}}
 (root/'range.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps(result,indent=2))

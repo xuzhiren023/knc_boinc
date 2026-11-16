@@ -1,0 +1,36 @@
+{
+  "engine_version": "0.4.0",
+  "required_functional_support": true,
+  "instructions": {
+    "vrcp23ps": {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrcp23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal stands in for the hardware's 0.912-ulp result (R27 p.577), special values and flags per Table 6.26; results that depend on the exact bits are marked approximate; the characterization plan captures the 2^23-entry table that makes it exact",
+      "pipes": "U"
+    },
+    "vrsqrt23ps": {
+      "class": "vector_long",
+      "functional": true,
+      "mnemonic": "vrsqrt23ps",
+      "note": "APPROXIMATE value: the correctly rounded reciprocal square root stands in for the hardware's 0.775-ulp result (R27 p.588), special values and flags per Table 6.29",
+      "pipes": "U"
+    },
+    "vfmadd231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfmadd231pd",
+      "note": "",
+      "pipes": "U"
+    },
+    "vfnmadd231pd": {
+      "class": "vector_arith",
+      "functional": true,
+      "mnemonic": "vfnmadd231pd",
+      "note": "",
+      "pipes": "U"
+    }
+  },
+  "seed_policy": "Native seed bit patterns need captured tables; default seed values are approximate.",
+  "scalar_baseline": "not rerun: installed S14-37 repro still mismatches; see s14-37-check.json"
+}

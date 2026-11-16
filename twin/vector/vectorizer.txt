@@ -1,71 +1,85 @@
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate mode V16SI, factor = 16 (main loop)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate scalar peel: required (alignment iterations 0, gap peel 1)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate scalar epilogue: non-contiguous or backward masked access
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: missed:  KNC rejected masked epilogue candidate: non-contiguous or backward masked access
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V16SI, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate accesses: gather 1, scatter 0, converting 0, masked 0; reductions 3
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:415:21: optimized:  KNC candidate body call sqrt (before target lowering)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate: helper calls introduced by target lowering and register-allocation spills are not known at vector costing
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate mode V16SI, factor = 16 (epilogue loop)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate scalar peel: required (alignment iterations 0, gap peel 1)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate scalar epilogue: non-contiguous or backward masked access
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: missed:  KNC rejected masked epilogue candidate: non-contiguous or backward masked access
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V16SI, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate access mode V8DF, factor = 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate accesses: gather 1, scatter 0, converting 0, masked 0; reductions 3
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:415:21: optimized:  KNC candidate body call sqrt (before target lowering)
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized:  KNC candidate: helper calls introduced by target lowering and register-allocation spills are not known at vector costing
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized: loop vectorized using 64 byte vectors and unroll factor 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:404:19: optimized: epilogue loop vectorized using masked 64 byte vectors and unroll factor 16
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:392:17: note: vectorized 1 loops in function.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:407:13: missed: statement clobbers memory: vect_b_index_12.176_267 = .GATHER_LOAD (vectp_ISRA.174_265, 256B, { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920 }, 1, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:410:18: missed: statement clobbers memory: vect_eps2_val_18.179_272 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _270, vect__14.178_269, 65535, 8);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:410:18: missed: statement clobbers memory: vect_eps2_val_18.180_275 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _270, _273, 65535, 8);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:407:13: missed: statement clobbers memory: vect_b_index_79.238_654 = .MASK_GATHER_LOAD (vectp_ISRA.237_647, 256B, { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920 }, 1, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, max_mask_828, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:410:18: missed: statement clobbers memory: vect_eps2_val_73.241_660 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _657, vect__77.240_656, stmp_659, 8);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:410:18: missed: statement clobbers memory: vect_eps2_val_73.242_664 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _657, _661, stmp_663, 8);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:410:51: note: ***** Analysis failed with vector mode V16SI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: not vectorized: Infinite loop detected.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:462:9: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:462:9: missed: not vectorized: Infinite loop detected.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: vectorized 0 loops in function.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: statement clobbers memory: _21 = __builtin_GOMP_loop_nonmonotonic_dynamic_start (0, _19, 1, 4, &.istart0.40, &.iend0.41);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:482:21: missed: statement clobbers memory: a = nbGravity_Exact.isra (_128, _129, _130, _131, _29); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:483:17: missed: statement clobbers memory: nbEvalPotentialClosure (st_16, MEM[(struct NBodyNode *)_29].pos, &externAcc);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:484:17: missed: statement clobbers memory: D.9530 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_32, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:484:17: missed: statement clobbers memory: D.9537 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_39, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:484:17: missed: statement clobbers memory: D.9544 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_46, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:487:27: missed: not vectorized: more than one data ref in stmt: *_59 = a;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:477:29: missed: statement clobbers memory: *_65 = nbGravity_Exact.isra (_124, _125, _126, _127, _63);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:467:21: missed: statement clobbers memory: a = nbGravity_Exact.isra (_120, _121, _122, _123, b_69); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:469:29: missed: statement clobbers memory: D.9560 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)b_69].pos, *_71, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:469:29: missed: statement clobbers memory: D.9562 = nbExtAcceleration (_74, MEM[(struct NBodyNode *)b_69].pos, barTime_10); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:472:27: missed: not vectorized: more than one data ref in stmt: *_81 = a;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: statement clobbers memory: _85 = __builtin_GOMP_loop_nonmonotonic_dynamic_next (&.istart0.40, &.iend0.41);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: statement clobbers memory: __builtin_GOMP_loop_end_nowait ();
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:491:17: missed: ../third_party/milkywayathome_client/crlibm/asincos.c:2432:3: missed: statement clobbers memory: p_quick (&asinh, &asinm, z_647, index_646);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:469:29: note: ***** Analysis failed with vector mode V8DI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:264:19: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:264:19: missed: SLP build failed.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:268:18: note: ***** Analysis failed with vector mode V16SI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate mode V16SI, factor = 16 (main loop)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate scalar peel: required (alignment iterations 0, gap peel 1)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate scalar epilogue: non-contiguous or backward masked access
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: missed:  KNC rejected masked epilogue candidate: non-contiguous or backward masked access
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V16SI, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate accesses: gather 1, scatter 0, converting 0, masked 0; reductions 3
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:429:21: optimized:  KNC candidate body call sqrt (before target lowering)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate: helper calls introduced by target lowering and register-allocation spills are not known at vector costing
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate mode V16SI, factor = 16 (epilogue loop)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate scalar peel: required (alignment iterations 0, gap peel 1)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate scalar epilogue: non-contiguous or backward masked access
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: missed:  KNC rejected masked epilogue candidate: non-contiguous or backward masked access
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V16SI, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate access mode V8DF, factor = 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate accesses: gather 1, scatter 0, converting 0, masked 0; reductions 3
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:429:21: optimized:  KNC candidate body call sqrt (before target lowering)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized:  KNC candidate: helper calls introduced by target lowering and register-allocation spills are not known at vector costing
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized: loop vectorized using 64 byte vectors and unroll factor 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:418:19: optimized: epilogue loop vectorized using masked 64 byte vectors and unroll factor 16
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:406:17: note: vectorized 1 loops in function.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:421:13: missed: statement clobbers memory: vect_b_index_12.237_267 = .GATHER_LOAD (vectp_ISRA.235_265, 256B, { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920 }, 1, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:424:18: missed: statement clobbers memory: vect_eps2_val_18.240_272 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _270, vect__14.239_269, 65535, 8);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:424:18: missed: statement clobbers memory: vect_eps2_val_18.241_275 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _270, _273, 65535, 8);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:421:13: missed: statement clobbers memory: vect_b_index_79.299_654 = .MASK_GATHER_LOAD (vectp_ISRA.298_647, 256B, { 0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920 }, 1, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, max_mask_828, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:424:18: missed: statement clobbers memory: vect_eps2_val_73.302_660 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _657, vect__77.301_656, stmp_659, 8);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:424:18: missed: statement clobbers memory: vect_eps2_val_73.303_664 = __builtin_knc_gather_v8df ({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, _657, _661, stmp_663, 8);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:424:51: note: ***** Analysis failed with vector mode V16SI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: not vectorized: Infinite loop detected.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:476:9: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:476:9: missed: not vectorized: Infinite loop detected.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: vectorized 0 loops in function.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: statement clobbers memory: _21 = __builtin_GOMP_loop_nonmonotonic_dynamic_start (0, _19, 1, 4, &.istart0.101, &.iend0.102);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:496:21: missed: statement clobbers memory: a = nbGravity_Exact.isra (_128, _129, _130, _131, _29); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:497:17: missed: statement clobbers memory: nbEvalPotentialClosure (st_16, MEM[(struct NBodyNode *)_29].pos, &externAcc);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:498:17: missed: statement clobbers memory: D.9570 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_32, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:498:17: missed: statement clobbers memory: D.9577 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_39, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:498:17: missed: statement clobbers memory: D.9584 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)_29].pos, *_46, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:501:27: missed: not vectorized: more than one data ref in stmt: *_59 = a;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:491:29: missed: statement clobbers memory: *_65 = nbGravity_Exact.isra (_124, _125, _126, _127, _63);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:481:21: missed: statement clobbers memory: a = nbGravity_Exact.isra (_120, _121, _122, _123, b_69); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:483:29: missed: statement clobbers memory: D.9600 = LMCAcceleration (lmcfunction_11, MEM[(struct NBodyNode *)b_69].pos, *_71, lmcmass_14, lmcscale_13, lmcscale2_12); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:483:29: missed: statement clobbers memory: D.9602 = nbExtAcceleration (_74, MEM[(struct NBodyNode *)b_69].pos, barTime_10); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:486:27: missed: not vectorized: more than one data ref in stmt: *_81 = a;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: statement clobbers memory: _85 = __builtin_GOMP_loop_nonmonotonic_dynamic_next (&.istart0.101, &.iend0.102);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: statement clobbers memory: __builtin_GOMP_loop_end_nowait ();
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:505:17: missed: statement clobbers memory: fprintf (stderr.97_86, "Bad external potential type: %d\n", _141);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:505:17: missed: statement clobbers memory: exit (1);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:483:29: note: ***** Analysis failed with vector mode V8DI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:278:19: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:278:19: missed: SLP build failed.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:282:18: note: ***** Analysis failed with vector mode V16SI
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:178:12: missed: couldn't vectorize loop
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:178:12: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:245:23: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:245:23: missed: unsupported SLP instances
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:234:27: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:234:27: missed: unsupported SLP instances
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:218:23: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:218:23: missed: unsupported SLP instances
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:253:27: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:253:27: missed: unsupported SLP instances
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:253:27: note: ***** Analysis failed with vector mode V16SI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:238:27: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:238:27: missed: unsupported SLP instances
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate mode V8DF, factor = 8 (main loop)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate scalar peel: not required (alignment iterations 0, gap peel 0)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate scalar epilogue: known remainder 0 within the x87 limit 1 (C6)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate access mode V8DF, factor = 8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate access mode V8DF, factor = 8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate access mode V8DF, factor = 8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate access mode V8DF, factor = 8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate accesses: gather 0, scatter 0, converting 0, masked 0; reductions 0
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:232:20: optimized:  KNC candidate body call sqrt (before target lowering)
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized:  KNC candidate: helper calls introduced by target lowering and register-allocation spills are not known at vector costing
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:230:23: optimized: loop vectorized using 64 byte vectors and unroll factor 8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:220:27: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:220:27: missed: unsupported SLP instances
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:220:27: note: ***** Analysis failed with vector mode V16SI
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:187:23: missed: couldn't vectorize loop
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:187:23: missed: not vectorized: unsupported control flow in loop.
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:179:23: optimized:  KNC candidate mode V8DF, factor = 8 (main loop)
@@ -88,88 +102,92 @@
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:171:23: missed: unsupported SLP instances
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:160:19: missed: couldn't vectorize loop
 ../third_party/milkywayathome_client/nbody/src/nbody_grav.c:160:19: missed: SLP build failed.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:148:10: note: vectorized 1 loops in function.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:148:10: missed: splitting region at dont-vectorize loop 7 entry at bb30
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:203:59: note: ***** Analysis failed with vector mode V8DI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:203:59: missed: splitting region at dominance boundary bb13
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:236:23: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vx] = MEM <unsigned char[64]> [(char * {ref-all})&x];
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:236:37: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vy] = MEM <unsigned char[64]> [(char * {ref-all})&y];
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:236:51: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vz] = MEM <unsigned char[64]> [(char * {ref-all})&z];
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:236:65: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vm] = MEM <unsigned char[64]> [(char * {ref-all})&m];
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:245:23: note: ***** Analysis failed with vector mode V16SI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:266:31: note: ***** Analysis failed with vector mode V16SI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:316:9: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:316:9: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:322:26: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:322:26: missed: not vectorized: Infinite loop detected.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:320:29: missed: couldn't vectorize loop
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:320:29: missed: not vectorized: unsupported control flow in loop.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: vectorized 0 loops in function.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: statement clobbers memory: _26 = __builtin_GOMP_loop_nonmonotonic_dynamic_start (0, _24, 8, 1, &.istart0.32, &.iend0.33);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:318:28: missed: statement clobbers memory: missing_38 = nbGravity8 (&group, ctx_22, st_21, _36, count_33);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:321:41: missed: statement clobbers memory: nbReportTreeIncest (ctx_22, st_21);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:376:17: missed: statement clobbers memory: nbEvalPotentialClosure (st_21, MEM[(struct NBodyNode *)_51].pos, &externAcc);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:377:17: missed: statement clobbers memory: D.9373 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_53, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:377:17: missed: statement clobbers memory: D.9380 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_60, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:377:17: missed: statement clobbers memory: D.9387 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_67, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:363:27: missed: not vectorized: more than one data ref in stmt: *_84 = group[_81];
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:344:29: missed: statement clobbers memory: D.9403 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)b_88].pos, *_90, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:344:29: missed: statement clobbers memory: D.9405 = nbExtAcceleration (_93, MEM[(struct NBodyNode *)b_88].pos, barTime_15); [return slot optimization]
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: statement clobbers memory: _46 = __builtin_GOMP_loop_nonmonotonic_dynamic_next (&.istart0.32, &.iend0.33);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: statement clobbers memory: __builtin_GOMP_loop_end_nowait ();
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:384:17: missed: statement clobbers memory: fprintf (stderr.27_102, "Bad external potential type: %d\n", _144);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:384:17: missed: statement clobbers memory: exit (1);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:322:32: note: ***** Analysis failed with vector mode V8DI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:442:14: missed: not vectorized: more than one data ref in stmt: LMCx = st_12(D)->LMCpos;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:506:13: missed: statement clobbers memory: __builtin_GOMP_parallel (nbMapForceBody_Exact._omp_fn.0, &.omp_data_o.39, 0, 0);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:512:14: missed: statement clobbers memory: rc_15 = nbMakeTree (ctx_11(D), st_12(D));
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:297:14: missed: not vectorized: more than one data ref in stmt: LMCx = st_12(D)->LMCpos;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:506:13: missed: statement clobbers memory: __builtin_GOMP_parallel (nbMapForceBody._omp_fn.0, &.omp_data_o.31, 0, 0);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: ***** Analysis succeeded with vector mode V16SI
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: SLPing BB part
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Costing subgraph: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: node 0xa005c5648 (max_nunits=2, refcnt=1) const vector(2) int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: op template: .omp_data_o.39.nbody = nbody_41;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	stmt 0 .omp_data_o.39.nbody = nbody_41;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	stmt 1 .omp_data_o.39.lmcfunction = lmcfunction_59;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	children 0xa005c5788
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: node (external) 0xa005c5788 (max_nunits=1, refcnt=1) const vector(2) int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	{ nbody_41, lmcfunction_59 }
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Cost model analysis: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Cost model analysis for part in loop 0:
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: not vectorized: vectorization is not profitable.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Costing subgraph: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: node 0xa005c58c8 (max_nunits=2, refcnt=1) vector(2) long unsigned int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: op template: .omp_data_o.39.ctx = ctx_11(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	stmt 0 .omp_data_o.39.ctx = ctx_11(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	stmt 1 .omp_data_o.39.st = st_12(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	children 0xa005c5968
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: node (external) 0xa005c5968 (max_nunits=1, refcnt=1) vector(2) long unsigned int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: 	{ ctx_11(D), st_12(D) }
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Cost model analysis: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: note: Cost model analysis for part in loop 0:
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:457:13: missed: not vectorized: vectorization is not profitable.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Costing subgraph: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: node 0xa005c5dc8 (max_nunits=2, refcnt=1) const vector(2) int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: op template: .omp_data_o.31.nbody = nbody_19;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	stmt 0 .omp_data_o.31.nbody = nbody_19;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	stmt 1 .omp_data_o.31.lmcfunction = lmcfunction_37;
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	children 0xa005c5f08
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: node (external) 0xa005c5f08 (max_nunits=1, refcnt=1) const vector(2) int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	{ nbody_19, lmcfunction_37 }
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Cost model analysis: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Cost model analysis for part in loop 0:
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: not vectorized: vectorization is not profitable.
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Costing subgraph: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: node 0xa005c6048 (max_nunits=2, refcnt=1) vector(2) long unsigned int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: op template: .omp_data_o.31.ctx = ctx_11(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	stmt 0 .omp_data_o.31.ctx = ctx_11(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	stmt 1 .omp_data_o.31.st = st_12(D);
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	children 0xa005c60e8
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: node (external) 0xa005c60e8 (max_nunits=1, refcnt=1) vector(2) long unsigned int
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: 	{ ctx_11(D), st_12(D) }
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Cost model analysis: 
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: note: Cost model analysis for part in loop 0:
-../third_party/milkywayathome_client/nbody/src/nbody_grav.c:312:13: missed: not vectorized: vectorization is not profitable.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:148:10: note: vectorized 2 loops in function.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:223:23: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vs] = MEM <unsigned char[64]> [(char * {ref-all})&soft];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:226:42: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&d] = MEM <unsigned char[64]> [(char * {ref-all})&vd];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:240:23: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vx] = MEM <unsigned char[64]> [(char * {ref-all})&x];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:240:37: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vy] = MEM <unsigned char[64]> [(char * {ref-all})&y];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:240:51: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vz] = MEM <unsigned char[64]> [(char * {ref-all})&z];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:240:65: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vm] = MEM <unsigned char[64]> [(char * {ref-all})&m];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:260:56: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vzz] = MEM <unsigned char[64]> [(char * {ref-all})&zz];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:260:40: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vyz] = MEM <unsigned char[64]> [(char * {ref-all})&yz];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:260:24: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vyy] = MEM <unsigned char[64]> [(char * {ref-all})&yy];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:259:56: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vxz] = MEM <unsigned char[64]> [(char * {ref-all})&xz];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:259:40: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vxy] = MEM <unsigned char[64]> [(char * {ref-all})&xy];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:259:24: missed: not vectorized: more than one data ref in stmt: MEM <unsigned char[64]> [(char * {ref-all})&vxx] = MEM <unsigned char[64]> [(char * {ref-all})&xx];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:280:31: note: ***** Analysis failed with vector mode V8DI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:330:9: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:330:9: missed: not vectorized: loop nest containing two or more consecutive inner loops cannot be vectorized
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:336:26: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:336:26: missed: not vectorized: Infinite loop detected.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:334:29: missed: couldn't vectorize loop
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:334:29: missed: not vectorized: unsupported control flow in loop.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: vectorized 0 loops in function.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: statement clobbers memory: _26 = __builtin_GOMP_loop_nonmonotonic_dynamic_start (0, _24, 8, 1, &.istart0.93, &.iend0.94);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:332:28: missed: statement clobbers memory: missing_38 = nbGravity8 (&group, ctx_22, st_21, _36, count_33);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:335:41: missed: statement clobbers memory: nbReportTreeIncest (ctx_22, st_21);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:390:17: missed: statement clobbers memory: nbEvalPotentialClosure (st_21, MEM[(struct NBodyNode *)_51].pos, &externAcc);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:391:17: missed: statement clobbers memory: D.9413 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_53, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:391:17: missed: statement clobbers memory: D.9420 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_60, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:391:17: missed: statement clobbers memory: D.9427 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)_51].pos, *_67, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:377:27: missed: not vectorized: more than one data ref in stmt: *_84 = group[_81];
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:358:29: missed: statement clobbers memory: D.9443 = LMCAcceleration (lmcfunction_16, MEM[(struct NBodyNode *)b_88].pos, *_90, lmcmass_19, lmcscale_18, lmcscale2_17); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:358:29: missed: statement clobbers memory: D.9445 = nbExtAcceleration (_93, MEM[(struct NBodyNode *)b_88].pos, barTime_15); [return slot optimization]
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: statement clobbers memory: _46 = __builtin_GOMP_loop_nonmonotonic_dynamic_next (&.istart0.93, &.iend0.94);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: statement clobbers memory: __builtin_GOMP_loop_end_nowait ();
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:398:17: missed: statement clobbers memory: fprintf (stderr.88_102, "Bad external potential type: %d\n", _144);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:398:17: missed: statement clobbers memory: exit (1);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:336:32: note: ***** Analysis failed with vector mode V8DI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:456:14: missed: not vectorized: more than one data ref in stmt: LMCx = st_12(D)->LMCpos;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:520:13: missed: statement clobbers memory: __builtin_GOMP_parallel (nbMapForceBody_Exact._omp_fn.0, &.omp_data_o.100, 0, 0);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:526:14: missed: statement clobbers memory: rc_15 = nbMakeTree (ctx_11(D), st_12(D));
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:311:14: missed: not vectorized: more than one data ref in stmt: LMCx = st_12(D)->LMCpos;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:520:13: missed: statement clobbers memory: __builtin_GOMP_parallel (nbMapForceBody._omp_fn.0, &.omp_data_o.92, 0, 0);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: ***** Analysis succeeded with vector mode V16SI
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: SLPing BB part
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Costing subgraph:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: node 0xa003fb908 (max_nunits=2, refcnt=1) const vector(2) int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: op template: .omp_data_o.100.nbody = nbody_41;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	stmt 0 .omp_data_o.100.nbody = nbody_41;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	stmt 1 .omp_data_o.100.lmcfunction = lmcfunction_59;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	children 0xa003fba48
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: node (external) 0xa003fba48 (max_nunits=1, refcnt=1) const vector(2) int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	{ nbody_41, lmcfunction_59 }
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Cost model analysis:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Cost model analysis for part in loop 0:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: not vectorized: vectorization is not profitable.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Costing subgraph:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: node 0xa003fbb88 (max_nunits=2, refcnt=1) vector(2) long unsigned int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: op template: .omp_data_o.100.ctx = ctx_11(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	stmt 0 .omp_data_o.100.ctx = ctx_11(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	stmt 1 .omp_data_o.100.st = st_12(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	children 0xa003fbc28
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: node (external) 0xa003fbc28 (max_nunits=1, refcnt=1) vector(2) long unsigned int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: 	{ ctx_11(D), st_12(D) }
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Cost model analysis:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: note: Cost model analysis for part in loop 0:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:471:13: missed: not vectorized: vectorization is not profitable.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Costing subgraph:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: node 0xa003fc088 (max_nunits=2, refcnt=1) const vector(2) int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: op template: .omp_data_o.92.nbody = nbody_19;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	stmt 0 .omp_data_o.92.nbody = nbody_19;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	stmt 1 .omp_data_o.92.lmcfunction = lmcfunction_37;
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	children 0xa003fc1c8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: node (external) 0xa003fc1c8 (max_nunits=1, refcnt=1) const vector(2) int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	{ nbody_19, lmcfunction_37 }
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Cost model analysis:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Cost model analysis for part in loop 0:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: not vectorized: vectorization is not profitable.
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Costing subgraph:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: node 0xa003fc308 (max_nunits=2, refcnt=1) vector(2) long unsigned int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: op template: .omp_data_o.92.ctx = ctx_11(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	stmt 0 .omp_data_o.92.ctx = ctx_11(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	stmt 1 .omp_data_o.92.st = st_12(D);
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	children 0xa003fc3a8
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: node (external) 0xa003fc3a8 (max_nunits=1, refcnt=1) vector(2) long unsigned int
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: 	{ ctx_11(D), st_12(D) }
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Cost model analysis:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: note: Cost model analysis for part in loop 0:
+../third_party/milkywayathome_client/nbody/src/nbody_grav.c:326:13: missed: not vectorized: vectorization is not profitable.

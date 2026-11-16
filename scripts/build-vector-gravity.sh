@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p build/tmp
 export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
-export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin:$PATH"
+export PATH="$(cygpath -u C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin):$PATH"
 export PYTHONDONTWRITEBYTECODE=1
 for variant in off on; do
     flag=0
@@ -18,10 +18,13 @@ done
 mkdir -p build/card
 cp build/vector/card-off/milkyway_nbody.mic build/card/milkyway_nbody.mic
 # Cygwin bash understands the package script's /cygdrive tool paths.
-/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin/bash scripts/package_card.sh
+C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin/bash.exe scripts/package_card.sh
 for variant in off on; do
     mkdir -p dist/card/vector-$variant
     cp build/vector/card-$variant/milkyway_nbody.mic dist/card/vector-$variant/
     cp dist/card/*.so* dist/card/vector-$variant/
+    chmod 755 dist/card/vector-$variant/milkyway_nbody.mic
+    chmod 644 dist/card/vector-$variant/*.so*
+    python C:/Users/xuzhi/Documents/gcc_knc/tools/knc_lint dist/card/vector-$variant/milkyway_nbody.mic > dist/card/vector-$variant/knc-lint.txt 2>&1
 done
 "$BASH" scripts/vector-card-commands.sh > dist/card/vector-commands.sh
