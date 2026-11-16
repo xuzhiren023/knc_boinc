@@ -28,3 +28,9 @@ multicore/body-*.json
 multicore/body-*/
 multicore/chunk-*.json
 multicore/chunk-*/
+# S5-01 regenerated binaries, extracted kernels, full input hashes and model logs.
+flags/*
+!flags/evidence.json
+!flags/run.log
+!flags/build-manifest.json
+!flags/run-native.sh

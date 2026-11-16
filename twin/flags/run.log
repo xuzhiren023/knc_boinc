@@ -1,0 +1,323 @@
+Large capture: 29615 records coalesced to 9654 byte-identical bounded file blocks
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V0\small.json --report twin\flags\V0\small-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\small-full.json --profile card-7120-measured --out twin\flags\V0\small-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\small-full-simulate\result.json
+summary: twin\flags\V0\small-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V0\small.json --out twin\flags\V0\small-functional --force --trace
+functional: ok
+executed 3040 dynamic instructions; all 1 expected items match
+result: twin\flags\V0\small-functional\result.json
+summary: twin\flags\V0\small-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\small.json --profile card-7120-measured --out twin\flags\V0\small-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 33622 core cycles (33622.000 per unit) for 3040 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V0\small-simulate\result.json
+summary: twin\flags\V0\small-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-0-init.json --out twin\flags\V0\large-0.json --report twin\flags\V0\large-0-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-0-full.json --profile card-7120-measured --out twin\flags\V0\large-0-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-0-full-simulate\result.json
+summary: twin\flags\V0\large-0-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V0\large-0.json --out twin\flags\V0\large-0-functional --force --trace
+functional: ok
+executed 40319 dynamic instructions; all 1 expected items match
+result: twin\flags\V0\large-0-functional\result.json
+summary: twin\flags\V0\large-0-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-0.json --profile card-7120-measured --out twin\flags\V0\large-0-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 466272 core cycles (466272.000 per unit) for 40319 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V0\large-0-simulate\result.json
+summary: twin\flags\V0\large-0-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-128-init.json --out twin\flags\V0\large-128.json --report twin\flags\V0\large-128-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-128-full.json --profile card-7120-measured --out twin\flags\V0\large-128-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-128-full-simulate\result.json
+summary: twin\flags\V0\large-128-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V0\large-128.json --out twin\flags\V0\large-128-functional --force --trace
+functional: ok
+executed 42477 dynamic instructions; all 1 expected items match
+result: twin\flags\V0\large-128-functional\result.json
+summary: twin\flags\V0\large-128-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-128.json --profile card-7120-measured --out twin\flags\V0\large-128-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 492667 core cycles (492667.000 per unit) for 42477 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V0\large-128-simulate\result.json
+summary: twin\flags\V0\large-128-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-256-init.json --out twin\flags\V0\large-256.json --report twin\flags\V0\large-256-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-256-full.json --profile card-7120-measured --out twin\flags\V0\large-256-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-256-full-simulate\result.json
+summary: twin\flags\V0\large-256-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V0\large-256.json --out twin\flags\V0\large-256-functional --force --trace
+functional: ok
+executed 25064 dynamic instructions; all 1 expected items match
+result: twin\flags\V0\large-256-functional\result.json
+summary: twin\flags\V0\large-256-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-256.json --profile card-7120-measured --out twin\flags\V0\large-256-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 322087 core cycles (322087.000 per unit) for 25064 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V0\large-256-simulate\result.json
+summary: twin\flags\V0\large-256-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-384-init.json --out twin\flags\V0\large-384.json --report twin\flags\V0\large-384-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-384-full.json --profile card-7120-measured --out twin\flags\V0\large-384-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-384-full-simulate\result.json
+summary: twin\flags\V0\large-384-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V0\large-384.json --out twin\flags\V0\large-384-functional --force --trace
+functional: ok
+executed 38852 dynamic instructions; all 1 expected items match
+result: twin\flags\V0\large-384-functional\result.json
+summary: twin\flags\V0\large-384-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-384.json --profile card-7120-measured --out twin\flags\V0\large-384-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 449293 core cycles (449293.000 per unit) for 38852 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V0\large-384-simulate\result.json
+summary: twin\flags\V0\large-384-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V1\small.json --report twin\flags\V1\small-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+Traceback (most recent call last):
+  File "twin/compare_flags.py", line 216, in <module>
+    head, back = max(backs,key=lambda x:x[1]-x[0])
+  File "twin/compare_flags.py", line 133, in main
+    'gravity_object_sha256':sha(binary.parent/'nbody_grav.o')}
+AssertionError: adapter refused the complete function
+Large capture: 29615 records coalesced to 9654 byte-identical bounded file blocks
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V0\small.json --report twin\flags\V0\small-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\small-full.json --profile card-7120-measured --out twin\flags\V0\small-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\small-full-simulate\result.json
+summary: twin\flags\V0\small-full-simulate\summary.md
+Resume verified twin\flags\V0\small-functional\result.json
+Resume verified twin\flags\V0\small-simulate\result.json
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-0-init.json --out twin\flags\V0\large-0.json --report twin\flags\V0\large-0-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-0-full.json --profile card-7120-measured --out twin\flags\V0\large-0-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-0-full-simulate\result.json
+summary: twin\flags\V0\large-0-full-simulate\summary.md
+Resume verified twin\flags\V0\large-0-functional\result.json
+Resume verified twin\flags\V0\large-0-simulate\result.json
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-128-init.json --out twin\flags\V0\large-128.json --report twin\flags\V0\large-128-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-128-full.json --profile card-7120-measured --out twin\flags\V0\large-128-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-128-full-simulate\result.json
+summary: twin\flags\V0\large-128-full-simulate\summary.md
+Resume verified twin\flags\V0\large-128-functional\result.json
+Resume verified twin\flags\V0\large-128-simulate\result.json
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-256-init.json --out twin\flags\V0\large-256.json --report twin\flags\V0\large-256-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-256-full.json --profile card-7120-measured --out twin\flags\V0\large-256-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-256-full-simulate\result.json
+summary: twin\flags\V0\large-256-full-simulate\summary.md
+Resume verified twin\flags\V0\large-256-functional\result.json
+Resume verified twin\flags\V0\large-256-simulate\result.json
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V0\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V0\app.disassembly.txt --init twin\flags\large-384-init.json --out twin\flags\V0\large-384.json --report twin\flags\V0\large-384-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V0\large-384-full.json --profile card-7120-measured --out twin\flags\V0\large-384-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V0\large-384-full-simulate\result.json
+summary: twin\flags\V0\large-384-full-simulate\summary.md
+Resume verified twin\flags\V0\large-384-functional\result.json
+Resume verified twin\flags\V0\large-384-simulate\result.json
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V1\small.json --report twin\flags\V1\small-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\large-0-init.json --out twin\flags\V1\large-0.json --report twin\flags\V1\large-0-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\large-128-init.json --out twin\flags\V1\large-128.json --report twin\flags\V1\large-128-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\large-256-init.json --out twin\flags\V1\large-256.json --report twin\flags\V1\large-256-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V1\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V1\app.disassembly.txt --init twin\flags\large-384-init.json --out twin\flags\V1\large-384.json --report twin\flags\V1\large-384-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V2\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V2\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V2\small.json --report twin\flags\V2\small-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V2\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V2\app.disassembly.txt --init twin\flags\large-0-init.json --out twin\flags\V2\large-0.json --report twin\flags\V2\large-0-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V2\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V2\app.disassembly.txt --init twin\flags\large-128-init.json --out twin\flags\V2\large-128.json --report twin\flags\V2\large-128-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V2\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V2\app.disassembly.txt --init twin\flags\large-256-init.json --out twin\flags\V2\large-256.json --report twin\flags\V2\large-256-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V2\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V2\app.disassembly.txt --init twin\flags\large-384-init.json --out twin\flags\V2\large-384.json --report twin\flags\V2\large-384-conversion.json
+from_binary: invalid_input: function 'nbGravity' not in the disassembly; functions: _init, setvbuf@plt-0x10, setvbuf@plt, __errno_location@plt, asin@plt, remove@plt, strtoul@plt, __libc_start_main@plt, setlocale@plt, ftruncate@plt, stpcpy@plt, __finite@plt, memchr@plt, strncmp@plt, fopen@plt, csqrt@plt, __muldc3@plt, strncpy@plt, fread@plt, fgets@plt, strstr@plt, srand@plt, freopen@plt, mkstemp@plt, execvp@plt, ungetc@plt, fflush@plt, GOMP_loop_end_nowait@plt, fnmatch@plt, fgetc@plt, tan@plt, kill@plt, __isnan@plt, feraiseexcept@plt, gettimeofday@plt, exp@plt, floor@plt, time@plt, log10@plt, __divdc3@plt
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V3\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V3\app.disassembly.txt --init twin\flags\small-init.json --out twin\flags\V3\small.json --report twin\flags\V3\small-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\small-full.json --profile card-7120-measured --out twin\flags\V3\small-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V3\small-full-simulate\result.json
+summary: twin\flags\V3\small-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V3\small.json --out twin\flags\V3\small-functional --force --trace
+functional: ok
+executed 3040 dynamic instructions; all 1 expected items match
+result: twin\flags\V3\small-functional\result.json
+summary: twin\flags\V3\small-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\small.json --profile card-7120-measured --out twin\flags\V3\small-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 33622 core cycles (33622.000 per unit) for 3040 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V3\small-simulate\result.json
+summary: twin\flags\V3\small-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V3\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V3\app.disassembly.txt --init twin\flags\large-0-init.json --out twin\flags\V3\large-0.json --report twin\flags\V3\large-0-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-0-full.json --profile card-7120-measured --out twin\flags\V3\large-0-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V3\large-0-full-simulate\result.json
+summary: twin\flags\V3\large-0-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V3\large-0.json --out twin\flags\V3\large-0-functional --force --trace
+functional: ok
+executed 40319 dynamic instructions; all 1 expected items match
+result: twin\flags\V3\large-0-functional\result.json
+summary: twin\flags\V3\large-0-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-0.json --profile card-7120-measured --out twin\flags\V3\large-0-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 466272 core cycles (466272.000 per unit) for 40319 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V3\large-0-simulate\result.json
+summary: twin\flags\V3\large-0-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V3\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V3\app.disassembly.txt --init twin\flags\large-128-init.json --out twin\flags\V3\large-128.json --report twin\flags\V3\large-128-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-128-full.json --profile card-7120-measured --out twin\flags\V3\large-128-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V3\large-128-full-simulate\result.json
+summary: twin\flags\V3\large-128-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V3\large-128.json --out twin\flags\V3\large-128-functional --force --trace
+functional: ok
+executed 42477 dynamic instructions; all 1 expected items match
+result: twin\flags\V3\large-128-functional\result.json
+summary: twin\flags\V3\large-128-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-128.json --profile card-7120-measured --out twin\flags\V3\large-128-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 492667 core cycles (492667.000 per unit) for 42477 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V3\large-128-simulate\result.json
+summary: twin\flags\V3\large-128-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V3\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V3\app.disassembly.txt --init twin\flags\large-256-init.json --out twin\flags\V3\large-256.json --report twin\flags\V3\large-256-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-256-full.json --profile card-7120-measured --out twin\flags\V3\large-256-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V3\large-256-full-simulate\result.json
+summary: twin\flags\V3\large-256-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V3\large-256.json --out twin\flags\V3\large-256-functional --force --trace
+functional: ok
+executed 25064 dynamic instructions; all 1 expected items match
+result: twin\flags\V3\large-256-functional\result.json
+summary: twin\flags\V3\large-256-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-256.json --profile card-7120-measured --out twin\flags\V3\large-256-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 322087 core cycles (322087.000 per unit) for 25064 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V3\large-256-simulate\result.json
+summary: twin\flags\V3\large-256-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\from_binary.py build\flags\V3\milkyway_nbody.mic --function nbGravity --disassembly twin\flags\V3\app.disassembly.txt --init twin\flags\large-384-init.json --out twin\flags\V3\large-384.json --report twin\flags\V3\large-384-conversion.json
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-384-full.json --profile card-7120-measured --out twin\flags\V3\large-384-full-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: unsupported
+streams[0]: instruction a4c113a calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+result: twin\flags\V3\large-384-full-simulate\result.json
+summary: twin\flags\V3\large-384-full-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py functional twin\flags\V3\large-384.json --out twin\flags\V3\large-384-functional --force --trace
+functional: ok
+executed 38852 dynamic instructions; all 1 expected items match
+result: twin\flags\V3\large-384-functional\result.json
+summary: twin\flags\V3\large-384-functional\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py simulate twin\flags\V3\large-384.json --profile card-7120-measured --out twin\flags\V3\large-384-simulate --force --no-issue-log --max-seconds 240
+timing_prediction: ok
+predicted 449293 core cycles (449293.000 per unit) for 38852 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin\flags\V3\large-384-simulate\result.json
+summary: twin\flags\V3\large-384-simulate\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py batch twin\flags\batch-small.json --profile card-7120-measured --out twin\flags\batch-small --force --max-seconds 240
+comparison: ok
+2 candidates: 2 ranked, 0 not evaluable, 0 sent to the native queue (none)
+| rank | candidate | status | cycles/unit | ratio to baseline | class | functional | limiting | bound gap | uncertain -> queue |
+|---:|---|---|---:|---:|---|---|---|---:|---|
+| 1 | V0 | ok | 33622.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 0.77 | yes |
+| 2 | V3 | ok | 33622.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 0.77 | yes |
+result: twin\flags\batch-small\result.json
+summary: twin\flags\batch-small\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py batch twin\flags\batch-large-0.json --profile card-7120-measured --out twin\flags\batch-large-0 --force --max-seconds 240
+comparison: ok
+2 candidates: 2 ranked, 0 not evaluable, 0 sent to the native queue (none)
+| rank | candidate | status | cycles/unit | ratio to baseline | class | functional | limiting | bound gap | uncertain -> queue |
+|---:|---|---|---:|---:|---|---|---|---:|---|
+| 1 | V0 | ok | 466272.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+| 2 | V3 | ok | 466272.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+result: twin\flags\batch-large-0\result.json
+summary: twin\flags\batch-large-0\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py batch twin\flags\batch-large-128.json --profile card-7120-measured --out twin\flags\batch-large-128 --force --max-seconds 240
+comparison: ok
+2 candidates: 2 ranked, 0 not evaluable, 0 sent to the native queue (none)
+| rank | candidate | status | cycles/unit | ratio to baseline | class | functional | limiting | bound gap | uncertain -> queue |
+|---:|---|---|---:|---:|---|---|---|---:|---|
+| 1 | V0 | ok | 492667.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+| 2 | V3 | ok | 492667.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+result: twin\flags\batch-large-128\result.json
+summary: twin\flags\batch-large-128\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py batch twin\flags\batch-large-256.json --profile card-7120-measured --out twin\flags\batch-large-256 --force --max-seconds 240
+comparison: ok
+2 candidates: 2 ranked, 0 not evaluable, 0 sent to the native queue (none)
+| rank | candidate | status | cycles/unit | ratio to baseline | class | functional | limiting | bound gap | uncertain -> queue |
+|---:|---|---|---:|---:|---|---|---|---:|---|
+| 1 | V0 | ok | 322087.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.086 | yes |
+| 2 | V3 | ok | 322087.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.086 | yes |
+result: twin\flags\batch-large-256\result.json
+summary: twin\flags\batch-large-256\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py batch twin\flags\batch-large-384.json --profile card-7120-measured --out twin\flags\batch-large-384 --force --max-seconds 240
+comparison: ok
+2 candidates: 2 ranked, 0 not evaluable, 0 sent to the native queue (none)
+| rank | candidate | status | cycles/unit | ratio to baseline | class | functional | limiting | bound gap | uncertain -> queue |
+|---:|---|---|---:|---:|---|---|---|---:|---|
+| 1 | V0 | ok | 449293.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+| 2 | V3 | ok | 449293.000 | 1.0 | unvalidated_scenario_estimate | ok | x87_serial, miss_stall | 1.005 | yes |
+result: twin\flags\batch-large-384\result.json
+summary: twin\flags\batch-large-384\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py schedule twin\flags\schedule-input.json --profile card-7120-measured --out twin\flags\schedule --force --method list --max-states 4096
+search: unsupported
+explored region contains an interior label
+result: twin\flags\schedule\result.json
+summary: twin\flags\schedule\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py prepare-native twin\flags\V0\small.json --profile card-7120-measured --out twin\flags\native-V0 --force --prediction twin\flags\V0\small-simulate\result.json
+native_request: invalid_input
+the kernel's memory blocks span 42944845376 bytes (0x4c7000 to 0xa0002c640); prepare-native relocates one contiguous image of at most 33554432 bytes. Place the kernel's arrays near its data sections (or drop data sections it does not use) before exporting a native request.
+result: twin\flags\native-V0\result.json
+summary: twin\flags\native-V0\summary.md
+$ C:\Users\xuzhi\AppData\Local\Programs\Python\Python38\python.exe C:\Users\xuzhi\.claude\skills\knc-twin\scripts\knc_twin.py prepare-native twin\flags\V3\small.json --profile card-7120-measured --out twin\flags\native-V3 --force --prediction twin\flags\V3\small-simulate\result.json
+native_request: invalid_input
+the kernel's memory blocks span 42944845376 bytes (0x4c7000 to 0xa0002c640); prepare-native relocates one contiguous image of at most 33554432 bytes. Place the kernel's arrays near its data sections (or drop data sections it does not use) before exporting a native request.
+result: twin\flags\native-V3\result.json
+summary: twin\flags\native-V3\summary.md
+Fixed inputs: small, large-0, large-128, large-256, large-384
+All-input passing variants: V0, V3
+Batch top nonbaseline candidate for native A/B: V3
