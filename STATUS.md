@@ -4,7 +4,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 | Sprint | State |
 |---|---|
-| 1 | S1-01..S1-05 merged; card run staged, waits for the gcc-knc lead's "go"; S1-06 (8-core twin check, large case) running |
+| 1 | S1-01..S1-05 merged; card run staged, waits for the gcc-knc lead's "go"; S1-06 merged incomplete (twin gaps; 1-ULP unit/ring gravity mismatch); S1-07 running |
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
