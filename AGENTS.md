@@ -18,3 +18,8 @@ You implement one ticket from `work/tickets/`. The ticket is the only channel to
   GCC-KNC docs: `gcc_knc/docs/USING.md`. No CMake, MinGW or MSVC on this laptop.
 - Finish by appending `## Engineer report` to the ticket: what you did, how to rerun the tests, what is not proven,
   questions.
+- Speed work (owner 2026-11-16): a gain the compiler could make (vectorization, scheduling, vector math, prefetch,
+  scalar double off x87) belongs in GCC-KNC: report it in your Engineer report with a reduced repro and the
+  `-fopt-info-vec-missed` or knc-twin evidence; the lead files it as a GCC-KNC ticket. What is outside the
+  compiler's control (algorithm, data layout, bit-exact ordering, exact-fallback logic) you write by hand with IMCI
+  intrinsics or vector code in our patches.
