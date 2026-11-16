@@ -28,8 +28,16 @@ class CompareTest(unittest.TestCase):
             (b / 'histogram.txt').write_text(
                 (a / 'histogram.txt').read_text().replace('0.25', '0.5'))
             result = compare()
-            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-            self.assertIn('FAIL', result.stdout)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn('max_abs=0.25', result.stdout)
+            # A captured stream is sufficient: no remote result files needed.
+            stream = pathlib.Path(tmp) / 'card.txt'
+            # Standalone upstream omits the BOINC-only <histogram> wrappers.
+            stream.write_text('OpenMP diagnostic\n' + (b / 'stdout.txt').read_text()
+                              + (b / 'histogram.txt').read_text().replace('<histogram>', '').replace('</histogram>', '')
+                              + 'run complete\n')
+            captured = subprocess.run([sys.executable, str(ROOT / 'scripts' / 'compare.py'), str(a), str(stream)], capture_output=True, text=True)
+            self.assertEqual(captured.returncode, 0, captured.stdout + captured.stderr)
             # Restore the histogram, then corrupt the other scientific result.
             (b / 'histogram.txt').write_bytes((a / 'histogram.txt').read_bytes())
             (b / 'stdout.txt').write_text('<search_likelihood>-12.4</search_likelihood>\n')

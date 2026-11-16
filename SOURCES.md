@@ -22,6 +22,7 @@ Only libraries already bundled in this commit are compiled:
 | popt | 1.17 fork | permissive MIT-style Red Hat notice, `popt/COPYING` |
 | dSFMT | 2.1 | BSD-3-Clause, `dSFMT/LICENSE.txt` |
 | CORE-MATH functions | bundled snapshots | MIT, notices in `milkyway/src/milkyway_math_funcs.c` |
+| crlibm | bundled 9c4c1c7e5f87f29535488b605ce38777e1a8b004 | LGPL-2.1-or-later, `crlibm/COPYING` and source notices |
 
 No BOINC, glfw, glm, tao, graphics, OpenCL, crlibm or external dependency is
 fetched separately. The upstream checkout includes other bundled directories;
@@ -32,7 +33,11 @@ fetched separately. The upstream checkout includes other bundled directories;
 fallback on Cygwin: GCC's builtin otherwise emits an unavailable `roundeven`
 libm symbol. Both patches are applied idempotently by `scripts/fetch.sh`.
 
-Math uses `NBODY_CRLIBM=0`: normal system libm for the default math macros.
+Math uses `NBODY_CRLIBM=1`, matching upstream's production default (S1-02).
 Upstream 1.97 unconditionally uses its bundled CORE-MATH implementations for
 `erf`, `cbrt` and gamma functions (`milkyway/include/milkyway_math_double.h`);
 these remain enabled, as required by this pinned source. No fast-math flags.
+
+The additional S1-02 patches select existing portable CORE-MATH paths on K1OM
+and let crlibm find the checked-in config header. See `patches/README.md` for
+the complete patch inventory and reasons.
