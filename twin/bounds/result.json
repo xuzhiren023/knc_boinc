@@ -1,10 +1,15 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\bounds",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\bounds\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\bounds\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\bounds",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\bounds\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\bounds\\summary.md"
   },
-  "assumptions": [],
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
+    "ZF/SF after imul are architecturally undefined; the model leaves them unchanged",
+    "bound under line_tracking: each line costs its cold level once and L1 afterwards (capacity and prefetch timing ignored)",
+    "memory concurrency bound: distinct missing lines x level latency / 8 outstanding misses per core; ignores the L2 hardware prefetcher"
+  ],
   "calibration_status": {
     "held_out_validation_cases": 160,
     "not_validated_shapes": {
@@ -70,12 +75,56 @@
       }
     }
   },
-  "engine_version": "0.3.1",
-  "error_details": "{\"callee\": \"fprintf\", \"instruction\": \"a42f4b2\"}",
+  "engine_version": "0.4.0",
   "functional_check": {
-    "status": "not_run"
+    "checked": 1,
+    "mismatches": [],
+    "status": "ok"
   },
-  "input": null,
+  "input": {
+    "hash_sha256": "eb85ac7097225196e777bb5d71876e660372a5ce2f0d882d3731601a07cd00ae",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 203
+      },
+      "loop": null,
+      "name": "milkyway_nbody__nbGravity",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "one nbGravity call, first body of first small tree"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\kernel.json"
+  },
   "invocation": {
     "argv": [
       "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
@@ -88,13 +137,158 @@
       "--force"
     ],
     "command": "bounds",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
-  "message": "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
-  "parameters_used": {},
-  "prediction": null,
+  "message": "trace lower bound: 43656 cycles (binding term: dependency_critical_path); conditional_bound",
+  "parameters_used": {
+    "core.min_issue_gap_same_context": {
+      "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+      "status": "documented",
+      "unit": "cycles between two issue events of one context",
+      "value": 2
+    },
+    "l1.accesses_per_cycle": {
+      "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+      "status": "documented",
+      "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+      "value": 1
+    },
+    "l1.outstanding_demand_misses_per_core": {
+      "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+      "status": "documented",
+      "unit": "cache lines",
+      "value": 8
+    },
+    "latency.l2_hit": {
+      "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 24
+    },
+    "latency.memory": {
+      "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+      "status": "derived",
+      "unit": "cycles",
+      "value": 328
+    },
+    "latency.scalar_alu": {
+      "source": "R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound)",
+      "status": "documented",
+      "unit": "cycles",
+      "value": 1
+    },
+    "latency.scalar_extend_extra": {
+      "source": "evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15.",
+      "status": "assumed",
+      "unit": "cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto",
+      "value": 0
+    },
+    "latency.scalar_imul": {
+      "source": "R02 p.56; not measured on this card by the imported runs",
+      "status": "documented",
+      "unit": "cycles",
+      "value": 10
+    },
+    "latency.scalar_load_l1": {
+      "source": "S6-03 l1.load_lat 3.03 (one thread)",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_add": {
+      "source": "S6-03 x87_add.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_control": {
+      "source": "prior from the published Pentium (P5) instruction timings (FLDCW 7 clocks; FNSTCW and FNSTSW are 2). Not measured on KNC; all three are charged the FLDCW value.",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 7
+    },
+    "latency.x87_div": {
+      "source": "S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 38
+    },
+    "latency.x87_move": {
+      "source": "evidence E (estimate), inferred: same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02), no KNC source for fld/fst/fxch/fldz; fld from memory uses the load latency instead",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_mul": {
+      "source": "S6-03 x87_mul.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_sqrt": {
+      "source": "prior from the published Pentium (P5) instruction timings (FSQRT 70 clocks): the KNC core derives from the P54C design (R01 section 2.1) and the P5 figures that could be checked on the card agree (FDIV 39 vs 39.25 measured in S6-03; IMUL 10 in R02 p.56). Not measured on KNC.",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 70
+    },
+    "occupancy.x87_div": {
+      "source": "S6-03 x87_div.rt 151.76 per thread at four threads (37.9 per core)",
+      "status": "measured",
+      "unit": "core cycles",
+      "value": 38
+    },
+    "occupancy.x87_mul": {
+      "source": "S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core)",
+      "status": "measured",
+      "unit": "core cycles",
+      "value": 2
+    },
+    "pairing.v_eligible_classes": {
+      "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+      "status": "documented",
+      "unit": "instruction classes that may issue on the V pipe",
+      "value": [
+        "scalar_alu",
+        "scalar_rmw",
+        "scalar_load",
+        "scalar_store",
+        "branch",
+        "mask_op",
+        "vector_store",
+        "vector_packstore",
+        "prefetch_l1",
+        "prefetch_l2"
+      ]
+    }
+  },
+  "prediction": {
+    "binding_term": "dependency_critical_path",
+    "kind": "trace_lower_bound",
+    "lower_bound_cycles": 43656,
+    "per_context": {
+      "0": {
+        "critical_path_cycles": 43656,
+        "dynamic_instructions": 3040,
+        "min_issue_events": 2473,
+        "spacing_bound_cycles": 4945
+      }
+    },
+    "result_class": {
+      "class": "conditional_bound",
+      "conditions": "valid under the model's resource and latency assumptions listed in 'assumptions'; a bound on this model, not a hardware guarantee"
+    },
+    "statement": "No schedule of these dynamic instructions on this core model can complete in fewer cycles than the largest term; the terms are independent optimistic constraints (issue slots, same-context spacing, resource occupancy, dependency chains, memory concurrency).",
+    "terms": {
+      "core_issue_events": 2473,
+      "dependency_critical_path": 43656,
+      "l1_port": 1125,
+      "memory_concurrency": 5658,
+      "per_context_issue_spacing": 4945,
+      "x87_unit_occupancy": 5630
+    }
+  },
   "profile": {
     "calibration": {
       "held_out_validation_cases": 160,
@@ -184,14 +378,12 @@
     "synthetic": false,
     "version": "0.3.0"
   },
-  "python_execution_seconds": 0.0913,
-  "representation_evaluated": null,
+  "python_execution_seconds": 0.8569,
+  "representation_evaluated": "normalized-records",
   "result_type": "analytical_bound",
   "scale": "core",
   "schema": "knc-twin.result/1",
-  "status": "unsupported",
-  "timestamp_utc": "2026-11-16T06:09:52Z",
-  "unsupported": [
-    "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
-  ]
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:52:49Z",
+  "unsupported": []
 }

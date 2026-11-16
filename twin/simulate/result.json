@@ -1,17 +1,140 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\simulate",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\simulate\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\simulate\\summary.md"
+    "issue_log": "twin/simulate\\issue-log.json",
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\simulate",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\simulate\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\simulate\\summary.md"
   },
-  "assumptions": [],
-  "calibration_status": null,
-  "engine_version": "0.3.1",
-  "error_details": "{\"callee\": \"fprintf\", \"instruction\": \"a42f4b2\"}",
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
+    "ZF/SF after imul are architecturally undefined; the model leaves them unchanged",
+    "line_tracking: true LRU replacement stands in for the hardware's pseudo-LRU; the L1 and L2 are modeled as private to the core with no coherence traffic",
+    "TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled",
+    "L2 hardware prefetcher sub-model: a stream per 4 KiB page after two accesses with the same stride (<= 2 lines), prefetching 16 lines ahead within the page into L2; prefetched fills do not use L1 demand-miss slots (assumed)",
+    "memory service sub-model: one memory fill per 20 core cycles for this core (measured sequential-stream rate, includes the hardware prefetcher); card-level sharing not modeled",
+    "front end: instruction bytes come from the listing; each two-cycle prefix (66, 67, lock, segment, rep: R02 p.56) delays that instruction's issue to 2 cycles per prefix after the previous issue of its context, which the 2-cycle same-context spacing hides for one prefix (S12-31 padding rows); an instruction with such a prefix does not pair (assumed)",
+    "front end: crossing a 16-byte or 64-byte boundary and the loop-head offset cost nothing (S12-31 mis_4..mis_60 within 0.45 ns per row)",
+    "instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)",
+    "a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing",
+    "register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies",
+    "x87 instructions issue on U only (register-file diagram, R01) and alone (S12-31); a memory-operand x87 load or arithmetic instruction holds its context until its result is complete; x87 stores retire like scalar stores",
+    "sign/zero extensions (movslq, movs*, movz*, cltq) cost a plain mov or scalar load plus latency.scalar_extend_extra and pair per pairing.extend_v_pairs: evidence E, inferred, no KNC source"
+  ],
+  "calibration_status": {
+    "held_out_validation_cases": 160,
+    "not_validated_shapes": {
+      "x87_sparse_rows_l1": {
+        "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+        "median_abs_error_pct": 16.0,
+        "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+        "worst_abs_error_pct": 17.9
+      }
+    },
+    "note": "Simulated/analytical outputs are model results, never native measurements. ",
+    "state": "imported_microbenchmarks_with_compiled_heldout_check",
+    "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+    "synthetic": false,
+    "validated_shapes": {
+      "l1_l2_dependent_loads": {
+        "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+        "median_abs_error_pct": 2.0,
+        "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+        "worst_abs_error_pct": 14.0
+      },
+      "l1_resident_stores_prefetch_pairing": {
+        "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+        "median_abs_error_pct": 2.0,
+        "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+        "worst_abs_error_pct": 12.0
+      },
+      "register_vector_chain_l1": {
+        "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+        "median_abs_error_pct": 1.0,
+        "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+        "worst_abs_error_pct": 11.0
+      },
+      "scalar_mask_l1": {
+        "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+        "median_abs_error_pct": 1.0,
+        "note": "scalar integer and mask chains, pairing, address-generation interlock",
+        "worst_abs_error_pct": 5.0
+      },
+      "x87_register_chain": {
+        "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+        "median_abs_error_pct": 1.0,
+        "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+        "worst_abs_error_pct": 3.0
+      },
+      "x87_row_loop_l1": {
+        "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+        "median_abs_error_pct": 2.9,
+        "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+        "worst_abs_error_pct": 3.8
+      },
+      "x87_sparse_rows_l2": {
+        "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+        "median_abs_error_pct": 3.7,
+        "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+        "worst_abs_error_pct": 6.6
+      },
+      "x87_sparse_rows_memory_stream": {
+        "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+        "median_abs_error_pct": 3.7,
+        "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+        "worst_abs_error_pct": 4.1
+      }
+    }
+  },
+  "engine_version": "0.4.0",
   "functional_check": {
-    "status": "not_run"
+    "checked": 1,
+    "mismatches": [],
+    "status": "ok"
   },
-  "input": null,
+  "input": {
+    "hash_sha256": "eb85ac7097225196e777bb5d71876e660372a5ce2f0d882d3731601a07cd00ae",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 203
+      },
+      "loop": null,
+      "name": "milkyway_nbody__nbGravity",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "one nbGravity call, first body of first small tree"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\kernel.json"
+  },
   "invocation": {
     "argv": [
       "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
@@ -24,21 +147,1350 @@
       "--force"
     ],
     "command": "simulate",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
-  "limiting_constraints": [],
-  "message": "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
-  "prediction": null,
-  "profile": null,
-  "python_execution_seconds": 0.0738,
-  "representation_evaluated": null,
+  "limiting_constraints": [
+    {
+      "constraint": "x87_serial",
+      "context_cycles": 11594
+    },
+    {
+      "constraint": "miss_stall",
+      "context_cycles": 11381
+    },
+    {
+      "constraint": "dependency",
+      "context_cycles": 4898
+    },
+    {
+      "constraint": "spacing",
+      "context_cycles": 1976
+    }
+  ],
+  "message": "predicted 33622 core cycles (33622.000 per unit) for 3040 dynamic instructions on 1 context(s); unvalidated_scenario_estimate",
+  "parameters_used": {
+    "core.contexts": {
+      "source": "R01 \u00a72.1; R17 slide 10",
+      "status": "documented",
+      "unit": "hardware threads per core",
+      "value": 4
+    },
+    "core.min_issue_gap_same_context": {
+      "source": "R02 ch.4 (page locator missing): one context never issues in two consecutive cycles; R01 pp.19, 23-24 (same fact, docs/research/knc-machine.yaml thread_issue_interval); R17 slide 11; consistent with S6-03 measured 2.08 ticks per independent op at one thread",
+      "status": "documented",
+      "unit": "cycles between two issue events of one context",
+      "value": 2
+    },
+    "frontend.slow_prefix_decode_cycles": {
+      "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+      "status": "documented",
+      "unit": "decode cycles per prefix",
+      "value": 2
+    },
+    "frontend.taken_branch_core_bubble_cycles": {
+      "source": "S8-01 C10 fixed-direction row: 6.22 per branch at one thread, 17.02 at four (three issues plus about one core cycle per unit); R02 ch.4 one-clock refill bubble. Hidden at one thread by the same-context spacing. Scope: forward transfers only (S8-01 C9 register chains at two threads show no cost for the loop back-edge).",
+      "status": "derived",
+      "unit": "core issue cycles lost after a taken branch",
+      "value": 1
+    },
+    "l1.accesses_per_cycle": {
+      "source": "R17 slide 13 (one L1 access per cycle, load or store)",
+      "status": "documented",
+      "unit": "L1 data accesses per core cycle (loads and stores, not prefetches)",
+      "value": 1
+    },
+    "l1.demand_load_miss_stalls_context": {
+      "source": "R08 cache performance notes ('In-order design stalls thread on L1 Data Cache Misses (except for store misses); other threads on the same core can continue'); R02 ch.4 (thread-specific flush on a miss)",
+      "status": "documented",
+      "unit": "boolean",
+      "value": true
+    },
+    "l1.outstanding_demand_misses_per_core": {
+      "source": "R08 concurrency slide ('each core can only support 8 outstanding L1 Data Cache misses')",
+      "status": "documented",
+      "unit": "cache lines",
+      "value": 8
+    },
+    "l1.size_bytes": {
+      "source": "R01 \u00a72.1; R08; R17 slide 13",
+      "status": "documented",
+      "unit": "bytes",
+      "value": 32768
+    },
+    "l1.store_miss_stalls_context": {
+      "source": "S6-03 l2.store_normal 23.39 ticks per store at one thread (an L2-resident footprint): each store waits for its line; R08's 'except store misses' does not hold for this card/pattern",
+      "status": "measured",
+      "unit": "boolean",
+      "value": true
+    },
+    "l1.ways": {
+      "source": "R01 \u00a72.1; R17 slide 13",
+      "status": "documented",
+      "unit": "ways",
+      "value": 8
+    },
+    "l2.hw_prefetch_depth_lines": {
+      "source": "S6-03 memory.load_rt 37.35 ticks per sequential line at one thread with the hardware prefetcher active: the HWP sub-model reproduces 37.4 with depth 16 (40.2 at 12, 51.4 at 8); at four threads it gives 85.5 against 77.9 (see references/validation.md)",
+      "status": "derived",
+      "unit": "lines ahead per confirmed stream",
+      "value": 16
+    },
+    "l2.hw_prefetch_max_stride_lines": {
+      "source": "R08 ('identifies strides up to 2 cache lines')",
+      "status": "documented",
+      "unit": "lines",
+      "value": 2
+    },
+    "l2.hw_prefetch_streams": {
+      "source": "R01 p.19 (16-stream L2 hardware prefetcher, 4 KiB bounded)",
+      "status": "documented",
+      "unit": "streams per core",
+      "value": 16
+    },
+    "l2.hw_prefetch_trains_on_stores": {
+      "source": "R01 TUNE_PREFQ bits (separate enables for non-RFO data reads and RFO/store reads) show the L2 prefetcher tracks store streams",
+      "status": "documented",
+      "unit": "boolean",
+      "value": true
+    },
+    "l2.size_bytes": {
+      "source": "R01 pp.22-23; R08; R17 slide 14",
+      "status": "documented",
+      "unit": "bytes",
+      "value": 524288
+    },
+    "l2.ways": {
+      "source": "R08; R17 slide 14",
+      "status": "documented",
+      "unit": "ways",
+      "value": 8
+    },
+    "latency.agi_cycles": {
+      "source": "S6-03 agi.gap0 3.11 vs 2.08 baseline at one thread: the dependent load issued one cycle after its earliest slot, i.e. address usable 3 cycles after the write issued; R01 p.19",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.branch_taken_bubble": {
+      "source": "S8-01 C9: loop costs about 2 ticks per vector op plus 2 per loop branch at one thread (the branch costs its issue slot only)",
+      "status": "derived",
+      "unit": "cycles",
+      "value": 0
+    },
+    "latency.l2_hit": {
+      "source": "S6-03 l2.load_lat 24.42 (one thread), 25.68 at four threads",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 24
+    },
+    "latency.memory": {
+      "source": "S6-03 memory.load_lat 356.53 per dependent hop at one thread (idle) minus the first-level TLB miss of 29 cycles (tlb.l1_miss_penalty_cycles): the measured chain touches a new 4 KiB page at every hop and the TLB sub-model charges that miss explicitly. 0.2.x used 357 and double-counted it when the TLB was modeled.",
+      "status": "derived",
+      "unit": "cycles",
+      "value": 328
+    },
+    "latency.scalar_alu": {
+      "source": "R17 slide 10; S6-03 scalar_add.lat 2.08 (<=2 bound)",
+      "status": "documented",
+      "unit": "cycles",
+      "value": 1
+    },
+    "latency.scalar_extend_extra": {
+      "source": "evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15.",
+      "status": "assumed",
+      "unit": "cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto",
+      "value": 0
+    },
+    "latency.scalar_imul": {
+      "source": "R02 p.56; not measured on this card by the imported runs",
+      "status": "documented",
+      "unit": "cycles",
+      "value": 10
+    },
+    "latency.scalar_load_l1": {
+      "source": "S6-03 l1.load_lat 3.03 (one thread)",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.store_to_load_same_line": {
+      "source": "S8-12 C9 memory chain u1 11.07 per link = folded-load add (4) + store-to-load path; spill_reload.lat 12.11 = path + plain load (5)",
+      "status": "derived",
+      "unit": "cycles after a store issues before a load of the same line sees the data",
+      "value": 7
+    },
+    "latency.x87_add": {
+      "source": "S6-03 x87_add.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_control": {
+      "source": "prior from the published Pentium (P5) instruction timings (FLDCW 7 clocks; FNSTCW and FNSTSW are 2). Not measured on KNC; all three are charged the FLDCW value.",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 7
+    },
+    "latency.x87_div": {
+      "source": "S6-03 x87_div.lat 39.25, .rt 38.24; one divide per 38 cycles per core at four threads",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 38
+    },
+    "latency.x87_load": {
+      "source": "S12-31 gas_0 488.9 and adj_0 433.5 cycles per 27-product row fix the sum of this value and the fmull memory form (operand read plus multiply) at 7 cycles; the split 3 + (1 + 3) keeps the measured x87 multiply latency of 3 and the documented one-cycle scalar load (R08)",
+      "status": "derived",
+      "unit": "cycles from issue until the loaded value is on the x87 stack",
+      "value": 3
+    },
+    "latency.x87_mem_operand_load": {
+      "source": "see latency.x87_load: the sum is measured, the split is assumed (R08: one-cycle scalar load)",
+      "status": "derived",
+      "unit": "cycles for the memory operand of an x87 arithmetic instruction before the operation starts",
+      "value": 1
+    },
+    "latency.x87_move": {
+      "source": "evidence E (estimate), inferred: same pipeline as the measured x87 add (S6-03 x87_add.lat 3.02), no KNC source for fld/fst/fxch/fldz; fld from memory uses the load latency instead",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_mul": {
+      "source": "S6-03 x87_mul.lat 3.02",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 3
+    },
+    "latency.x87_sqrt": {
+      "source": "prior from the published Pentium (P5) instruction timings (FSQRT 70 clocks): the KNC core derives from the P54C design (R01 section 2.1) and the P5 figures that could be checked on the card agree (FDIV 39 vs 39.25 measured in S6-03; IMUL 10 in R02 p.56). Not measured on KNC.",
+      "status": "assumed",
+      "unit": "cycles",
+      "value": 70
+    },
+    "memory.core_service_cycles_per_line": {
+      "source": "S6-03 memory.load_rt per core at four threads 19.48 ticks per line (37.35 at one thread); modeled as the integer 20",
+      "status": "measured",
+      "unit": "core cycles between memory fills for one core (sequential stream, hardware prefetcher active)",
+      "value": 20
+    },
+    "occupancy.x87_div": {
+      "source": "S6-03 x87_div.rt 151.76 per thread at four threads (37.9 per core)",
+      "status": "measured",
+      "unit": "core cycles",
+      "value": 38
+    },
+    "occupancy.x87_mul": {
+      "source": "S6-03 x87_mul.rt 4.02 per thread at two threads (one per 2 cycles per core)",
+      "status": "measured",
+      "unit": "core cycles",
+      "value": 2
+    },
+    "pairing.dependent_pairs_allowed": {
+      "source": "R02 p.56 (cmp/jcc, push/push, pop/pop); push/pop not modeled",
+      "status": "documented",
+      "unit": "U/V pairs allowed despite a flag dependency",
+      "value": [
+        [
+          "cmp",
+          "jcc"
+        ],
+        [
+          "test",
+          "jcc"
+        ]
+      ]
+    },
+    "pairing.encoding_rules": {
+      "source": "R02 p.56",
+      "status": "documented",
+      "unit": "rules",
+      "value": {
+        "max_bytes": 8,
+        "no_displacement_and_immediate": true,
+        "no_vex_mvex_with_disp32": true
+      }
+    },
+    "pairing.extend_v_pairs": {
+      "source": "evidence E (estimate), inferred: treated like the other scalar integer ops of R02 p.34 Table 3-1, which does not list them; no KNC source. Lead decision 2026-11-15.",
+      "status": "assumed",
+      "unit": "boolean: may movslq, movs*, movz*, cltq, cltd, cqto issue in the V slot",
+      "value": true
+    },
+    "pairing.load_store_pair": {
+      "source": "S6-03 spill_reload.rt at four threads: 1.07 core cycles per vector store plus reload, so a U-pipe load and a V-pipe store issue in one cycle; the L1 access limit is applied to loads only",
+      "status": "derived",
+      "unit": "boolean",
+      "value": true
+    },
+    "pairing.u_instruction_can_be_branch": {
+      "source": "evidence E (estimate), model assumption without a KNC source: an instruction after a control transfer in the same issue slot is not paired",
+      "status": "assumed",
+      "unit": "boolean",
+      "value": false
+    },
+    "pairing.v_eligible_classes": {
+      "source": "R02 p.34 Table 3-1 (mask, vector store, packstore, prefetch, scalar); R17 slide 10 (scalar dual issue)",
+      "status": "documented",
+      "unit": "instruction classes that may issue on the V pipe",
+      "value": [
+        "scalar_alu",
+        "scalar_rmw",
+        "scalar_load",
+        "scalar_store",
+        "branch",
+        "mask_op",
+        "vector_store",
+        "vector_packstore",
+        "prefetch_l1",
+        "prefetch_l2"
+      ]
+    },
+    "pairing.v_jmp_pairs": {
+      "source": "S8-01 C10 fixed-direction row: cmp/je, add, jmp cost three issue events per unit (6.22 ticks at one thread), so the jmp did not pair with the add; conditional branches keep the cmp/jcc pairing (R02 p.56)",
+      "status": "measured",
+      "unit": "boolean: may an unconditional jmp issue in the V slot",
+      "value": false
+    },
+    "pairing.v_nop_pairs": {
+      "source": "S12-31 microbench window 5: fifteen single-byte NOPs before the loop cost 22.7 ns per row, 1.51 ns (one issue) each; S6-03 agi.gap1-4 for the U side",
+      "status": "measured",
+      "unit": "boolean",
+      "value": false
+    },
+    "pairing.x87_pairs_with_scalar": {
+      "source": "S12-31 microbench, card windows 3 and 5 (2026-11-15): moving faddp out from between cmp and jg saves one issue per iteration (adj_0 and mid_0 -44.8/-45.6 ns per 27-product row, 1.66 ns per iteration); an x87 instruction issues alone",
+      "status": "measured",
+      "unit": "boolean",
+      "value": false
+    },
+    "store.load_after_store_interlock_cycles": {
+      "source": "S6-03 spill_reload.rt 4.20/4.26 per pair at two/four threads and S8-12 C9 memory chains u2/u4 8.56/8.30 per link at one thread (two issues plus four cycles); vector rows only, applied to scalar stores as well (assumed)",
+      "status": "derived",
+      "unit": "cycles after a store before the same context may issue a load",
+      "value": 4
+    },
+    "tlb.l1_entries_4k": {
+      "source": "S8-12 C4 rerun (2026-11-08): loads cost L1 latency up to 64 4 KiB pages per core and about 29 ticks more beyond",
+      "status": "measured",
+      "unit": "pages",
+      "value": 64
+    },
+    "tlb.l1_miss_penalty_cycles": {
+      "source": "S8-12 C4 rerun: 31.76-31.79 vs 3.01-3.02 ticks per load at one thread",
+      "status": "measured",
+      "unit": "cycles",
+      "value": 29
+    },
+    "x87.mem_operand_serializes": {
+      "source": "S12-31 microbench (card windows 3 and 5): the row loop costs two cycles per issue plus a constant whatever follows fmull (faddp directly, or add and cmp first), so the instructions after an x87 memory-operand instruction do not issue while it completes",
+      "status": "derived",
+      "unit": "boolean",
+      "value": true
+    }
+  },
+  "prediction": {
+    "active_contexts": [
+      0
+    ],
+    "core_issue_utilization": 0.0862,
+    "dynamic_instructions": 3040,
+    "frontend": {
+      "decode_delay_cycles": 0,
+      "icache_misses": 0,
+      "layout": true,
+      "padding_nops": 0,
+      "slow_prefix_instructions": 63,
+      "taken_branch_bubbles": 55
+    },
+    "functional_exactness": "exact",
+    "input_files": [
+      {
+        "addr": "0x1004b4020",
+        "bytes": 656,
+        "file": "block-0.bin",
+        "format": "raw",
+        "sha256": "ca5870781aef69fa6a7dc062dc2bbd694e80fd45b66f653998c4dde1a57d8213"
+      },
+      {
+        "addr": "0x1008f5160",
+        "bytes": 384,
+        "file": "block-1.bin",
+        "format": "raw",
+        "sha256": "9761b2bc2a5b09ebe746fa92dcbe558699be182d4da7e2beb98814cfcc1107eb"
+      },
+      {
+        "addr": "0xa0001a940",
+        "bytes": 32,
+        "file": "block-2.bin",
+        "format": "raw",
+        "sha256": "957c0c4ec6b84279b6d8a163c9d6826aea9fa5fbe861551cc5751d92440c3a08"
+      },
+      {
+        "addr": "0xa00004160",
+        "bytes": 160,
+        "file": "block-3.bin",
+        "format": "raw",
+        "sha256": "a4296af9f092ca1bae7b3db823c4f2953530f1c2e42267a92dc1cc4b67f0929a"
+      },
+      {
+        "addr": "0xa00004240",
+        "bytes": 160,
+        "file": "block-4.bin",
+        "format": "raw",
+        "sha256": "5df43fe86de1dda49e5ac85f65dc6e1fe5b11895635c4cced3b665c5b30bb13a"
+      },
+      {
+        "addr": "0xa0001b980",
+        "bytes": 160,
+        "file": "block-5.bin",
+        "format": "raw",
+        "sha256": "4c319f902c857a0cd62862d51548dc90befb757e6a96fe86a283e8ee386dd58c"
+      },
+      {
+        "addr": "0xa0001ba40",
+        "bytes": 160,
+        "file": "block-6.bin",
+        "format": "raw",
+        "sha256": "290beb7463beb6f7fe8e871f9985c30a767f2f678535ebf066adcd4f60badc79"
+      },
+      {
+        "addr": "0xa0001bb20",
+        "bytes": 160,
+        "file": "block-7.bin",
+        "format": "raw",
+        "sha256": "c5bdd1e5afda027d899002aea7f149347fecb96ee46a68192575fde457d7b674"
+      },
+      {
+        "addr": "0xa0001bd80",
+        "bytes": 160,
+        "file": "block-8.bin",
+        "format": "raw",
+        "sha256": "ca5b458d55f242fa1cf2dfc81dfaccf4642aebd0db5e0605f916ae9e6f5d3ec8"
+      },
+      {
+        "addr": "0xa0001bbe0",
+        "bytes": 160,
+        "file": "block-9.bin",
+        "format": "raw",
+        "sha256": "5723e64ef4de376ff965ea1a2a6151028391ec58ab03ce29965d01234020256e"
+      },
+      {
+        "addr": "0xa0001bcc0",
+        "bytes": 160,
+        "file": "block-10.bin",
+        "format": "raw",
+        "sha256": "168fcde1fd4eaa07bef9defe85309be3e9fa5e94104c360bc61ecfe25811d148"
+      },
+      {
+        "addr": "0xa0002a8c0",
+        "bytes": 128,
+        "file": "block-11.bin",
+        "format": "raw",
+        "sha256": "c81a95669ef84f768c409641ea1f5849c6db7f56e10ce0c2b1524e354da145b4"
+      },
+      {
+        "addr": "0xa0002b640",
+        "bytes": 128,
+        "file": "block-12.bin",
+        "format": "raw",
+        "sha256": "bc3c02ed47d5c6d597531f1284b7765cfa07cd0a1f5fe6296896756efc64df68"
+      },
+      {
+        "addr": "0xa0001c5a0",
+        "bytes": 160,
+        "file": "block-13.bin",
+        "format": "raw",
+        "sha256": "e97d894d4f228884e3cd3ee191ef7f461e428b817ab37c74753e528d68be831d"
+      },
+      {
+        "addr": "0xa0002b7c0",
+        "bytes": 128,
+        "file": "block-14.bin",
+        "format": "raw",
+        "sha256": "f5d8d9ace6a472386b7790398c93b8fbd75bc1a64e250273f8a6f907715a7415"
+      },
+      {
+        "addr": "0xa0001c680",
+        "bytes": 160,
+        "file": "block-15.bin",
+        "format": "raw",
+        "sha256": "d34b48d38a81813eaea747a1901fedb62ef4218cb00b6e9447306142fc768d29"
+      },
+      {
+        "addr": "0xa0001c740",
+        "bytes": 160,
+        "file": "block-16.bin",
+        "format": "raw",
+        "sha256": "4799c781551ea4be085fafbc37ff0a1f50885a2363f06feef0577e167a0c2d24"
+      },
+      {
+        "addr": "0xa0002b740",
+        "bytes": 128,
+        "file": "block-17.bin",
+        "format": "raw",
+        "sha256": "94d02fa46f7106d6a491703772de0c12c0ec3484a0986750578b665cb082ed4b"
+      },
+      {
+        "addr": "0xa0002bdc0",
+        "bytes": 128,
+        "file": "block-18.bin",
+        "format": "raw",
+        "sha256": "d9c58bc189c619aad629e664a940f8cb9be49b036c2d0e63cbe61c7d0ace43c7"
+      },
+      {
+        "addr": "0xa00004300",
+        "bytes": 160,
+        "file": "block-19.bin",
+        "format": "raw",
+        "sha256": "9f62e037c1191ba706e3192abb6fe9c7c5c2fd3fb94569e0e50a758b4a1d5033"
+      },
+      {
+        "addr": "0xa000043e0",
+        "bytes": 160,
+        "file": "block-20.bin",
+        "format": "raw",
+        "sha256": "6f7e72762a099160f35202cefe3fd021ca6afe5e4a289ba8e0e8f5182556aaae"
+      },
+      {
+        "addr": "0xa0001a5c0",
+        "bytes": 160,
+        "file": "block-21.bin",
+        "format": "raw",
+        "sha256": "45828d27dbcbf8b85e8e16344872f6cdf5f3608d1153de052bc6a85d2c056686"
+      },
+      {
+        "addr": "0xa0001a6a0",
+        "bytes": 160,
+        "file": "block-22.bin",
+        "format": "raw",
+        "sha256": "acc7b836b0d9cd4ea72bc4a97037ae5db40949858ba28ca6c57b3de2aac9d148"
+      },
+      {
+        "addr": "0xa0001aa60",
+        "bytes": 160,
+        "file": "block-23.bin",
+        "format": "raw",
+        "sha256": "9390b63740b7bcc460e569682fb7da192df5e6443146c9e5c83afa937c36a0bb"
+      },
+      {
+        "addr": "0xa0001ab40",
+        "bytes": 160,
+        "file": "block-24.bin",
+        "format": "raw",
+        "sha256": "04fa16cb43e8e6168c624cc452f247fa7bda2bc1205933980bd23374326f899c"
+      },
+      {
+        "addr": "0xa0001ac00",
+        "bytes": 160,
+        "file": "block-25.bin",
+        "format": "raw",
+        "sha256": "6f35c0f3e6ebfed51bb37cbf7ea9952ae73c7bc3f25751764b9ab3e7e39472b1"
+      },
+      {
+        "addr": "0xa0001c340",
+        "bytes": 160,
+        "file": "block-26.bin",
+        "format": "raw",
+        "sha256": "b4a80e82394d47268ced89fb5aaa96522e003169f077982ac80421d7869b1ea0"
+      },
+      {
+        "addr": "0xa0002c040",
+        "bytes": 128,
+        "file": "block-27.bin",
+        "format": "raw",
+        "sha256": "9755819db55f5cb20061c630f00a234320aac3df664474d8e1d46df62cd71ce9"
+      },
+      {
+        "addr": "0xa0001c400",
+        "bytes": 160,
+        "file": "block-28.bin",
+        "format": "raw",
+        "sha256": "eeba1a8cbdcdebd5b0336ae62ef65d55a0aeb6e9bcf742ce4cddb6b62fcb638f"
+      },
+      {
+        "addr": "0xa0002c240",
+        "bytes": 128,
+        "file": "block-29.bin",
+        "format": "raw",
+        "sha256": "0c5fd1acd910c7a65378087894593ba4c883367ff1a2c17af2fae5c6a4ee64d5"
+      },
+      {
+        "addr": "0xa0001c4e0",
+        "bytes": 160,
+        "file": "block-30.bin",
+        "format": "raw",
+        "sha256": "af5a1ccbd3e73df216255a784a84267389f18ca8898d0a6e64ea259f6660a05a"
+      },
+      {
+        "addr": "0xa0002c0c0",
+        "bytes": 128,
+        "file": "block-31.bin",
+        "format": "raw",
+        "sha256": "11072dc379d4ee7e743a2a5c7bef32aba9c5473d64de2b0d91f658e84e2332f3"
+      },
+      {
+        "addr": "0xa0002bcc0",
+        "bytes": 128,
+        "file": "block-32.bin",
+        "format": "raw",
+        "sha256": "dc7307fe53a74e2add58a3297c906cefb4c545d63c9f9eec193c115a39156d0e"
+      },
+      {
+        "addr": "0xa0002b8c0",
+        "bytes": 128,
+        "file": "block-33.bin",
+        "format": "raw",
+        "sha256": "771bc392fdd36ba61afb0b09d98f39b161f8332a8e8f6e45a697422247cf9d3a"
+      },
+      {
+        "addr": "0xa0001c9c0",
+        "bytes": 160,
+        "file": "block-34.bin",
+        "format": "raw",
+        "sha256": "1c521b29012e20fec4ad963e65b83388596e8e3ffe0813a3a270d8f01b420546"
+      },
+      {
+        "addr": "0xa0002c140",
+        "bytes": 128,
+        "file": "block-35.bin",
+        "format": "raw",
+        "sha256": "e7809363834431cdc6a83382e7d282d27a766a7b36c14682c15fb648f6d440c1"
+      },
+      {
+        "addr": "0xa0001c1a0",
+        "bytes": 160,
+        "file": "block-36.bin",
+        "format": "raw",
+        "sha256": "72d9b6a12f8413fc2d854009fcafd8ad114979a594d1ba604d3890b2e5064309"
+      },
+      {
+        "addr": "0xa0001b3e0",
+        "bytes": 160,
+        "file": "block-37.bin",
+        "format": "raw",
+        "sha256": "3725ff0bc5be75a8b7a6d8dec5b1033c1a1687554e697a7c208ff7c318a2a90c"
+      },
+      {
+        "addr": "0xa0001af00",
+        "bytes": 160,
+        "file": "block-38.bin",
+        "format": "raw",
+        "sha256": "96ffd3a2b1d3f00482d9f0eb0d70dae1a85ee7a1afdea88506b07fc186e4e164"
+      },
+      {
+        "addr": "0xa0002bf40",
+        "bytes": 128,
+        "file": "block-39.bin",
+        "format": "raw",
+        "sha256": "a782ef6ca76ecdc9580c568eb8e6491f75b47356fb719c3bf9a8bb076c0a8089"
+      },
+      {
+        "addr": "0xa0001afc0",
+        "bytes": 160,
+        "file": "block-40.bin",
+        "format": "raw",
+        "sha256": "e383d6e8c16fa7ec0a278645c152ba3e7fe4c0e760d525986646eeeefb8b46a0"
+      },
+      {
+        "addr": "0xa0001cde0",
+        "bytes": 160,
+        "file": "block-41.bin",
+        "format": "raw",
+        "sha256": "fcd54e83f09e02a0edc202a5ff63ef6f7ef10dfce2019d07df341a99a388d463"
+      },
+      {
+        "addr": "0xa0001b240",
+        "bytes": 160,
+        "file": "block-42.bin",
+        "format": "raw",
+        "sha256": "cd094a5407887e0fd1345baeec233dac71490a3901060b8da2f124465d076cab"
+      },
+      {
+        "addr": "0xa0001b160",
+        "bytes": 160,
+        "file": "block-43.bin",
+        "format": "raw",
+        "sha256": "d352d438608e418e532b4c7ce0d48f315bff8d6716968d5ce2ca51651e03a989"
+      },
+      {
+        "addr": "0xa0001b700",
+        "bytes": 160,
+        "file": "block-44.bin",
+        "format": "raw",
+        "sha256": "2d85048a74b49f39a62a68145e8dd8692b019f45931659ccfac217ba4f3a8f66"
+      },
+      {
+        "addr": "0xa0002b240",
+        "bytes": 128,
+        "file": "block-45.bin",
+        "format": "raw",
+        "sha256": "e8b87e8bf5d4a15cad9df3e4bcedc7c89eb2fe6546eb39a1789ef52730b6e4e9"
+      },
+      {
+        "addr": "0xa0002b0c0",
+        "bytes": 128,
+        "file": "block-46.bin",
+        "format": "raw",
+        "sha256": "873c42247e1595f28d53c35e6557aa98aff1a712d16e4cdb45b50b88e70923e1"
+      },
+      {
+        "addr": "0xa0002b4c0",
+        "bytes": 128,
+        "file": "block-47.bin",
+        "format": "raw",
+        "sha256": "802438e241bc0cfbecab2093cbb8d23bbc73f0ae851f0568157555ee64908a6c"
+      },
+      {
+        "addr": "0xa0001cec0",
+        "bytes": 160,
+        "file": "block-48.bin",
+        "format": "raw",
+        "sha256": "7a3c67c401ac1787a45c60bd2d7eaba72fb1382dc8da7993905d2006a057333c"
+      },
+      {
+        "addr": "0xa0002acc0",
+        "bytes": 128,
+        "file": "block-49.bin",
+        "format": "raw",
+        "sha256": "381d430cfddff6b02efda659f2e97de2c3555e6578245b5662faa0d7db837015"
+      },
+      {
+        "addr": "0xa0002abc0",
+        "bytes": 128,
+        "file": "block-50.bin",
+        "format": "raw",
+        "sha256": "0130759f076f09ecbac55ff975b9a62525c8b050b0075a93c3442198103af891"
+      },
+      {
+        "addr": "0xa0002c340",
+        "bytes": 128,
+        "file": "block-51.bin",
+        "format": "raw",
+        "sha256": "79812bd6654d4b47f32d54252c8177c7cf11f8735c83c133f7920d1f894d7ac7"
+      },
+      {
+        "addr": "0xa0002c4c0",
+        "bytes": 128,
+        "file": "block-52.bin",
+        "format": "raw",
+        "sha256": "5fd0f1b19cbdbf1e3c25492a20ecfc5b6ef3505c9e12544c144bae2c41da1b0f"
+      },
+      {
+        "addr": "0xa0002bbc0",
+        "bytes": 128,
+        "file": "block-53.bin",
+        "format": "raw",
+        "sha256": "19d647541af79bf0f505373bb8b1a63201535c479b009fd0b6a6b894f0ca235f"
+      },
+      {
+        "addr": "0xa0001c0c0",
+        "bytes": 160,
+        "file": "block-54.bin",
+        "format": "raw",
+        "sha256": "bf9731fcec728ffd3eccd26fa2b47d4dcff7d76a8b3430aec66e6ed4598df20d"
+      },
+      {
+        "addr": "0xa0002b6c0",
+        "bytes": 128,
+        "file": "block-55.bin",
+        "format": "raw",
+        "sha256": "e955cd2c7643839956739f6862a2bbd2f7a22ee78de49c24ad9ebea316508f5e"
+      },
+      {
+        "addr": "0xa0001b300",
+        "bytes": 160,
+        "file": "block-56.bin",
+        "format": "raw",
+        "sha256": "5f846cc63cf4b3284275c3fbda1a75130647aaf91fa315afcf0d5e305f039a39"
+      },
+      {
+        "addr": "0xa0001b4a0",
+        "bytes": 160,
+        "file": "block-57.bin",
+        "format": "raw",
+        "sha256": "eef1d9620603db1fefd9a53f4f91bfff725546d48f1f74007c69c08c4a05f51d"
+      },
+      {
+        "addr": "0xa0002afc0",
+        "bytes": 128,
+        "file": "block-58.bin",
+        "format": "raw",
+        "sha256": "3e4df9253556eddcda5c35097595bb7b274e5ef5b50437e1e822949561fafa4a"
+      },
+      {
+        "addr": "0xa0002aec0",
+        "bytes": 128,
+        "file": "block-59.bin",
+        "format": "raw",
+        "sha256": "01fb497fb80861f39300d2eee9ed9a070f21d31a0c4ce05697128aa524ba18ca"
+      },
+      {
+        "addr": "0xa0002ad40",
+        "bytes": 128,
+        "file": "block-60.bin",
+        "format": "raw",
+        "sha256": "fa5d8a25ec55abc10656e841409046cefc14727293bb18cb417424bbc4d410ff"
+      },
+      {
+        "addr": "0xa0002a9c0",
+        "bytes": 128,
+        "file": "block-61.bin",
+        "format": "raw",
+        "sha256": "303166a2dfb4a784165edf81b831a9a2f41ef71c83e1c94fbde9959cb1f02705"
+      },
+      {
+        "addr": "0xa0001cf80",
+        "bytes": 160,
+        "file": "block-62.bin",
+        "format": "raw",
+        "sha256": "3d98f97775d7f99e8c64372fe9576aac8dc896c5a5d34ea07a4188e5633f91db"
+      },
+      {
+        "addr": "0xa0001c820",
+        "bytes": 160,
+        "file": "block-63.bin",
+        "format": "raw",
+        "sha256": "8742bbbc556dca52589b22ae03ec066c67c9c986ce367e8ea6c726404db3f925"
+      },
+      {
+        "addr": "0xa0002ae40",
+        "bytes": 128,
+        "file": "block-64.bin",
+        "format": "raw",
+        "sha256": "46bf444d520f844a4a361d38dc630774c60c244e6a70a7c3d6ec8de84009e263"
+      },
+      {
+        "addr": "0xa0002bec0",
+        "bytes": 128,
+        "file": "block-65.bin",
+        "format": "raw",
+        "sha256": "c95e00d6f8bc1df13d278cfb9c3f9da3dd9d4cc8e07f11d945b51fb6a82275ab"
+      },
+      {
+        "addr": "0xa0001d060",
+        "bytes": 160,
+        "file": "block-66.bin",
+        "format": "raw",
+        "sha256": "e0df89446823a59725c20d687057bc160e8989f76a49cd373e27d7440ea7ae4e"
+      },
+      {
+        "addr": "0xa0002b9c0",
+        "bytes": 128,
+        "file": "block-67.bin",
+        "format": "raw",
+        "sha256": "2da363eb87a9549d5d169a753cb67d544b5f09742b204dd29e5b3f7b3f2121cd"
+      },
+      {
+        "addr": "0xa0002c540",
+        "bytes": 128,
+        "file": "block-68.bin",
+        "format": "raw",
+        "sha256": "222eff68c28a3f19c76ee84c1742228584e93a04d71658f4c80da4fe71eee05e"
+      },
+      {
+        "addr": "0xa0002c2c0",
+        "bytes": 128,
+        "file": "block-69.bin",
+        "format": "raw",
+        "sha256": "a2ace3a9169abb3d4d3be404a6f418155bbd8f438df98848ec5379877fb6b87b"
+      },
+      {
+        "addr": "0xa0002aa40",
+        "bytes": 128,
+        "file": "block-70.bin",
+        "format": "raw",
+        "sha256": "fea757a504fbd38ff094ca2db86a0e77e40db52fc12808434c87c56b350a12d5"
+      },
+      {
+        "addr": "0xa0002b2c0",
+        "bytes": 128,
+        "file": "block-71.bin",
+        "format": "raw",
+        "sha256": "cf0d012b16634c2cf5957106f70e7f844e04fa748049e028201f35d82ef494bd"
+      },
+      {
+        "addr": "0xa0002aac0",
+        "bytes": 128,
+        "file": "block-72.bin",
+        "format": "raw",
+        "sha256": "beb3646c2a13ea0a846d06c7484743212502dcab4f7e466a99fe8ea3330befb3"
+      },
+      {
+        "addr": "0xa0001b0a0",
+        "bytes": 160,
+        "file": "block-73.bin",
+        "format": "raw",
+        "sha256": "136d36d4f9bc05cc62c7dce0eeadfe36f5c2efa4cc9d01ff54a416b097b9974f"
+      },
+      {
+        "addr": "0xa0002ac40",
+        "bytes": 128,
+        "file": "block-74.bin",
+        "format": "raw",
+        "sha256": "116703a04cfa374192b34b4629f5babbc0945be3299bdb982050102dfad06ee0"
+      },
+      {
+        "addr": "0xa0002c5c0",
+        "bytes": 128,
+        "file": "block-75.bin",
+        "format": "raw",
+        "sha256": "767eeb3d02b3bb4c1f2adac5147953a06bcbeb4971b6c2419e5f40613cf2ef41"
+      },
+      {
+        "addr": "0xa0002a740",
+        "bytes": 128,
+        "file": "block-76.bin",
+        "format": "raw",
+        "sha256": "6c77b61ffd67a3a5282146705acfe6f7920cd973a61c3ae39b7983a56af6a8cc"
+      },
+      {
+        "addr": "0xa0002bac0",
+        "bytes": 128,
+        "file": "block-77.bin",
+        "format": "raw",
+        "sha256": "efcf726b32e42ce85012cdb2d433751582aaa9d9703fd30049edbe33d86f69dc"
+      },
+      {
+        "addr": "0xa0002af40",
+        "bytes": 128,
+        "file": "block-78.bin",
+        "format": "raw",
+        "sha256": "ed140086db903433eb886c68c3a43967fd8629f4f4121b547ba19e2ddef5f872"
+      },
+      {
+        "addr": "0xa0002adc0",
+        "bytes": 128,
+        "file": "block-79.bin",
+        "format": "raw",
+        "sha256": "47b428f2c9c50587cd32a9efb6e8a81c775626c3b0dd6c2e6f4353e9d9441858"
+      },
+      {
+        "addr": "0xa0001c260",
+        "bytes": 160,
+        "file": "block-80.bin",
+        "format": "raw",
+        "sha256": "837e34d0aa6bb5f250a6b8ea386546113b75c9a01857fb3450fe068f17c011ea"
+      },
+      {
+        "addr": "0xa0002bd40",
+        "bytes": 128,
+        "file": "block-81.bin",
+        "format": "raw",
+        "sha256": "123b8d37229e21fb2f10767438e94ce541b9957c514e747f5fe29ad19e77f9b7"
+      },
+      {
+        "addr": "0xa0002bc40",
+        "bytes": 128,
+        "file": "block-82.bin",
+        "format": "raw",
+        "sha256": "a89499a495c53f8bba7cb65cc3deb0b06a27429791ca1f73933f37c155fc45ba"
+      },
+      {
+        "addr": "0xa0002a7c0",
+        "bytes": 128,
+        "file": "block-83.bin",
+        "format": "raw",
+        "sha256": "2ea68af6d48acc4251bd7df9096bdf53ebeb2e5c9893d3aaab1ee07985abac55"
+      },
+      {
+        "addr": "0xa0002b140",
+        "bytes": 128,
+        "file": "block-84.bin",
+        "format": "raw",
+        "sha256": "a19210c38eb49ddb8b9f9d9ed8591c670364ad0b45e004b9c7339ad76bf156c4"
+      },
+      {
+        "addr": "0xa0002c1c0",
+        "bytes": 128,
+        "file": "block-85.bin",
+        "format": "raw",
+        "sha256": "41b0542f2370301d19a8eee704d393446e73eb1b7eb03ed1ca04ae28238480f0"
+      },
+      {
+        "addr": "0xa0001a760",
+        "bytes": 160,
+        "file": "block-86.bin",
+        "format": "raw",
+        "sha256": "65a10ad5dfbda3885be533042964a9b556640dde4aaaef2b1a83fabade50ac9b"
+      },
+      {
+        "addr": "0xa0002b540",
+        "bytes": 128,
+        "file": "block-87.bin",
+        "format": "raw",
+        "sha256": "9a6b4658abce7541f3e771bf2330bee3a525cfb763323f067635a24055f20471"
+      },
+      {
+        "addr": "0xa0001a840",
+        "bytes": 160,
+        "file": "block-88.bin",
+        "format": "raw",
+        "sha256": "7b9bbd9acd81fcf7ad87a09b058141fff8d0dc755607e39265de9aeb12e90b3c"
+      },
+      {
+        "addr": "0xa0002b1c0",
+        "bytes": 128,
+        "file": "block-89.bin",
+        "format": "raw",
+        "sha256": "d5be5a9c9ed3343b04b3a3c5c85bf08ffa9ce8ab907cf68f055adcc3d2d76825"
+      },
+      {
+        "addr": "0xa0001b7e0",
+        "bytes": 160,
+        "file": "block-90.bin",
+        "format": "raw",
+        "sha256": "44f8a67b67fed82ea64370dcb08fa43bda4b3b1cead132ce8677c1d92e3366fb"
+      },
+      {
+        "addr": "0xa0001ace0",
+        "bytes": 160,
+        "file": "block-91.bin",
+        "format": "raw",
+        "sha256": "5681fd962ed7a729dff702985b5c28db40eba18625569aa18f5cf0c84e7ff388"
+      },
+      {
+        "addr": "0xa0001a9a0",
+        "bytes": 160,
+        "file": "block-92.bin",
+        "format": "raw",
+        "sha256": "cb7e3e9e7e465c554d2359c0bba293b3795cbd124da1b25138d155d19422a32f"
+      },
+      {
+        "addr": "0xa0002a640",
+        "bytes": 128,
+        "file": "block-93.bin",
+        "format": "raw",
+        "sha256": "3816fd4c65cda54e1692ab150fecb615265763404fc1bf5bddc976f9d90e273c"
+      },
+      {
+        "addr": "0xa0001bf20",
+        "bytes": 160,
+        "file": "block-94.bin",
+        "format": "raw",
+        "sha256": "0ad2c24ceb2cd58d12d1ba08ff961eeded9ad6802fb08b9896eda84b116025c6"
+      },
+      {
+        "addr": "0xa0001b580",
+        "bytes": 160,
+        "file": "block-95.bin",
+        "format": "raw",
+        "sha256": "e5c64b393248dd0737f5c5b32a22d180b99779b4c33b6e2def60010b4d2f084a"
+      },
+      {
+        "addr": "0xa0001b8a0",
+        "bytes": 160,
+        "file": "block-96.bin",
+        "format": "raw",
+        "sha256": "5a2c4acd5b22821c4699d0b1b97016a7b1439e15bf53e1a3766dee40cd2ddee9"
+      },
+      {
+        "addr": "0xa0002c3c0",
+        "bytes": 128,
+        "file": "block-97.bin",
+        "format": "raw",
+        "sha256": "dfb28eb52e7f2a251945cc6decaf6d0caea128998bf2a082958b5829f2ac2b38"
+      },
+      {
+        "addr": "0xa0002b5c0",
+        "bytes": 128,
+        "file": "block-98.bin",
+        "format": "raw",
+        "sha256": "15e3e78faf5e3b554686646cda6d6fd8e509ba42e3c2fdb643ce1c57d36d280c"
+      },
+      {
+        "addr": "0xa0002ab40",
+        "bytes": 128,
+        "file": "block-99.bin",
+        "format": "raw",
+        "sha256": "fe703ce93dadf49e89396599951b5f48b9bab6d664f535cf14f5cce95632dd2d"
+      },
+      {
+        "addr": "0xa0002b040",
+        "bytes": 128,
+        "file": "block-100.bin",
+        "format": "raw",
+        "sha256": "cb8b4c59bd5b1a369da74b4a2ddce3476855fdaa87ce6a4d6c60cf1834b073ac"
+      },
+      {
+        "addr": "0xa0001be60",
+        "bytes": 160,
+        "file": "block-101.bin",
+        "format": "raw",
+        "sha256": "bedbcf161bd73bd9411ab52d90f0f063cefb887248103330c7028990c9b14908"
+      },
+      {
+        "addr": "0xa0002b840",
+        "bytes": 128,
+        "file": "block-102.bin",
+        "format": "raw",
+        "sha256": "addeca42380cc3bd7916e560d00d6c2461e6852df5e57acf6769d0a098cb2ed9"
+      },
+      {
+        "addr": "0xa0002a6c0",
+        "bytes": 128,
+        "file": "block-103.bin",
+        "format": "raw",
+        "sha256": "290a7c5d3e668742d2da92fd6277b18506c7a8c911e9cb51cd931175b8db431b"
+      },
+      {
+        "addr": "0xa0002ba40",
+        "bytes": 128,
+        "file": "block-104.bin",
+        "format": "raw",
+        "sha256": "a1e7731cc5fcf4a076ccdd4c0c9fce5f4a18bc2aa156312160dc5c56beaab51f"
+      },
+      {
+        "addr": "0xa0002bb40",
+        "bytes": 128,
+        "file": "block-105.bin",
+        "format": "raw",
+        "sha256": "4a207ae0a7bc6c21b1902c0ce1731ca4bc9f7c5addfbaee2910446603a8c1895"
+      },
+      {
+        "addr": "0xa0001c000",
+        "bytes": 160,
+        "file": "block-106.bin",
+        "format": "raw",
+        "sha256": "bc7bdb2b7ffee84a25862e83038c1f7addbc4f07dd18353c6564589821afb2bb"
+      },
+      {
+        "addr": "0xa0002b940",
+        "bytes": 128,
+        "file": "block-107.bin",
+        "format": "raw",
+        "sha256": "89169211227b8939b78fe51f4dd544805ef38dd58d744abb27ecb929ca3dbbdc"
+      },
+      {
+        "addr": "0xa0002b340",
+        "bytes": 128,
+        "file": "block-108.bin",
+        "format": "raw",
+        "sha256": "99cf7ac24a7951e3500c0c2c796ada95c2a13c1c4dd95bdfb009005fa1bb8eb2"
+      },
+      {
+        "addr": "0xa0001c8e0",
+        "bytes": 160,
+        "file": "block-109.bin",
+        "format": "raw",
+        "sha256": "ba37a173f30749314341443a91a8c1ab45980b60c7b714aafff95d1bea209160"
+      },
+      {
+        "addr": "0xa0001ae20",
+        "bytes": 160,
+        "file": "block-110.bin",
+        "format": "raw",
+        "sha256": "5e642c4e800899041e9f9bff5a76e7cc90d6c2717463d2f10d48246e6a34f4b5"
+      },
+      {
+        "addr": "0xa0002a840",
+        "bytes": 128,
+        "file": "block-111.bin",
+        "format": "raw",
+        "sha256": "d9482dc99b2496f64a839f92580a65bad2bb6bdf024babeddad8b68623eafdb4"
+      },
+      {
+        "addr": "0xa0002a940",
+        "bytes": 128,
+        "file": "block-112.bin",
+        "format": "raw",
+        "sha256": "bc7d1134998f256c91133373bbd41ee86ade24597ba9242f532a5a0e760df4af"
+      },
+      {
+        "addr": "0xa0002be40",
+        "bytes": 128,
+        "file": "block-113.bin",
+        "format": "raw",
+        "sha256": "c5fd402e281054e8e9cd563f93eca14626eda9f8e842693d994f0487162cee7f"
+      },
+      {
+        "addr": "0xa0002bfc0",
+        "bytes": 128,
+        "file": "block-114.bin",
+        "format": "raw",
+        "sha256": "1624abc9791815902dd47f8823b402cc5022ae07ab98a7ceae8544bb0c980795"
+      },
+      {
+        "addr": "0xa0002c440",
+        "bytes": 128,
+        "file": "block-115.bin",
+        "format": "raw",
+        "sha256": "436d3bf9879858a8fc4d1ac6b99f3e86fb64850d26ea41d1ae38f590f7194c1c"
+      },
+      {
+        "addr": "0xa0002b440",
+        "bytes": 128,
+        "file": "block-116.bin",
+        "format": "raw",
+        "sha256": "398adf38bb04e367171c83a266bc57738cffea76663727927816729a3db00ae5"
+      },
+      {
+        "addr": "0xa0002b3c0",
+        "bytes": 128,
+        "file": "block-117.bin",
+        "format": "raw",
+        "sha256": "864a8a56ec29f40d9f08cd8d15a49d3a0933898320b0b562e00cd1a55d4d6919"
+      }
+    ],
+    "issue_events": 2898,
+    "issue_span_cycles": 33620,
+    "kind": "timing_prediction_core_cycles",
+    "memory": {
+      "cold_level": "memory",
+      "stats": {
+        "accesses": 1125,
+        "hw_prefetch_hits": 0,
+        "hw_prefetches": 300,
+        "inflight_waits": 4,
+        "l1_hits": 986,
+        "l2_hits": 86,
+        "memory": 53,
+        "memory_service_waits": 287,
+        "outstanding_limit_stalls": 0,
+        "prefetches": 0,
+        "prefetches_useless": 0,
+        "store_misses": 3,
+        "tlb_misses": 12
+      },
+      "submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "type": "line_tracking",
+      "warm_ranges": 0
+    },
+    "pair_fraction": 0.0934,
+    "per_context": {
+      "0": {
+        "completion": 33622,
+        "dynamic_instructions": 3040,
+        "first_issue": 0,
+        "issued": 3040,
+        "last_issue": 33619,
+        "pairs": 142,
+        "stall_cycles": {
+          "agi": 21,
+          "core_busy": 300,
+          "dependency": 4898,
+          "flags": 54,
+          "miss_stall": 11381,
+          "resource": 396,
+          "spacing": 1976,
+          "store_interlock": 102,
+          "x87_serial": 11594
+        }
+      }
+    },
+    "predicted_cycles": 33622,
+    "predicted_cycles_per_unit": 33622.0,
+    "result_class": {
+      "class": "unvalidated_scenario_estimate",
+      "reasons": [
+        "the kernel declares no provenance.shape, so no held-out validation can vouch for it",
+        "TLB, L2 hardware prefetcher and memory service sub-models are part of the memory domain (scenario: tlb=auto, hardware_prefetcher=auto, memory_service=auto)",
+        "the trace misses L1 (86 L2, 53 memory accesses): cache behaviour is modeled, not validated"
+      ]
+    },
+    "unit_count": 1,
+    "unit_of_work": "one nbGravity call, first body of first small tree"
+  },
+  "profile": {
+    "calibration": {
+      "held_out_validation_cases": 160,
+      "not_validated_shapes": {
+        "x87_sparse_rows_l1": {
+          "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+          "median_abs_error_pct": 16.0,
+          "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+          "worst_abs_error_pct": 17.9
+        }
+      },
+      "state": "imported_microbenchmarks_with_compiled_heldout_check",
+      "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+      "validated_shapes": {
+        "l1_l2_dependent_loads": {
+          "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+          "median_abs_error_pct": 2.0,
+          "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+          "worst_abs_error_pct": 14.0
+        },
+        "l1_resident_stores_prefetch_pairing": {
+          "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+          "median_abs_error_pct": 2.0,
+          "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+          "worst_abs_error_pct": 12.0
+        },
+        "register_vector_chain_l1": {
+          "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+          "median_abs_error_pct": 1.0,
+          "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+          "worst_abs_error_pct": 11.0
+        },
+        "scalar_mask_l1": {
+          "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+          "median_abs_error_pct": 1.0,
+          "note": "scalar integer and mask chains, pairing, address-generation interlock",
+          "worst_abs_error_pct": 5.0
+        },
+        "x87_register_chain": {
+          "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+          "median_abs_error_pct": 1.0,
+          "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+          "worst_abs_error_pct": 3.0
+        },
+        "x87_row_loop_l1": {
+          "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+          "median_abs_error_pct": 2.9,
+          "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+          "worst_abs_error_pct": 3.8
+        },
+        "x87_sparse_rows_l2": {
+          "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+          "median_abs_error_pct": 3.7,
+          "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+          "worst_abs_error_pct": 6.6
+        },
+        "x87_sparse_rows_memory_stream": {
+          "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+          "median_abs_error_pct": 3.7,
+          "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+          "worst_abs_error_pct": 4.1
+        }
+      }
+    },
+    "chain": [
+      "knc-common",
+      "core-x100-measured",
+      "card-7120-measured"
+    ],
+    "hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
+    "id": "card-7120-measured",
+    "kind": "card",
+    "native_measurement_ids": [
+      "S6-03: card_run jobs claude-0380b2ec, claude-7191652b, claude-b1f534af (2026-11-06), .work/_shared/S6-03/knc-char.mic, median of five group medians, spread <2% unless starred",
+      "S8-01: .work/_shared/tmp/claude-s8-01/job1..job19 (2026-11-07/08), one launch each",
+      "S8-10 C11: .work/_shared/tmp/claude-s8-10-out/c11-*.out (2026-11-09), three launches",
+      "S8-12 reruns: .work/_shared/tmp/claude-s8-12/job{1..6}-*.out (2026-11-08)",
+      "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
+    ],
+    "parameter_status_counts": {
+      "assumed": 15,
+      "derived": 15,
+      "documented": 40,
+      "measured": 32,
+      "unknown": 5
+    },
+    "synthetic": false,
+    "version": "0.3.0"
+  },
+  "python_execution_seconds": 1.1086,
+  "python_execution_seconds_simulation": 0.2624,
+  "representation_evaluated": "normalized-records",
   "result_type": "timing_prediction",
   "scale": "core",
   "schema": "knc-twin.result/1",
-  "status": "unsupported",
-  "timestamp_utc": "2026-11-16T06:09:52Z",
-  "unsupported": [
-    "streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
-  ]
+  "status": "ok",
+  "timestamp_utc": "2026-11-16T12:52:48Z",
+  "unsupported": []
 }

@@ -1,23 +1,26 @@
+Reference small-1: exit=0; stdout/stderr tree-incest diagnostics=0/0
+Capture warning gates: quietErrors=0, treeIncest=0 (first error would print)
 capabilities: ok
-profiles: card-3120-documented, card-5110p-literature, card-7120-measured, core-x100-measured, knc-common, overlay-no-branch-bubble, overlay-vector-load-12, synthetic-demo
+profiles: card-3120-documented, card-5110p-literature, card-7120-measured, core-x100-measured, knc-common, multicore-assumed, overlay-no-branch-bubble, overlay-vector-load-12, synthetic-demo
 result: twin/capabilities\result.json
 summary: twin/capabilities\summary.md
-function nbGravity: 243 instructions, 8 padding nops, 5 with two-cycle prefixes; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
-callees without a stub (declare them in --calls): fprintf
-undeclared_callees: ['fprintf']
-validation: unsupported
-streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+function nbGravity: 207 instructions; complete: {'parser': True, 'isa': True, 'functional': True, 'timing': True}
+callees without a stub (declare them in --calls): nbReportTreeIncest
+Gravity region exit: .A_4050b2; 202 unchanged binary instructions; cold call excluded
+validation: ok
+kernel is well-formed: 1 stream(s), normalized-records
 result: twin/validate\result.json
 summary: twin/validate\summary.md
-functional: unsupported
-streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+functional: ok
+executed 3040 dynamic instructions; all 1 expected items match
 result: twin/functional\result.json
 summary: twin/functional\summary.md
-timing_prediction: unsupported
-streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+timing_prediction: ok
+predicted 33622 core cycles (33622.000 per unit) for 3040 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
 result: twin/simulate\result.json
 summary: twin/simulate\summary.md
-analytical_bound: unsupported
-streams[0]: instruction a42f4b2 calls 'fprintf', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {"cycles": N, "model": ...})
+analytical_bound: ok
+trace lower bound: 43656 cycles (binding term: dependency_critical_path); conditional_bound
 result: twin/bounds\result.json
 summary: twin/bounds\summary.md
+Gravity trace: cold_error_exit absent; normal return/output stores retained

@@ -1,0 +1,178 @@
+[
+  {
+    "case": "fixed-0",
+    "input_bits": "3ff0000000000000",
+    "expected_bits": "0000000000000000",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-1",
+    "input_bits": "4000000000000000",
+    "expected_bits": "3fe62e42fefa39ef",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-2",
+    "input_bits": "3fe0000000000000",
+    "expected_bits": "bfe62e42fefa39ef",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-3",
+    "input_bits": "4005bf0a8b145769",
+    "expected_bits": "3ff0000000000000",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-4",
+    "input_bits": "01a56e1fc2f8f359",
+    "expected_bits": "c085963447f87fb5",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-5",
+    "input_bits": "7e37e43c8800759c",
+    "expected_bits": "4085963447f87fb5",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "fixed-6",
+    "input_bits": "0000000000000001",
+    "expected_bits": "c0874385446d71c3",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-000",
+    "input_bits": "19da1f73ec6906a6",
+    "expected_bits": "c07a6545de94439c",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-001",
+    "input_bits": "6e31af6fc6c8067d",
+    "expected_bits": "4080083b8318a15c",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-002",
+    "input_bits": "0e0122140689a848",
+    "expected_bits": "c0814e0ca441c4ed",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-003",
+    "input_bits": "485848feb9fdcdf7",
+    "expected_bits": "40575322c86f0918",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-004",
+    "input_bits": "6d8de8d3c6f53eba",
+    "expected_bits": "407f9ee0cb5ce0ec",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-005",
+    "input_bits": "2deb627b54e3ce01",
+    "expected_bits": "c068f90749b8da98",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-006",
+    "input_bits": "15922e36193a367c",
+    "expected_bits": "c07d5d3767eaa1f7",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "seed-007",
+    "input_bits": "2e442c5fcdd6991b",
+    "expected_bits": "c0687db9608c87b8",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  },
+  {
+    "case": "captured",
+    "input_bits": "3ff0000000000000",
+    "expected_bits": "0000000000000000",
+    "status": "ok",
+    "functional_check": {
+      "checked": 1,
+      "mismatches": [],
+      "status": "ok"
+    }
+  }
+]

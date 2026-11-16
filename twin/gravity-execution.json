@@ -1,0 +1,18 @@
+{
+  "dynamic_instructions": 3040,
+  "cold_exit_executed": false,
+  "error_branches": [
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a405044",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "je",
+      "taken": false,
+      "x87": null
+    }
+  ],
+  "normal_return_executed": true
+}

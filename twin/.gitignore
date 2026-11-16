@@ -5,3 +5,10 @@ log-kernel.json
 final-memory.json
 __pycache__/
 __pycache__/
+# S1-05: full extraction before the documented cold-error region cut.
+gravity-full.json
+log-cases/*.json
+!log-cases/log-one-intermediates.json
+# Full dynamic traces and schedule logs are regenerated; compact evidence is kept.
+functional/trace.json
+issue-log.json

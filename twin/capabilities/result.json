@@ -1,14 +1,15 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\capabilities",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\capabilities\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05\\twin\\capabilities\\summary.md"
   },
   "assumptions": [],
   "calibration_status": null,
   "capabilities": {
     "adapters": [
       "scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
+      "scripts/from_binary.py: objects/ELF listings -> whole functions, relocated switches, loop regions and complete per-line reports",
       "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"
     ],
     "branch_scenarios": [
@@ -23,13 +24,16 @@
       "validate",
       "functional",
       "simulate",
+      "sample-loop",
       "bounds",
+      "schedule",
       "compare",
       "batch",
+      "rollup",
       "prepare-native",
       "import-native"
     ],
-    "engine_version": "0.3.1",
+    "engine_version": "0.4.0",
     "functional_coverage": {
       "exact": "scalar integer ALU (8/16/32/64-bit, flags, adc/sbb/setcc/bt/movsx/movzx/cltq/cqto/idiv/imul/push/pop/leave), conditional branches, mask ops, int32 and int64-logic vector ops, f32/f64 add/sub/subr/mul/max/min/FMA with single rounding and explicit rounding mode/FTZ/DAZ, compares to mask, blends, conversions (dq<->ps, pd->dq, ps<->pd, round), register swizzles, broadcasts, up/down conversions (float16/uint8/sint8/uint16/sint16), masked loads/stores, vloadunpack/vpackstore halves, dword/qword gather and scatter with completion masks, vpermd/vpermf32x4, x87 stack with extended precision, control word (RC/PC), fld/fst/fild/fistp/fxch/fchs/fabs/fsqrt/fcom/fnstsw/fldcw",
       "timing_only": [
@@ -374,6 +378,13 @@
         "pipes": "U"
       },
       {
+        "class": "x87_add",
+        "functional": true,
+        "mnemonic": "fiadds",
+        "note": "",
+        "pipes": "U"
+      },
+      {
         "class": "x87_div",
         "functional": true,
         "mnemonic": "fidivl",
@@ -384,6 +395,20 @@
         "class": "x87_div",
         "functional": true,
         "mnemonic": "fidivrl",
+        "note": "",
+        "pipes": "U"
+      },
+      {
+        "class": "x87_div",
+        "functional": true,
+        "mnemonic": "fidivrs",
+        "note": "",
+        "pipes": "U"
+      },
+      {
+        "class": "x87_div",
+        "functional": true,
+        "mnemonic": "fidivs",
         "note": "",
         "pipes": "U"
       },
@@ -412,6 +437,13 @@
         "class": "x87_mul",
         "functional": true,
         "mnemonic": "fimull",
+        "note": "",
+        "pipes": "U"
+      },
+      {
+        "class": "x87_mul",
+        "functional": true,
+        "mnemonic": "fimuls",
         "note": "",
         "pipes": "U"
       },
@@ -489,6 +521,20 @@
         "class": "x87_add",
         "functional": true,
         "mnemonic": "fisubrl",
+        "note": "",
+        "pipes": "U"
+      },
+      {
+        "class": "x87_add",
+        "functional": true,
+        "mnemonic": "fisubrs",
+        "note": "",
+        "pipes": "U"
+      },
+      {
+        "class": "x87_add",
+        "functional": true,
+        "mnemonic": "fisubs",
         "note": "",
         "pipes": "U"
       },
@@ -889,6 +935,13 @@
         "functional": true,
         "mnemonic": "jmp",
         "note": "",
+        "pipes": "UV"
+      },
+      {
+        "class": "branch",
+        "functional": true,
+        "mnemonic": "jmp_table",
+        "note": "resolved read-only switch table; indirect prediction follows the branch scenario (assumed)",
         "pipes": "UV"
       },
       {
@@ -2808,7 +2861,7 @@
     ],
     "not_implemented": [
       "any mnemonic outside the table (rejected, no default cost); call/ret are region boundaries",
-      "transcendental approximations (vrcp23ps, vrsqrt23ps, vlog2ps, vexp223ps, vscaleps) exact bit patterns",
+      "vrcp23ps/vrsqrt23ps exact bit patterns without opt-in captured tables; vlog2ps/vexp223ps exact bit patterns",
       "second-level TLB and page walks; the instruction cache; cross-core coherence traffic in core scale; card-level bandwidth sharing",
       "contexts communicating through memory (functional model runs contexts sequentially)",
       "C, Fortran or binaries: no translation is attempted; ABI, encodings, executable loading",
@@ -2851,6 +2904,13 @@
         "synthetic": false
       },
       {
+        "description": "Explicit assumed multi-core geometry and queue parameters; automatically overlaid only for unit/ring simulations. No native validation. Channel interval and lat",
+        "file": "multicore-assumed.json",
+        "id": "multicore-assumed",
+        "kind": "overlay",
+        "synthetic": false
+      },
+      {
         "description": "Sensitivity overlay: no core issue cycle lost after a taken branch (the 0.2.x model). Apply with --overlay profiles/overlay-no-branch-bubble.json to see how muc",
         "file": "overlay-no-branch-bubble.json",
         "id": "overlay-no-branch-bubble",
@@ -2877,11 +2937,13 @@
       "core": "implemented: 1-4 in-order contexts, U/V pairing rules, same-context issue spacing, round-robin picker, x87 stack with physical-register dependencies, AGI, demand-miss stalls, nonblocking prefetch, outstanding-miss limit, L1/L2 LRU line tracking, optional first-level DTLB, streaming L2 hardware prefetcher and per-core memory service sub-models, gather/scatter/x87/L2-prefetch occupancy",
       "instruction": "implemented: latency/pipe class per supported mnemonic (capabilities table), exact functional semantics where 'functional' is true",
       "pair": "analytical scenario only (two cores exchanging lines over the ring); needs core-scale cycles and transfer counts as parameters",
-      "region": "implemented: function or loop regions from GCC-KNC assembly (scripts/from_gcc_s.py) or hand-written records, 1-4 contexts; functional execution, timing, bounds, exhaustive reorder search (<= 12 instructions)"
+      "region": "implemented: function or loop regions from GCC-KNC assembly (scripts/from_gcc_s.py) or hand-written records, 1-4 contexts; functional execution, timing, bounds, exhaustive reorder search (<= 12 instructions)",
+      "ring": "simulated: same detailed unit with synthetic previous-epoch symmetry background; all results unvalidated scenario estimates",
+      "unit": "simulated: 1-8 detailed cores in lockstep, private caches, 61-position ring, 64 TDs, 8 controllers/16 channels; assumed maps and queues, background off by default"
     },
     "target": "Intel Xeon Phi Knights Corner (K1OM, IMCI). Not Knights Landing, not AVX-512, not an out-of-order x86 model."
   },
-  "engine_version": "0.3.1",
+  "engine_version": "0.4.0",
   "functional_check": {
     "status": "not_run"
   },
@@ -2895,18 +2957,18 @@
       "--force"
     ],
     "command": "capabilities",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-05",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
   "prediction": null,
   "profile": null,
-  "python_execution_seconds": 0.004,
+  "python_execution_seconds": 0.005,
   "representation_evaluated": null,
   "result_type": "capabilities",
   "scale": null,
   "schema": "knc-twin.result/1",
   "status": "ok",
-  "timestamp_utc": "2026-11-16T06:09:40Z",
+  "timestamp_utc": "2026-11-16T12:52:39Z",
   "unsupported": []
 }
