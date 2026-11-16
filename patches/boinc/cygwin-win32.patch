@@ -1,0 +1,145 @@
+diff --git a/lib/boinc_win.h b/lib/boinc_win.h
+index ef418b2..4758247 100644
+--- a/lib/boinc_win.h
++++ b/lib/boinc_win.h
+@@ -186,7 +186,9 @@ typedef size_t socklen_t;
+ #ifdef HAVE_WINTERNL_H
+ #include <winternl.h>
+ #endif
++#ifndef __CYGWIN__
+ #include <share.h>
++#endif
+ #include <shlobj.h>
+ #include <userenv.h>
+ #ifdef HAVE_WINHTTP_H
+@@ -404,6 +406,10 @@ void __cdecl __MINGW_NOTHROW fpreset (void);
+ 
+ #endif //_DEBUG
+ 
++#ifdef __CYGWIN__
++#include "boinc_cygwin.h"
++#endif
++
+ #define new DEBUG_NEW
+ 
+ #endif //BOINC_BOINC_WIN_H
+diff --git a/lib/diagnostics.cpp b/lib/diagnostics.cpp
+index 911b627..700b2ed 100644
+--- a/lib/diagnostics.cpp
++++ b/lib/diagnostics.cpp
+@@ -384,7 +384,7 @@ int diagnostics_init(
+ #if defined(_WIN32)
+ 
+     //_set_abort_behavior(NULL, _WRITE_ABORT_MSG);
+-#ifdef __MINGW32__
++#if defined(__MINGW32__) || defined(__CYGWIN__)
+     std::set_terminate(boinc_term_func);
+     std::set_unexpected(boinc_term_func);
+ #else
+diff --git a/lib/filesys.cpp b/lib/filesys.cpp
+index 793bcba..e452b83 100644
+--- a/lib/filesys.cpp
++++ b/lib/filesys.cpp
+@@ -132,7 +132,7 @@ int is_symlink(const char* path) {
+ //
+ DIRREF dir_open(const char* p) {
+     DIRREF dirp;
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     if (!is_dir(p)) return NULL;
+     dirp = (DIR_DESC*) calloc(sizeof(DIR_DESC), 1);
+     if (!dirp) {
+@@ -156,7 +156,7 @@ DIRREF dir_open(const char* p) {
+ // ERR_READDIR if some other error occurred
+ //
+ int dir_scan(char* p, DIRREF dirp, int p_len) {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     WIN32_FIND_DATAA data;
+     while (1) {
+         if (dirp->first) {
+@@ -209,7 +209,7 @@ int dir_scan(char* p, DIRREF dirp, int p_len) {
+ // Close a directory
+ //
+ void dir_close(DIRREF dirp) {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     if (dirp->handle != INVALID_HANDLE_VALUE) {
+         FindClose(dirp->handle);
+         dirp->handle = INVALID_HANDLE_VALUE;
+@@ -234,7 +234,7 @@ bool is_dir_empty(const char *p) {
+ }
+ 
+ DirScanner::DirScanner(string const& path) {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     first = true;
+     handle = INVALID_HANDLE_VALUE;
+     if (!is_dir((char*)path.c_str())) {
+@@ -250,7 +250,7 @@ DirScanner::DirScanner(string const& path) {
+ // Skip items starting with .
+ //
+ bool DirScanner::scan(string& s) {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     WIN32_FIND_DATAA data;
+     while (1) {
+         if (first) {
+@@ -292,7 +292,7 @@ bool DirScanner::scan(string& s) {
+ }
+ 
+ DirScanner::~DirScanner() {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     if (handle != INVALID_HANDLE_VALUE) {
+         FindClose(handle);
+     }
+@@ -304,7 +304,7 @@ DirScanner::~DirScanner() {
+ }
+ 
+ static int boinc_delete_file_aux(const char* path) {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     if (!DeleteFileA(path)) {
+         return ERR_UNLINK;
+     }
+@@ -589,7 +589,7 @@ FILE* boinc_fopen(const char* path, const char* mode) {
+     }
+     FILE *f = boinc::fopen(path, mode);
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__CYGWIN32__)
+     // on Windows: if fopen fails, try again for 5 seconds
+     // (since the file might be open by FastFind, Diskeeper etc.)
+     //
+diff --git a/lib/util.cpp b/lib/util.cpp
+index 11d4561..3bc6c83 100644
+--- a/lib/util.cpp
++++ b/lib/util.cpp
+@@ -331,7 +331,7 @@ int run_command(char *cmd, vector<string> &out) {
+     //
+     WaitForSingleObject(pi.hProcess, INFINITE);
+ 
+-    unsigned long exit_code;
++    DWORD exit_code;
+     GetExitCodeProcess(pi.hProcess, &exit_code);
+     if (exit_code) return -1;
+ 
+@@ -472,7 +472,7 @@ int get_exit_status(HANDLE pid_handle, int &status, double dt) {
+     } else {
+         WaitForSingleObject(pid_handle, INFINITE);
+     }
+-    unsigned long stat=1;
++    DWORD stat=1;
+     GetExitCodeProcess(pid_handle, &stat);
+     status = (int) stat;
+     return 0;
+@@ -643,7 +643,7 @@ int boinc_process_cpu_time(HANDLE process_handle, double& cpu) {
+ }
+ 
+ bool process_exists(HANDLE h) {
+-    unsigned long status = 1;
++    DWORD status = 1;
+     if (GetExitCodeProcess(h, &status)) {
+         if (status == STILL_ACTIVE) return true;
+     }
