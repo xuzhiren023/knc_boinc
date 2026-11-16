@@ -45,3 +45,13 @@ Histogram capture uses upstream `--print-histogram`; no histogram output patch i
 CORE-MATH portability patches were removed: that code does not exist in 1.96.
 All remaining patches were checked against pristine 1.96 and regenerated
 with its context/line numbers. Fetch also verifies the fully patched state.
+
+- `zz-nbody-phase-timers.patch` (S8-01): `NBODY_PHASE_TIMERS=1` measures
+  tree, force, integration, per-step likelihood, final results, setup and
+  whole-run wall times using OpenMP. Default off. PHASE records are emitted
+  to stderr after results; steps is a count (seconds is zero). Setup includes
+  the initial gravity evaluation and overlaps tree/force totals.
+  `NBODY_STATIC_INTEGRATE=1` selects static scheduling for the two independent
+  per-body integrator loops; default off. Build with make variables
+  `PHASE_TIMERS=1 STATIC_INTEGRATE=1`; `scripts/build-s8.sh` builds the
+  requested three variants, `tests/phase_timers.py` checks large-case outputs.

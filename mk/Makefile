@@ -29,6 +29,9 @@ endif
 # S6-01 is opt-in; enabling the card default remains the lead's call.
 VECTOR_GRAVITY ?= 0
 CPPFLAGS += -DNBODY_VECTOR_GRAVITY=$(VECTOR_GRAVITY)
+PHASE_TIMERS ?= 0
+STATIC_INTEGRATE ?= 0
+CPPFLAGS += -DNBODY_PHASE_TIMERS=$(PHASE_TIMERS) -DNBODY_STATIC_INTEGRATE=$(STATIC_INTEGRATE)
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
@@ -41,6 +44,14 @@ COMMON_LDFLAGS += -Wl,--disable-new-dtags,-rpath,'$$ORIGIN:$$ORIGIN/../lib'
 endif
 .PHONY: x86 card program
 # Reusing an OUT directory must not silently keep the other macro setting.
+.PHONY: phase-config-check
+phase-config-check:
+$(OUT)/.phase-options: phase-config-check
+	@$(TOOLCHAIN)/mkdir -p $(OUT)
+	@printf '%s\n' '$(PHASE_TIMERS) $(STATIC_INTEGRATE)' > $@.tmp
+	@$(TOOLCHAIN)/cmp -s $@.tmp $@ || $(TOOLCHAIN)/cp $@.tmp $@
+	@$(TOOLCHAIN)/rm -f $@.tmp
+$(addprefix $(OUT)/nbody/src/,$(addsuffix .c.o,main nbody nbody_plain nbody_grav)): $(OUT)/.phase-options
 .PHONY: vector-config-check
 vector-config-check:
 $(OUT)/.vector-gravity: vector-config-check
