@@ -28,12 +28,13 @@ static void wait_file(const char* name, HANDLE process) {
     }
     throw std::runtime_error(name);
 }
+#include "knc_client_scenarios.h"
 int main(int argc, char** argv) {
     PROCESS_INFORMATION pi = {};
     HANDLE mapping = NULL;
     SHARED_MEM* shm = nullptr;
     try {
-        require(argc==3, "usage: fake-client APP.exe local|global");
+        require(argc==3 || argc==4, "usage: fake-client APP.exe local|global [wrapper-scenario]");
         bool global = !strcmp(argv[2], "global");
         char name[256];
         int i;
@@ -61,10 +62,19 @@ int main(int argc, char** argv) {
         require(f, "init_data.xml");
         require(write_init_data_file(f, aid)==0, "write_init_data_file"); fclose(f);
         STARTUPINFOA si = {}; si.cb=sizeof(si);
-        char command[4096]; snprintf(command, sizeof(command), "\"%s\"", argv[1]);
+        char command[4096];
+        if (argc==4) {
+            const char* fake=getenv("KNC_FAKE_CARD"); require(fake,"KNC_FAKE_CARD missing");
+            snprintf(command,sizeof(command),"\"%s\" --fake-card \"%s\"",argv[1],fake);
+        } else snprintf(command,sizeof(command),"\"%s\"",argv[1]);
         require(CreateProcessA(NULL, command, NULL, NULL, FALSE, CREATE_NO_WINDOW,
             NULL, NULL, &si, &pi), "CreateProcess");
         CloseHandle(pi.hThread);
+        if (argc==4) {
+            wrapper_scenario(argv[3],shm,ipc,pi,command);
+            CloseHandle(pi.hProcess); pi.hProcess=NULL;
+            detach_shmem(mapping,shm); return 0;
+        }
         double fraction=0, checkpoint=0;
         char msg[MSG_CHANNEL_SIZE];
         for (int n=0; n<150 && (fraction<=0 || checkpoint<=0); ++n) {

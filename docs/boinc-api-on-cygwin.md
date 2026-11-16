@@ -92,9 +92,9 @@ build an OpenGL renderer.
 ## Build variant
 
 Use **Cygwin x86-64 g++ with explicit `_WIN32`, `_WIN64`, `WIN32`,
-`__CYGWIN32__`, and `HAVE_CONFIG_H`**, as recorded in `mk/boinc.mk`.
-`__CYGWIN32__` selects BOINC's legacy Cygwin CRT/header guards (the compiler
-only predefines `__CYGWIN__`). `_WIN64` selects the correct Windows diagnostics
+and `HAVE_CONFIG_H`**, as recorded in `mk/boinc.mk`. S2-02 normalizes the
+patched Cygwin CRT/header guards to the compiler-defined `__CYGWIN__`;
+no artificial `__CYGWIN32__` flag is needed. `_WIN64` selects the Windows diagnostics
 structures on this 64-bit compiler. This remains a Cygwin executable using
 cygwin1.dll; it calls Win32 through the installed w32api headers/import libs.
 It is not a native MinGW build. Consumers must use the same flags and include

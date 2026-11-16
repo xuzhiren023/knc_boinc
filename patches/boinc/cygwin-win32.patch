@@ -1,8 +1,15 @@
-diff --git a/lib/boinc_win.h b/lib/boinc_win.h
-index ef418b2..4758247 100644
 --- a/lib/boinc_win.h
 +++ b/lib/boinc_win.h
-@@ -186,7 +186,9 @@ typedef size_t socklen_t;
+@@ -148,7 +148,7 @@
+ #define SECURITY_WIN32
+ #endif
+
+-#if !defined(__CYGWIN32__) || defined(USE_WINSOCK)
++#if !defined(__CYGWIN__) || defined(USE_WINSOCK)
+
+ /* If we're not running under CYGWIN use windows networking */
+ #undef USE_WINSOCK
+@@ -186,7 +186,9 @@
  #ifdef HAVE_WINTERNL_H
  #include <winternl.h>
  #endif
@@ -12,120 +19,207 @@ index ef418b2..4758247 100644
  #include <shlobj.h>
  #include <userenv.h>
  #ifdef HAVE_WINHTTP_H
-@@ -404,6 +406,10 @@ void __cdecl __MINGW_NOTHROW fpreset (void);
- 
+@@ -198,7 +200,7 @@
+ #include <wtsapi32.h>
+
+ #include <process.h>
+-#if defined(__MINGW32__) || defined(__CYGWIN32__)
++#if defined(__MINGW32__) || defined(__CYGWIN__)
+ #include <pbt.h>
+ #endif
+
+@@ -221,11 +223,11 @@
+
+
+ #include <io.h>
+-#if !defined(__CYGWIN32__)
++#if !defined(__CYGWIN__)
+ #include <direct.h>
+ #endif
+
+-#if !defined(__CYGWIN32__)
++#if !defined(__CYGWIN__)
+ #include <tchar.h>
+ #else
+ #ifndef _TCHAR_DEFINED
+@@ -404,6 +406,10 @@
+
  #endif //_DEBUG
- 
+
 +#ifdef __CYGWIN__
 +#include "boinc_cygwin.h"
 +#endif
 +
  #define new DEBUG_NEW
- 
+
  #endif //BOINC_BOINC_WIN_H
-diff --git a/lib/diagnostics.cpp b/lib/diagnostics.cpp
-index 911b627..700b2ed 100644
 --- a/lib/diagnostics.cpp
 +++ b/lib/diagnostics.cpp
-@@ -384,7 +384,7 @@ int diagnostics_init(
+@@ -384,7 +384,7 @@
  #if defined(_WIN32)
- 
+
      //_set_abort_behavior(NULL, _WRITE_ABORT_MSG);
 -#ifdef __MINGW32__
 +#if defined(__MINGW32__) || defined(__CYGWIN__)
      std::set_terminate(boinc_term_func);
      std::set_unexpected(boinc_term_func);
  #else
-diff --git a/lib/filesys.cpp b/lib/filesys.cpp
-index 793bcba..e452b83 100644
 --- a/lib/filesys.cpp
 +++ b/lib/filesys.cpp
-@@ -132,7 +132,7 @@ int is_symlink(const char* path) {
+@@ -24,7 +24,7 @@
+ #include <fcntl.h>
+ #endif
+
+-#if !defined(_WIN32) || defined(__CYGWIN32__)
++#if !defined(_WIN32) || defined(__CYGWIN__)
+ #include "config.h"
+ #include <fcntl.h>
+ #include <cerrno>
+@@ -132,7 +132,7 @@
  //
  DIRREF dir_open(const char* p) {
      DIRREF dirp;
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      if (!is_dir(p)) return NULL;
      dirp = (DIR_DESC*) calloc(sizeof(DIR_DESC), 1);
      if (!dirp) {
-@@ -156,7 +156,7 @@ DIRREF dir_open(const char* p) {
+@@ -156,7 +156,7 @@
  // ERR_READDIR if some other error occurred
  //
  int dir_scan(char* p, DIRREF dirp, int p_len) {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      WIN32_FIND_DATAA data;
      while (1) {
          if (dirp->first) {
-@@ -209,7 +209,7 @@ int dir_scan(char* p, DIRREF dirp, int p_len) {
+@@ -209,7 +209,7 @@
  // Close a directory
  //
  void dir_close(DIRREF dirp) {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      if (dirp->handle != INVALID_HANDLE_VALUE) {
          FindClose(dirp->handle);
          dirp->handle = INVALID_HANDLE_VALUE;
-@@ -234,7 +234,7 @@ bool is_dir_empty(const char *p) {
+@@ -234,7 +234,7 @@
  }
- 
+
  DirScanner::DirScanner(string const& path) {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      first = true;
      handle = INVALID_HANDLE_VALUE;
      if (!is_dir((char*)path.c_str())) {
-@@ -250,7 +250,7 @@ DirScanner::DirScanner(string const& path) {
+@@ -250,7 +250,7 @@
  // Skip items starting with .
  //
  bool DirScanner::scan(string& s) {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      WIN32_FIND_DATAA data;
      while (1) {
          if (first) {
-@@ -292,7 +292,7 @@ bool DirScanner::scan(string& s) {
+@@ -292,7 +292,7 @@
  }
- 
+
  DirScanner::~DirScanner() {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      if (handle != INVALID_HANDLE_VALUE) {
          FindClose(handle);
      }
-@@ -304,7 +304,7 @@ DirScanner::~DirScanner() {
+@@ -304,7 +304,7 @@
  }
- 
+
  static int boinc_delete_file_aux(const char* path) {
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      if (!DeleteFileA(path)) {
          return ERR_UNLINK;
      }
-@@ -589,7 +589,7 @@ FILE* boinc_fopen(const char* path, const char* mode) {
+@@ -342,7 +342,7 @@
+ // get file size
+ //
+ int file_size(const char* path, double& size) {
+-#if defined(_WIN32) && !defined(__CYGWIN32__) && !defined(__MINGW32__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
+     HANDLE h = CreateFileA(path, 0, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE, 0, OPEN_EXISTING, 0, 0);
+     if (h == INVALID_HANDLE_VALUE) return ERR_STAT;
+     LARGE_INTEGER lisize;
+@@ -368,7 +368,7 @@
+ // It can also be slightly more.
+ //
+ int file_size_alloc(const char* path, double& size) {
+-#if defined(_WIN32) && !defined(__CYGWIN32__) && !defined(__MINGW32__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
+     DWORD hi;
+     DWORD lo = GetCompressedFileSizeA(path, &hi);
+     if (lo != INVALID_FILE_SIZE) {
+@@ -393,7 +393,7 @@
+
+ int boinc_truncate(const char* path, double size) {
+     int retval;
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+     // the usual Windows nightmare.
+     // There's another function, SetEndOfFile(),
+     // that supposedly works with files over 2GB,
+@@ -589,7 +589,7 @@
      }
      FILE *f = boinc::fopen(path, mode);
- 
+
 -#ifdef _WIN32
-+#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
      // on Windows: if fopen fails, try again for 5 seconds
      // (since the file might be open by FastFind, Diskeeper etc.)
      //
-diff --git a/lib/util.cpp b/lib/util.cpp
-index 11d4561..3bc6c83 100644
+@@ -863,7 +863,7 @@
+
+
+ FILE_LOCK::FILE_LOCK() {
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+   handle = INVALID_HANDLE_VALUE;
+ #else
+     fd = -1;
+@@ -872,13 +872,13 @@
+ }
+
+ FILE_LOCK::~FILE_LOCK() {
+-#if !defined(_WIN32) || defined(__CYGWIN32__)
++#if !defined(_WIN32) || defined(__CYGWIN__)
+     if (fd >= 0) close(fd);
+ #endif
+ }
+
+ int FILE_LOCK::lock(const char* filename) {
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+     handle = CreateFileA(
+         filename, GENERIC_WRITE,
+         0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+@@ -913,7 +913,7 @@
+ }
+
+ int FILE_LOCK::unlock(const char* filename) {
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+     CloseHandle(handle);
+ #else
+     close(fd);
 --- a/lib/util.cpp
 +++ b/lib/util.cpp
-@@ -331,7 +331,7 @@ int run_command(char *cmd, vector<string> &out) {
+@@ -331,7 +331,7 @@
      //
      WaitForSingleObject(pi.hProcess, INFINITE);
- 
+
 -    unsigned long exit_code;
 +    DWORD exit_code;
      GetExitCodeProcess(pi.hProcess, &exit_code);
      if (exit_code) return -1;
- 
-@@ -472,7 +472,7 @@ int get_exit_status(HANDLE pid_handle, int &status, double dt) {
+
+@@ -472,7 +472,7 @@
      } else {
          WaitForSingleObject(pid_handle, INFINITE);
      }
@@ -134,12 +228,90 @@ index 11d4561..3bc6c83 100644
      GetExitCodeProcess(pid_handle, &stat);
      status = (int) stat;
      return 0;
-@@ -643,7 +643,7 @@ int boinc_process_cpu_time(HANDLE process_handle, double& cpu) {
+@@ -643,7 +643,7 @@
  }
- 
+
  bool process_exists(HANDLE h) {
 -    unsigned long status = 1;
 +    DWORD status = 1;
      if (GetExitCodeProcess(h, &status)) {
          if (status == STILL_ACTIVE) return true;
      }
+--- a/lib/diagnostics.h
++++ b/lib/diagnostics.h
+@@ -246,7 +246,7 @@
+ #define BOINCTRACE          wxLogDebug
+ #endif
+
+-#elif defined(_CONSOLE) && !(defined(__MINGW32__) || defined(__CYGWIN32__))
++#elif defined(_CONSOLE) && !(defined(__MINGW32__) || defined(__CYGWIN__))
+
+ // Microsoft CRT
+ //
+@@ -258,7 +258,7 @@
+
+ #else  // _DEBUG
+
+-#if defined(__MINGW32__) || defined(__CYGWIN32__)
++#if defined(__MINGW32__) || defined(__CYGWIN__)
+ #define BOINCASSERT(expr)   assert(expr)
+ #define BOINCTRACE          boinc_trace
+ #else  // __MINGW32__
+@@ -286,7 +286,7 @@
+
+ #define BOINCASSERT(expr)
+ #ifndef IRIX
+-#if defined(__MINGW32__) || defined(__CYGWIN32__)
++#if defined(__MINGW32__) || defined(__CYGWIN__)
+ #define BOINCTRACE
+ #else
+ #define BOINCTRACE(...)
+--- a/lib/diagnostics_win.cpp
++++ b/lib/diagnostics_win.cpp
+@@ -21,7 +21,7 @@
+ #include "boinc_win.h"
+ #include "win_util.h"
+
+-#ifndef __CYGWIN32__
++#ifndef __CYGWIN__
+ #include "stackwalker_win.h"
+ #endif
+
+--- a/lib/filesys.h
++++ b/lib/filesys.h
+@@ -18,7 +18,7 @@
+ #ifndef BOINC_FILESYS_H
+ #define BOINC_FILESYS_H
+
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+ #include "boinc_win.h"
+ #else
+ #include <dirent.h>
+@@ -118,7 +118,7 @@
+ // remove this code - the DirScanner class does the same thing.
+ // But need to rewrite a couple of places that use it
+ //
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+ typedef struct _DIR_DESC {
+     char path[MAXPATHLEN];
+     bool first;
+@@ -137,7 +137,7 @@
+ extern bool is_dir_empty(const char*);
+
+ class DirScanner {
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+     std::string dir;
+     bool first;
+     void* handle;
+@@ -151,7 +151,7 @@
+ };
+
+ struct FILE_LOCK {
+-#if defined(_WIN32) && !defined(__CYGWIN32__)
++#if defined(_WIN32) && !defined(__CYGWIN__)
+     HANDLE handle;
+ #else
+     int fd;
