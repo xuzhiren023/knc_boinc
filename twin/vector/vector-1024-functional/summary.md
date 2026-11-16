@@ -1,14 +1,14 @@
 # knc-twin functional: OK
 
-- Engine 0.4.0, 2026-11-16T16:44:22Z
-- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S6-01\twin\vector\vector-1024.json (sha256 65e0c61d5213...)
+- Engine 0.4.0, 2026-11-16T17:15:35Z
+- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S6-03\twin\vector\vector-1024.json (sha256 4723b501f6a4...)
 - Scale: region; representation: normalized-records
 - Functional check: ok
 
-**executed 654829 dynamic instructions; all 9 expected items match**
+**executed 703228 dynamic instructions; all 9 expected items match**
 
 ## Result
-- dynamic_instructions: 654829
+- dynamic_instructions: 703228
 - contexts: 1
 - functional_check_status: ok
 - checked_items: 9
@@ -16,8 +16,13 @@
 
 ## Assumptions
 - x87 precision control is 53-bit: results round to that significand with the extended exponent range
+- vcvtpd2ps writes 8 floats to the low lanes and zeroes the upper 8 (assumed)
+- vrsqrt23ps is approximate on the hardware (R27 gives a relative-error bound, not the bit pattern); the twin substitutes the correctly rounded value, so values that depend on its exact bits are not bit-exact (calibration plan: capture the hardware table)
+- vcvtfxpntpd2dq/udq write the 8 results to the low lanes and zero the upper 8 (assumed)
+- vrcp23ps is approximate on the hardware (R27 gives a relative-error bound, not the bit pattern); the twin substitutes the correctly rounded value, so values that depend on its exact bits are not bit-exact (calibration plan: capture the hardware table)
+- out-of-range or NaN double-to-int conversion produced the x86 integer indefinite; KNC-specific value not verified
 - ZF/SF after imul are architecturally undefined; the model leaves them unchanged
 
 Invocation: `C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-1024-functional --force`
-Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S6-01\twin\vector\vector-1024-functional
-Python execution time: 80.089 s (not KNC time)
+Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S6-03\twin\vector\vector-1024-functional
+Python execution time: 84.639 s (not KNC time)

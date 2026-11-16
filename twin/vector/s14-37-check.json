@@ -1,0 +1,19 @@
+{
+  "engine_version": "0.4.0",
+  "status": "functional_mismatch",
+  "functional_check": {
+    "checked": 1,
+    "mismatches": [
+      {
+        "got": "0xbf1202b59a43239e",
+        "want": "0xbf1202b59a43239f",
+        "where": "mem[0x2000][0]"
+      }
+    ],
+    "status": "mismatch"
+  },
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range"
+  ],
+  "unsupported": []
+}

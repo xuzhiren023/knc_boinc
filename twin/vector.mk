@@ -11,7 +11,3 @@ $(VOBJ): ../twin/vector/replay.c ../twin/vector/replay_blocks.h
 .PHONY: vector-replay
 vector-replay: $(OBJECTS) $(VGRAV) $(VOBJ)
 	$(CXX) $(COMMON_LDFLAGS) $(filter-out $(OUT)/nbody/src/main.c.o $(OUT)/nbody/src/nbody_grav.c.o,$(OBJECTS)) $(VGRAV) $(VOBJ) $(COMMON_LDLIBS) -o $(VROOT)/replay.exe
-# Evidence-only probe: vector sqrt/div lowering is rejected under S6-01's rule.
-.PHONY: lowering-probe
-lowering-probe:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c ../build/vector/rejected-grav.c -o ../build/vector/rejected-grav.o

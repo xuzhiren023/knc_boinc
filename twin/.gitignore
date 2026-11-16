@@ -49,3 +49,10 @@ vector/*/final-memory.json
 vector/*/trace.json
 vector/*/result.json
 vector/vector-current.json
+
+# S6-03: two additional faithful captured groups.
+vector/vector-2048.json
+vector/vector-4088.json
+vector/scalar-2048.json
+vector/scalar-4088.json
+vector/actual-off.bin

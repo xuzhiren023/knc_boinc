@@ -9,7 +9,7 @@ indices=[i for i in range(len(r)-3) if [x['op'] for x in r[i:i+4]]==['setne','or
 assert len(indices)==1
 branch=r[indices[0]+3]['id']
 result={}
-for first in (0,1024):
+for first in (0,1024,2048,4088):
     path=root/('vector-%d-functional/trace.json'%first)
     if not path.exists(): continue
     trace=json.loads(path.read_text())['0']

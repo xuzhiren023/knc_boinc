@@ -1,98 +1,85 @@
-"""Compact truthful S6-01 evidence; never promote mismatching timings."""
+"""S6-03 evidence from final binaries and raw twin results; no partial timings."""
 import collections
 import hashlib
 import json
+import os
 from pathlib import Path
-import sys
-ROOT=Path(__file__).resolve().parents[2]
-sys.path.insert(0,str(ROOT/'tests'))
-from force_chunk_matrix import science
-sys.path.insert(0,str(ROOT/'scripts'))
-import compare
-root=ROOT/'twin/vector'
-def load(path): return json.loads(path.read_text())
-def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
-k=load(root/'vector-full.json')
-r=k['streams'][0]['instructions'];ops=collections.Counter(x['op'] for x in r)
-x87={op:n for op,n in ops.items() if op.startswith(('fadd','fsub','fmul','fdiv','fsqrt'))}
-forbidden={op:n for op,n in ops.items() if op.startswith(('vfm','vfnm','vrcp','vrsqrt'))}
-report={'status':'incomplete: stopped at exactness/codegen gates',
-    'macro_default':0,'codegen':{
-        'zmm_arithmetic':any(x['op'] in ('vaddpd','vsubpd','vmulpd') for x in r),
-        'masked_zmm_arithmetic':all(ops[op] for op in ('vpandq','vpxorq')),
-        'mask_implementation':'bit selection of untouched accumulator bits, not k-register predication',
-        'no_x87_arithmetic':not x87,'x87_arithmetic':x87,'forbidden_instructions_in_final_kernel':forbidden,
-        'instructions':len(r),'opcode_counts':dict(ops),
-        'full_compiled_function_retained':not any(x['op']=='call' for x in r),
-        'compiler_flags':'-O2 -g -fopenmp -fno-strict-aliasing -ffp-contract=off -fno-math-errno -march=knc -std=gnu99',
-        'optimized_report':'twin/vector/vectorizer.txt','disassembly':'twin/vector/nbGravity8.disassembly.txt',
-        'literal_full_vector_requirement_met':False},'exactness':{},'groups':[]}
-# The early matrix and final refresh share identical final scientific behavior;
-# use the final refresh directories except for the long 1-thread medium case.
-def sha_normalized(data): return hashlib.sha256(data).hexdigest()
-rows=[]
-for case,threads in [('small',1),('small',12),('medium',1),('medium',12),('large',12)]:
-    final=ROOT/'runs/force-chunk'/('%s-chunkvector-final-on-t%d'%(case,threads))
-    label='vector-final' if (case,threads)!=('medium',1) and (final/'exit.txt').exists() else 'vector'
-    a=ROOT/'runs/force-chunk'/('%s-chunk%s-off-t%d'%(case,label,threads))
-    b=ROOT/'runs/force-chunk'/('%s-chunk%s-on-t%d'%(case,label,threads))
-    if not (a/'exit.txt').exists() or not (b/'exit.txt').exists():
-        rows.append({'case':case+'-'+str(threads),'status':'not completed'})
-        continue
-    assert (a/'exit.txt').read_text().strip()==(b/'exit.txt').read_text().strip()=='0'
-    print('%s-%d macro off vs on:'%(case,threads))
-    code=compare.compare(a,b,compare.TOLERANCE)
-    def saved(p):
-        return b''.join(line for line in (p/'histogram.txt').read_bytes().splitlines(keepends=True)
-                        if not line.startswith(b'# Generated '))
-    exact=science(a)==science(b) and saved(a)==saved(b) and code==0
-    rows.append({'case':case+'-'+str(threads),'status':'exact' if exact else 'mismatch',
-        'likelihood':science(a)[0], 'saved_histogram_sha256_without_generated_timestamp':sha_normalized(saved(a)),
-        'reference':a.relative_to(ROOT).as_posix(),'candidate':b.relative_to(ROOT).as_posix(),
-        'histogram_difference_policy':'only # Generated timestamp omitted; every other byte compared'})
-report['exactness']={'cases':[x['case'] for x in rows], 'results':rows,
-    'all_exact':all(x['status']=='exact' for x in rows),
-    'acceleration_bytes':(root/'actual.bin').stat().st_size,
-    'accelerations_exact':(root/'actual.bin').read_bytes()==(root/'capture/expected.bin').read_bytes(),
-    'acceleration_sha256':sha(root/'actual.bin'),'range_audit':load(root/'range.json')}
-util=load(root/'lane-utilization.json') if (root/'lane-utilization.json').exists() else {}
-for first in (0,1024):
-    group={'first_body':first,'comparison':'waiting for S14-37'}
-    for variant in ('vector','scalar'):
+ROOT = Path(__file__).resolve().parents[2]
+root = ROOT/'twin/vector'
+def load(p): return json.loads(p.read_text())
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+k = load(root/'vector-full.json')
+r = k['streams'][0]['instructions']
+ops = collections.Counter(x['op'] for x in r)
+x87 = {op:n for op,n in ops.items() if op.startswith(('fadd','fsub','fmul','fdiv','fsqrt'))}
+x87_remaining = {op:n for op,n in ops.items() if op.startswith('f')}
+cap = load(root/'capabilities.json')
+report = {'status': 'host/codegen and twin vector replay checked; card A/B pending',
+    'macro_default': 0, 'capabilities': cap,
+    'codegen': {
+        'zmm_arithmetic': all(ops[op] for op in ('vaddpd','vsubpd','vmulpd')),
+        'masked_zmm_arithmetic': all(ops[op] for op in ('vpandq','vpxorq')),
+        'mask_implementation': 'bit selection preserves inactive accumulator bits',
+        'no_x87_arithmetic': not x87, 'x87_arithmetic': x87,
+        'remaining_x87': x87_remaining,
+        'remaining_x87_reason': 'scalar guarded packing and unpacking use fld/fst/fxch; fcompl/fnstsw implement cell-opening comparison; no x87 add/sub/mul/div/sqrt',
+        'refinement_instructions': {op:n for op,n in ops.items() if op.startswith(('vfm','vfnm','vrcp','vrsqrt'))},
+        'source_contraction': 'off; FMAs occur only in correctly rounded compiler div/sqrt expansions (GCC-KNC S10-09)',
+        'instructions': len(r), 'opcode_counts': dict(ops),
+        'full_compiled_function_retained': not any(x['op']=='call' for x in r),
+        'compiler_flags': '-O2 -g -fopenmp -fno-strict-aliasing -ffp-contract=off -fno-math-errno -march=knc -std=gnu99',
+        'optimized_report': 'twin/vector/vectorizer.txt',
+        'disassembly': 'twin/vector/nbGravity8.disassembly.txt',
+        'literal_full_vector_requirement_met': not x87},
+    'exactness': load(root/'exactness.json'), 'groups': []}
+for name, digest in report['exactness']['binary_sha256'].items():
+    assert sha(ROOT/name) == digest, 'matrix was not run with final binary: '+name
+report['exactness'].update({
+    'acceleration_bytes': (root/'actual.bin').stat().st_size,
+    'accelerations_exact': (root/'actual.bin').read_bytes() == (root/'actual-off.bin').read_bytes() == (root/'capture/expected.bin').read_bytes(),
+    'acceleration_sha256': sha(root/'actual.bin'), 'range_audit': load(root/'range.json')})
+util = load(root/'lane-utilization.json')
+scalar_ready = os.environ.get('TWIN_SCALAR_READY') == '1'
+for first in (0,1024,2048,4088):
+    group = {'first_body':first, 'comparison': 'waiting for S14-37' if not scalar_ready else 'same-profile baseline',
+             'scalar_functional': 'not rerun: S14-37 is not installed' if not scalar_ready else None}
+    for variant in (('vector','scalar') if scalar_ready else ('vector',)):
         for mode in ('functional','simulate'):
-            path=root/('%s-%d-%s/result.json'%(variant,first,mode))
-            if not path.exists():
-                group[variant+'_'+mode]='not completed';continue
-            result=load(path)
-            group[variant+'_'+mode]=result['status']
-            group[variant+'_'+mode+'_evidence']={key:result.get(key) for key in
+            result = load(root/f'{variant}-{first}-{mode}/result.json')
+            group[variant+'_'+mode] = result['status']
+            evidence = {key:result.get(key) for key in
                 ('engine_version','status','message','functional_check','assumptions','unsupported',
                  'limiting_constraints','calibration_status','result_class','parameters_used')}
-            if mode=='simulate' and result.get('prediction'):
-                group[variant+'_'+mode+'_evidence']['result_class']=result['prediction'].get('result_class')
-                group[variant+'_'+mode+'_evidence']['parameters_used']=result.get('parameters_used')
-                group[variant+'_'+mode+'_evidence']['profile']={x:result['profile'].get(x) for x in ('id','hash','version','synthetic')}
-            # A non-ok status is evidence of a blocker, never a cycle estimate.
-            if mode=='simulate' and result['status']=='ok' and group.get(variant+'_functional')=='ok':
-                pred=result['prediction']
-                group[variant+'_cycles_per_body']=pred['predicted_cycles_per_unit']
-                group[variant+'_result_class']=pred['result_class']
-    if str(first) in util:
-        group.update(util[str(first)])
+            group[variant+'_'+mode+'_evidence'] = evidence
+            if mode == 'simulate' and result.get('prediction'):
+                pred = result['prediction']
+                evidence['result_class'] = pred.get('result_class')
+                evidence['functional_exactness'] = pred.get('functional_exactness')
+                evidence['approximate_instructions'] = pred.get('approximate_instructions')
+                evidence['profile'] = {x:result['profile'].get(x) for x in ('id','hash','version','synthetic')}
+                # The skill permits cycle predictions only for status-ok runs.
+                if result['status']=='ok' and group[variant+'_functional']=='ok':
+                    group[variant+'_cycles_per_body'] = pred['predicted_cycles_per_unit']
+                    group[variant+'_result_class'] = pred['result_class']
+    group.update(util[str(first)])
     report['groups'].append(group)
-report['timing']={'cycles_per_body':'see only status-ok per-group entries','result_class':'unvalidated_scenario_estimate for passing group 1024 only',
-    'reason':'Only status-ok matching per-group runs may supply timing. Mismatch/budget partials are not predictions.',
-    'classification_if_a_future_run_passes':'unvalidated_scenario_estimate; gravity shape is not validated',
-    'observed_codegen_constraints':['scalar x87 sqrt and division','scalar quadrupoles and pointer packing',
-        'stack staging and longest-walk group divergence'],
-    'twin_limiting_constraints':'copied per run above; no timing constraints were emitted for these failed runs'}
-current=load(root/'vector-current.json') if (root/'vector-current.json').exists() else k
-assert k['streams']==current['streams'] and k['init']['memory']==current['init']['memory']
-report['codegen']['final_extraction_matches_executed_kernel']=True
-report['artifacts']={str(p.relative_to(ROOT)).replace(chr(92),'/'):sha(p) for p in
-    [ROOT/'build/x86/milkyway_nbody.exe',ROOT/'build/vector/x86-on/milkyway_nbody.exe',
-     ROOT/'build/vector/card-off/milkyway_nbody.mic',ROOT/'build/vector/card-on/milkyway_nbody.mic',
-     ROOT/'build/gravity_chunk.mic',ROOT/'patches/nbody-vector-gravity.patch']}
+report['timing'] = {'classification': 'unvalidated_scenario_estimate; gravity is not a validated shape',
+    'policy': 'Only status-ok matching functional and simulate runs supply cycles. Approximate seeds cannot prove native bytes.',
+    'constraints': ['guarded scalar pointer packing', 'stack staging', 'longest-walk group divergence'],
+    'scalar_baseline': cap['scalar_baseline']}
+current = load(root/'vector-current.json')
+assert k['streams'] == current['streams'] and k['init']['memory'] == current['init']['memory']
+for first in (0,1024,2048,4088):
+    executed = load(root/f'vector-{first}.json')
+    assert executed['streams'][0]['instructions'] == r
+report['codegen']['final_extraction_matches_executed_kernel'] = True
+report['artifacts'] = {p.relative_to(ROOT).as_posix():sha(p) for p in [
+    ROOT/'build/x86/milkyway_nbody.exe', ROOT/'build/vector/x86-on/milkyway_nbody.exe',
+    ROOT/'build/vector/card-off/milkyway_nbody.mic', ROOT/'build/vector/card-on/milkyway_nbody.mic',
+    ROOT/'patches/nbody-vector-gravity.patch']}
 (root/'evidence.json').write_text(json.dumps(report,indent=2)+'\n')
-print('S6-01: exact host cases %d/5; acceleration bytes %d exact=%s; twin/codegen gates remain failed'%(
-    sum(x['status']=='exact' for x in rows),report['exactness']['acceleration_bytes'],report['exactness']['accelerations_exact']))
+print('S6-03: x87 arithmetic',x87,'; host matrix exact:',report['exactness']['all_exact'],
+      '; 98,304 acceleration bytes exact:',report['exactness']['accelerations_exact'])
+for g in report['groups']:
+    print('group',g['first_body'],'functional',g['vector_functional'],'simulate',g['vector_simulate'],
+          'cycles/body',g.get('vector_cycles_per_body','withheld'), 'lane utilization',g['lane_utilization'])

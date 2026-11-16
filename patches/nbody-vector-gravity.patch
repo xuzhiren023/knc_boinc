@@ -1,6 +1,6 @@
 --- a/nbody/src/nbody_grav.c
 +++ b/nbody/src/nbody_grav.c
-@@ -141,9 +141,142 @@
+@@ -141,9 +141,156 @@
      return acc0;
  }
  
@@ -78,14 +78,18 @@
 +                else q[l] = More(node);
 +            }
 +        }
-+        for (l = 0; l < 8; ++l)
 +        {
-+            if (hit[l]) d[l] += soft[l];
-+            else d[l] = 1; /* inert lanes cannot introduce divide-by-zero */
++            nb_vec8 vd, vs;
++            for (l = 0; l < 8; ++l)
++            {
++                vd[l] = hit[l] ? d[l] : 1;
++                vs[l] = soft[l]; /* zero for every inert lane */
++            }
++            vd = vd + vs;
++            for (l = 0; l < 8; ++l) d[l] = vd[l];
 +        }
-+        /* KNC lowers vector sqrt/div through FMA and reciprocal seeds.
-+         * Keep this stage scalar under S6-01's strict instruction rule. */
-+        #pragma GCC novector
++        /* GCC-KNC expands V8DF sqrt/div to correctly rounded IEEE operations.
++         * Internal refinement FMAs do not contract source expressions. */
 +        for (l = 0; l < 8; ++l)
 +        {
 +            r[l] = mw_sqrt(d[l]);
@@ -105,23 +109,33 @@
 +            ay = (nb_vec8)((mask & (nb_mask8)(ay + vm*vy)) | (~mask & (nb_mask8)ay));
 +            az = (nb_vec8)((mask & (nb_mask8)(az + vm*vz)) | (~mask & (nb_mask8)az));
 +        }
-+        for (l = 0; l < 8; ++l)
 +        {
-+            if (quad[l])
++            nb_vec8 vx, vy, vz, vd, vr, vxx, vxy, vxz, vyy, vyz, vzz;
++            nb_vec8 qx, qy, qz, dot, inv, phi;
++            nb_mask8 mask;
++            for (l = 0; l < 8; ++l)
 +            {
-+                real qx = (xx[l]*x[l] + xy[l]*y[l]) + xz[l]*z[l];
-+                real qy = (xy[l]*x[l] + yy[l]*y[l]) + yz[l]*z[l];
-+                real qz = (xz[l]*x[l] + yz[l]*y[l]) + zz[l]*z[l];
-+                real dot = (qx*x[l] + qy*y[l]) + qz*z[l];
-+                real inv = 1.0 / ((d[l]*d[l]) * r[l]);
-+                real phi = (2.5 * (inv * dot)) / d[l];
-+                ax[l] += phi * x[l];
-+                ay[l] += phi * y[l];
-+                az[l] += phi * z[l];
-+                ax[l] -= inv * qx;
-+                ay[l] -= inv * qy;
-+                az[l] -= inv * qz;
++                /* Non-quad slots are inert; select preserves every inactive bit. */
++                vx[l] = quad[l] ? x[l] : 0; vy[l] = quad[l] ? y[l] : 0;
++                vz[l] = quad[l] ? z[l] : 0; vd[l] = quad[l] ? d[l] : 1;
++                vr[l] = quad[l] ? r[l] : 1;
++                vxx[l] = xx[l]; vxy[l] = xy[l]; vxz[l] = xz[l];
++                vyy[l] = yy[l]; vyz[l] = yz[l]; vzz[l] = zz[l];
++                mask[l] = quad[l] ? ~0ULL : 0ULL;
 +            }
++            /* Match mw_mulmv, mw_dotv and nbGravity's quad sequence exactly. */
++            qx = (vxx*vx + vxy*vy) + vxz*vz;
++            qy = (vxy*vx + vyy*vy) + vyz*vz;
++            qz = (vxz*vx + vyz*vy) + vzz*vz;
++            dot = (qx*vx + qy*vy) + qz*vz;
++            inv = 1.0 / ((vd*vd) * vr);
++            phi = (2.5 * (inv * dot)) / vd;
++            ax = (nb_vec8)((mask & (nb_mask8)(ax + phi*vx)) | (~mask & (nb_mask8)ax));
++            ay = (nb_vec8)((mask & (nb_mask8)(ay + phi*vy)) | (~mask & (nb_mask8)ay));
++            az = (nb_vec8)((mask & (nb_mask8)(az + phi*vz)) | (~mask & (nb_mask8)az));
++            ax = (nb_vec8)((mask & (nb_mask8)(ax - inv*qx)) | (~mask & (nb_mask8)ax));
++            ay = (nb_vec8)((mask & (nb_mask8)(ay - inv*qy)) | (~mask & (nb_mask8)ay));
++            az = (nb_vec8)((mask & (nb_mask8)(az - inv*qz)) | (~mask & (nb_mask8)az));
 +        }
 +    } while (active);
 +    for (l = 0; l < count; ++l)
@@ -143,7 +157,7 @@
      const int nbody = st->nbody;  /* Prevent reload on each loop */
      mwvector LMCx = ZERO_VECTOR;
      mwvector a = ZERO_VECTOR, externAcc = ZERO_VECTOR;
-@@ -174,11 +307,27 @@
+@@ -174,11 +321,27 @@
  	    lmcscale2 = 1.0;
      }
  
@@ -171,7 +185,7 @@
          /* Repeat the base hackGrav part in each case or else GCC's
           * -funswitch-loops doesn't happen. Without that this constant
           * gets checked on every body on every step which is dumb.  */
-@@ -187,7 +336,11 @@
+@@ -187,7 +350,11 @@
              case EXTERNAL_POTENTIAL_DEFAULT:
                  //mw_printf("DEFAULT POTENTIAL - TREE\n");
                  b = &bodies[i];
@@ -183,7 +197,7 @@
                  externAcc = mw_addv(nbExtAcceleration(&ctx->pot, Pos(b), barTime), LMCAcceleration(lmcfunction, Pos(b), LMCx, lmcmass, lmcscale, lmcscale2));
                  /** WARNING!: Adding any code to this section may cause the checkpointing to randomly bug out. I'm not
                      sure what causes this, but if you ever plan to add another gravity calculation outside of a new potential,
-@@ -206,12 +359,20 @@
+@@ -206,12 +373,20 @@
  
              case EXTERNAL_POTENTIAL_NONE:
                  //mw_printf("NULL POTENTIAL - TREE\n");
@@ -204,7 +218,7 @@
                  nbEvalPotentialClosure(st, Pos(&bodies[i]), &externAcc);
                  mw_incaddv(externAcc, LMCAcceleration(lmcfunction, Pos(&bodies[i]), LMCx, lmcmass, lmcscale, lmcscale2));
                  mw_incaddv(a, externAcc);
-@@ -223,6 +384,9 @@
+@@ -223,6 +398,9 @@
                  mw_fail("Bad external potential type: %d\n", ctx->potentialType);
          }
      }

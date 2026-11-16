@@ -1,40 +1,45 @@
 # knc-twin timing_prediction: OK
 
-- Engine 0.4.0, 2026-11-16T16:45:42Z
+- Engine 0.4.0, 2026-11-16T17:17:00Z
 - Profile card-7120-measured v0.3.0 (hash 2058f0ec2d80...)
 - Calibration: imported_microbenchmarks_with_compiled_heldout_check. Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).
-- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S6-01\twin\vector\vector-1024.json (sha256 65e0c61d5213...)
+- Input C:\Users\xuzhi\Documents\knc-boinc\.work\S6-03\twin\vector\vector-1024.json (sha256 4723b501f6a4...)
 - Scale: core; representation: normalized-records
 - Functional check: ok
 
-**predicted 3142632 core cycles (392829.000 per unit) for 654829 dynamic instructions on 1 context(s); unvalidated_scenario_estimate**
+**predicted 2347071 core cycles (293383.875 per unit) for 703228 dynamic instructions on 1 context(s); unvalidated_scenario_estimate**
 
 ## Result
 - result_class: unvalidated_scenario_estimate
-- predicted_cycles: 3142632
-- predicted_cycles_per_unit: 392829
-- issue_span_cycles: 3142630
+- predicted_cycles: 2347071
+- predicted_cycles_per_unit: 293384
+- issue_span_cycles: 2347069
 - unit_of_work: eight contiguous bodies, first large force step
 - unit_count: 8
-- dynamic_instructions: 654829
-- issue_events: 565577
-- core_issue_utilization: 0.18
-- pair_fraction: 0.2726
+- dynamic_instructions: 703228
+- issue_events: 605821
+- core_issue_utilization: 0.2581
+- pair_fraction: 0.277
 - kind: timing_prediction_core_cycles
-- functional_exactness: exact
+- functional_exactness: approximate: vrcp23ps, vrsqrt23ps are not bit-exact (stub or approximate instruction)
 
 | context | dynamic_instructions | issued | pairs | first_issue | last_issue | completion |
 |---|---|---|---|---|---|---|
-| 0 | 654829 | 654829 | 89252 | 0 | 3142629 | 3142632 |
+| 0 | 703228 | 703228 | 97407 | 0 | 2347068 | 2347071 |
 
 ## Limiting constraints
-- constraint=miss_stall, context_cycles=779698
-- constraint=dependency, context_cycles=652944
-- constraint=x87_serial, context_cycles=514113
-- constraint=spacing, context_cycles=444705
+- constraint=miss_stall, context_cycles=784829
+- constraint=spacing, context_cycles=535500
+- constraint=dependency, context_cycles=192230
+- constraint=x87_serial, context_cycles=122679
 
 ## Assumptions
 - x87 precision control is 53-bit: results round to that significand with the extended exponent range
+- vcvtpd2ps writes 8 floats to the low lanes and zeroes the upper 8 (assumed)
+- vrsqrt23ps is approximate on the hardware (R27 gives a relative-error bound, not the bit pattern); the twin substitutes the correctly rounded value, so values that depend on its exact bits are not bit-exact (calibration plan: capture the hardware table)
+- vcvtfxpntpd2dq/udq write the 8 results to the low lanes and zero the upper 8 (assumed)
+- vrcp23ps is approximate on the hardware (R27 gives a relative-error bound, not the bit pattern); the twin substitutes the correctly rounded value, so values that depend on its exact bits are not bit-exact (calibration plan: capture the hardware table)
+- out-of-range or NaN double-to-int conversion produced the x86 integer indefinite; KNC-specific value not verified
 - ZF/SF after imul are architecturally undefined; the model leaves them unchanged
 - line_tracking: true LRU replacement stands in for the hardware's pseudo-LRU; the L1 and L2 are modeled as private to the core with no coherence traffic
 - TLB sub-model: 64-entry fully associative LRU first-level DTLB for 4096-byte pages; a miss adds 29 cycles; second-level TLB reach and page walks are not modeled
@@ -46,6 +51,7 @@
 - a taken forward branch, call or return costs the core 1 issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing
 - register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies
 - x87 instructions issue on U only (register-file diagram, R01) and alone (S12-31); a memory-operand x87 load or arithmetic instruction holds its context until its result is complete; x87 stores retire like scalar stores
+- load-to-use beyond L1 = level latency + (L1 form latency - scalar L1 latency); the extra form cost is assumed additive
 - sign/zero extensions (movslq, movs*, movz*, cltq) cost a plain mov or scalar load plus latency.scalar_extend_extra and pair per pairing.extend_v_pairs: evidence E, inferred, no KNC source
 
 ## Parameters consulted
@@ -70,24 +76,20 @@
 | latency.agi_cycles | 3 | measured | cycles |
 | latency.branch_taken_bubble | 0 | derived | cycles |
 | latency.l2_hit | 24 | measured | cycles |
+| latency.mask_op | 1 | assumed | cycles |
 | latency.memory | 328 | derived | cycles |
 | latency.scalar_alu | 1 | documented | cycles |
 | latency.scalar_extend_extra | 0 | assumed | cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto |
 | latency.scalar_load_l1 | 3 | measured | cycles |
 | latency.store_to_load_same_line | 7 | derived | cycles after a store issues before a load of the same line sees the data |
 | latency.vector_arith | 4 | measured | cycles |
+| latency.vector_convert_df | 7 | measured | cycles |
 | latency.vector_load_l1 | 5 | derived | cycles, L1 hit plain vector load to dependent use |
-| latency.x87_add | 3 | measured | cycles |
+| latency.vector_long | 6 | measured | cycles |
 | latency.x87_control | 7 | assumed | cycles |
-| latency.x87_div | 38 | measured | cycles |
 | latency.x87_load | 3 | derived | cycles from issue until the loaded value is on the x87 stack |
-| latency.x87_mem_operand_load | 1 | derived | cycles for the memory operand of an x87 arithmetic instruction before the operation starts |
 | latency.x87_move | 3 | assumed | cycles |
-| latency.x87_mul | 3 | measured | cycles |
-| latency.x87_sqrt | 70 | assumed | cycles |
 | memory.core_service_cycles_per_line | 20 | measured | core cycles between memory fills for one core (sequential stream, hardware prefetcher active) |
-| occupancy.x87_div | 38 | measured | core cycles |
-| occupancy.x87_mul | 2 | measured | core cycles |
 | pairing.dependent_pairs_allowed | [['cmp', 'jcc'], ['test', 'jcc']] | documented | U/V pairs allowed despite a flag dependency |
 | pairing.encoding_rules | {'max_bytes': 8, 'no_displacement_and_immediate': True, 'no_vex_mvex_with_disp32': True} | documented | rules |
 | pairing.extend_v_pairs | True | assumed | boolean: may movslq, movs*, movz*, cltq, cltd, cqto issue in the V slot |
@@ -104,5 +106,5 @@
 | x87.mem_operand_serializes | True | derived | boolean |
 
 Invocation: `C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-1024-simulate --force`
-Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S6-01\twin\vector\vector-1024-simulate
-Python execution time: 54.230 s (not KNC time)
+Artifacts: C:\Users\xuzhi\Documents\knc-boinc\.work\S6-03\twin\vector\vector-1024-simulate
+Python execution time: 85.987 s (not KNC time)
