@@ -8,6 +8,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
 | 5 | S5-01 merged (twin cannot rank gravity flags: -O2 = -O2 -funroll-loops code, -O3 inlines; card A/B script ready); S5-02 merged (card force chunk 4, 26 x86 runs bit-identical; card before/after pending) |
+| 6 | S6-01 merged as an opt-in hybrid prototype (off): x86 bit-identical; sqrt/div/quad still x87; waits for S14-37 and the gcc-knc answer on vector FP64 div/sqrt; S6-02 (test hygiene) running |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
 
 ## Proven
