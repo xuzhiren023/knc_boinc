@@ -9,6 +9,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 | 3 | S3-01, S3-02 merged |
 | 5 | S5-01 merged (twin cannot rank gravity flags: -O2 = -O2 -funroll-loops code, -O3 inlines; card A/B script ready); S5-02 merged (card force chunk 4, 26 x86 runs bit-identical; card before/after pending) |
 | 6 | S6-03 merged: full vector gravity walk (opt-in, off by default), x86 bit-identical, twin functional ok on 4 groups (~272-293k predicted cycles/body, lanes 79-94% busy); scalar twin comparison waits for S14-37 |
+| 7 | S7-01 merged: pinned to N-body 1.96 (server's standard app); new x86 refs (small -448.32648945358238, large -4980.4452402155885); waiting for the owner's captured task (S7-02) |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
 
 ## Proven
