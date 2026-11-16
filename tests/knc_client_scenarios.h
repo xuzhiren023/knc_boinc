@@ -1,4 +1,5 @@
 // Included by the S2-01 fake client; uses its upstream IPC and Win32 process.
+#include "../src/knc_graphics_format.h"
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -51,6 +52,44 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         }
         return fraction>0 && fraction<.8;
     },"wrapper did not report running progress");
+    if (mode=="graphics") {
+        void* address=nullptr; HANDLE mapping=nullptr;
+        wait([&]{mapping=attach_shmem("boinc_knc_nbody_731",&address);return mapping!=nullptr;},"graphics mapping missing",15);
+        auto* shared=static_cast<knc_graphics*>(address);
+        knc_graphics copy={};
+        auto sample=[&]{
+            uint32_t before=*(volatile uint32_t*)&shared->sequence; MemoryBarrier();
+            memcpy(&copy,shared,sizeof(copy)); MemoryBarrier();
+            return !(before&1) && before==*(volatile uint32_t*)&shared->sequence &&
+                copy.magic==KNC_GRAPHICS_MAGIC && copy.size==sizeof(copy);
+        };
+        wait([&]{return sample() && copy.snapshot.body_count>0 && copy.status==KNC_RUNNING;},"no live snapshot",15);
+        uint32_t first=copy.sequence;
+        // Launch the real graphics consumer in the same BOINC slot.
+        PROCESS_INFORMATION gfx={}; STARTUPINFOA si={};si.cb=sizeof(si);
+        std::string cmd=std::string("\"")+getenv("KNC_GRAPHICS_EXE")+"\"";
+        require(CreateProcessA(nullptr,cmd.data(),nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,nullptr,&si,&gfx),"live graphics launch");
+        require(shm->process_control_request.send_msg("<suspend/>"),"send suspend");
+        wait([&]{return sample() && copy.status==KNC_SUSPENDED;},"graphics did not suspend",15);
+        uint32_t paused=copy.sequence;
+        wait([&]{return sample() && copy.sequence!=paused;},"suspended heartbeat stalled",5);
+        std::string dir=contents("knc_remote");while(!dir.empty() && (dir.back()==10||dir.back()==13))dir.pop_back();
+        wait([&]{auto file=contents(dir+"/snapshot");return sample() && file.size()==sizeof(knc_snapshot) &&
+            !memcmp(file.data(),&copy.snapshot,sizeof(knc_snapshot));},"snapshot differs from x86 file",10);
+        // The real reader must show suspension and then live running state.
+        HWND gw=nullptr;
+        for(int n=0;n<100 && !gw;n++){gw=FindWindowA("KNCNBodyGraphics","MilkyWay@home - suspended");Sleep(100);}
+        require(gw,"live graphics suspended title");
+        uint64_t step=copy.snapshot.step;
+        require(shm->process_control_request.send_msg("<resume/>"),"send resume");
+        wait([&]{return sample() && copy.status==KNC_RUNNING && copy.sequence!=first && copy.snapshot.step>step;},"snapshot did not resume",15);
+        wait([&]{return FindWindowA("KNCNBodyGraphics","MilkyWay@home - running")!=nullptr;},"live graphics running title",5);
+        completed();
+        require(sample() && copy.status==KNC_FINISHED,"graphics did not finish");
+        PostMessageA(gw,WM_CLOSE,0,0);require(WaitForSingleObject(gfx.hProcess,5000)==WAIT_OBJECT_0,"graphics exit");
+        CloseHandle(gfx.hThread);CloseHandle(gfx.hProcess);detach_shmem(mapping,address);
+        puts("PASS graphics relay: x86 bytes, sequence, suspended heartbeat, resume, finished, live window");return;
+    }
     if (mode=="normal") {completed(); puts("PASS wrapper normal outputs"); return;}
     if (mode=="abort") {
         require(shm->process_control_request.send_msg("<abort/>"),"send abort");

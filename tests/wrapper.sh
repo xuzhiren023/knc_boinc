@@ -5,13 +5,13 @@ cd "$(dirname "$0")/.."
 export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin:$PATH"
 mkdir -p build/tmp
 export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
-make -C mk -j6 knc-wrapper boinc-api-test x86
+make -C mk -j6 knc-wrapper boinc-api-test x86 graphics
 wrapper=$(cygpath -aw build/wrapper/knc_wrapper.exe)
-client=$(cygpath -aw build/boinc/boinc_fake_client.exe)
+client=$(cygpath -au build/boinc/boinc_fake_client.exe)
 run=$(mktemp -d build/wrapper/test.XXXXXX)
 scenarios=("$@")
 if [[ ${#scenarios[@]} == 0 ]]; then
-    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable)
+    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable graphics)
 fi
 for scenario in "${scenarios[@]}"; do
     slot="$run/$scenario"
@@ -33,10 +33,12 @@ poll_interval=0.1
 connect_timeout=2
 retry_limit=2
 checkpoint_timeout=15
+snapshot_interval=0.2
 bodies=1024
 CFG
     if [[ "$scenario" == unreachable ]]; then touch "$slot/card/.unreachable"; fi
     export KNC_FAKE_CARD=$(cygpath -am "$slot/card")
+    export KNC_GRAPHICS_EXE=$(cygpath -aw build/graphics/knc_nbody_graphics.exe)
     export KNC_TASK_ARGS=
     mode="$scenario"
     if [[ "$scenario" == *-contract ]]; then

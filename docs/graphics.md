@@ -11,8 +11,7 @@ bash tests/graphics.sh
 bash tests/packaging.sh
 ```
 
-`tests/graphics.sh` builds host and card format checks, runs a shortened copy
-of the small upstream workunit (1024 bodies, timeEvolve 0.004), converts its
+`tests/graphics.sh` builds host and card format checks, runs the full medium upstream workunit (1024 bodies, timeEvolve 3.945), converts its
 `--output-file` final-state body rows, launches real OpenGL windows, and captures
 the demo window's client area using OpenGL readback from its actual window framebuffer before presentation. It saves the PNG to
 `docs/img/knc-nbody-graphics.png`. `--screenshot BMP` captures the first rendered window frame. No synthetic particle positions are used for
@@ -21,7 +20,7 @@ the screenshot. The converter needs only Python's standard library. Upstream
 variants; its older texinfo's `--output-cartesian` switch no longer exists.
 
 ```bash
-python tools/make_demo_snapshot.py build/graphics/final-state.txt build/graphics/demo.snapshot --time 0.004
+python tools/make_demo_snapshot.py build/graphics/final-state.txt build/graphics/demo.snapshot --time 3.945
 build/graphics/knc_nbody_graphics.exe --demo build/graphics/demo.snapshot
 build/graphics/knc_nbody_graphics.exe --fullscreen --demo build/graphics/demo.snapshot
 ```
@@ -72,9 +71,8 @@ sequence for heartbeat-only updates at least once per second, including while
 suspended. Sequence wraps modulo 2^32. The renderer copies between equal even
 sequence loads separated by full barriers and validates the copied header and
 active body values. After 5 seconds without a new sequence it shows a stale idle
-scene; suspended, waiting, invalid and missing data also show the calm idle
-scene. A valid zero-body snapshot is safe. The producer side is S3-01; this
-ticket supplies its format contract, not producer/wrapper publication code.
+scene; waiting, invalid and missing data also show the calm idle
+scene; suspended data retain the frozen body frame. A valid zero-body snapshot is safe. The producer and relay are documented in [graphics-shmem.md](graphics-shmem.md).
 
 Windowed is the default. `--fullscreen` uses the screen dimensions and a borderless
 window. Escape closes either mode; fullscreen also closes on keyboard, mouse
@@ -94,6 +92,6 @@ requires both tags. The package dependency scan starts from both executables.
 
 No card access is required. The package retains the card science executable and
 its runtime closure; existing `scripts/card-launch.sh` is the lead's card runner.
-Real-client staging, service-session access and live producer updates still need
-lead integration testing. The offline window test uses the real BOINC mapping
+Real-client staging and service-session access still need lead integration testing.
+Live fake-card producer updates are covered by `bash tests/wrapper.sh graphics`. The offline window test uses the real BOINC mapping
 implementation, rather than a fake attach function.
