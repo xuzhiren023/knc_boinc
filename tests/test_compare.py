@@ -7,6 +7,27 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 class CompareTest(unittest.TestCase):
+    def test_stderr_only_real_task(self):
+        # Real workunits declare no result files and do not request a printed
+        # histogram. Still enforce one finite likelihood and the same tolerance.
+        (ROOT / 'build/tmp').mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT / 'build/tmp') as tmp:
+            a, b = pathlib.Path(tmp) / 'a.txt', pathlib.Path(tmp) / 'b.txt'
+            a.write_text('<search_likelihood>-12.5</search_likelihood>\n')
+            for output, code in (('-12.5', 0), ('-12.50000000001', 0),
+                                 ('-12.4', 1), ('nan', 1), ('inf', 1)):
+                b.write_text('<search_likelihood>' + output + '</search_likelihood>\n')
+                result = subprocess.run([sys.executable, str(ROOT / 'scripts/compare.py'),
+                                         str(a), str(b), '--likelihood-only'],
+                                        capture_output=True, text=True)
+                self.assertEqual(result.returncode, code, result.stdout + result.stderr)
+            for output in ('', a.read_text() * 2):
+                b.write_text(output)
+                result = subprocess.run([sys.executable, str(ROOT / 'scripts/compare.py'),
+                                         str(a), str(b), '--likelihood-only'],
+                                        capture_output=True, text=True)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+
     def test_accept_identical_and_reject_doctored_output(self):
         (ROOT / 'build' / 'tmp').mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=ROOT / 'build' / 'tmp') as tmp:

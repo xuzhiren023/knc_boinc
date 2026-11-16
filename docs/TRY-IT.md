@@ -15,8 +15,8 @@ repository. This laptop's lab card is `192.168.1.100`, login `root`; confirm tho
 values with its owner. Reserve exclusive card use before running a 240-thread
 task. Do not run the offline sample alongside BOINC or another card job.
 
-Use **Git for Windows Bash** for every command below, starting in this ticket's
-worktree. No PowerShell commands are embedded in the blocks. A source build
+Use **Git for Windows Bash** for every command below, starting in the lead's
+reviewed main checkout shown below. No PowerShell commands are embedded in the blocks. A source build
 needs the existing GCC-KNC and Cygwin toolchain, Git, make and Python 3; do not
 install CMake, MinGW or MSVC. The owner may instead use the lead's already-built
 `dist/milkyway_package/` plus the matching x86 reference binary in `build/x86/`.
@@ -24,7 +24,7 @@ Keep the repository's sample inputs and comparison scripts with that package.
 Do not mix artifacts from different revisions.
 
 ```bash
-cd /c/Users/xuzhi/Documents/knc-boinc/.work/S4-02
+cd /c/Users/xuzhi/Documents/knc-boinc
 export REPO="$PWD"
 export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin:$PATH"
 mkdir -p build/tmp
@@ -254,7 +254,7 @@ for item in root:
             print('OUTPUT', ET.tostring(ref, encoding='unicode').strip())
     elif item.tag == 'app_version':
         print('APP_VERSION', item.findtext('app_name'), item.findtext('version_num'),
-              'COMMAND_LINE', item.findtext('command_line', default=''))
+              'CMDLINE', item.findtext('cmdline', default=''))
 PY
 ```
 
@@ -266,15 +266,20 @@ argv; XML entities must be decoded, as the extractor does. Never paste arbitrary
 server text into a shell for execution. The historical 2024 example in
 [packaging.md](packaging.md) is not a current standard task definition.
 
-Have the lead reconcile the capture with the wrapper's file-option rules and
-server output/log declarations **before enabling experimental work**. The
-wrapper captures `nbody_stdout.txt` and `nbody_stderr.txt`; confirm whether the
-server expects those files, other outputs, or BOINC stderr. Files referenced
-only inside Lua or visualizer strings are not automatically staged.
-Do not edit `client_state.xml` or replace an executable under a queued task.
-Restart stock BOINC, finish/report the stock task (or explicitly abort it at
-the owner's choice), and drain other project tasks with No new tasks set.
-Stop the client again before installation.
+The owner's 2026-11-16 capture has four suspended `milkyway_nbody` 196/`mt`
+tasks. Their inputs open as `nbody_parameters.lua` and `histogram.txt`; their
+results declare no output files. The result travels in BOINC stderr: the
+wrapper forwards the complete card stderr, including `<search_likelihood>`
+and all component tags, and retains `nbody_stderr.txt` for diagnostics.
+`OMP_THREAD_LIMIT=12 bash tests/wrapper.sh real-contract` exercises the captured 117676 contract
+after `python scripts/real_task.py capture`. Files referenced only inside Lua
+or visualizer strings are not automatically staged. Keep the four tasks
+suspended and No new tasks selected until the owner chooses a card trial;
+the matching anonymous version below can bind those existing tasks. Stop the
+client before installation. Do not edit `client_state.xml` or the stock exe.
+The fake-card test can take two hours; its host-only thread limit bounds actual
+execution while still checking that the card argv requests 240. Keep that
+test environment override out of real-card launches.
 
 ## Install the anonymous-platform package
 
@@ -284,6 +289,8 @@ than running BOINC as administrator to bypass key permissions.
 
 ```bash
 cd "$REPO"
+export PACKAGE=/c/Users/xuzhi/Documents/knc-boinc/dist/milkyway_package
+python packaging/check_package.py "$PACKAGE"
 export BACKUP="$(mktemp -d "$REPO/build/boinc-backup.XXXXXX")"
 cp -a "$BOINC_DATA/." "$BACKUP/"
 export PROJECT="$BOINC_DATA/projects/milkyway.cs.rpi.edu_milkyway"
@@ -293,14 +300,32 @@ test -d "$PROJECT" && printf 'Project: %s\nBackup: %s\n' "$PROJECT" "$BACKUP"
 Use the actual folder under `projects/` if the attached URL produced another
 name. Existing `app_info.xml` or `app_config.xml` must be reviewed/merged first;
 the commands below assume neither exists. This manifest declares only
-`milkyway_nbody` and replaces the project's automatic application selection.
+`milkyway_nbody`, version `196`, platform `windows_x86_64`, plan class `mt`,
+matching the already downloaded tasks. The lead reviews/builds the package in
+**main** at the absolute `PACKAGE` path above before the owner installs it.
+It replaces the project's automatic application selection.
 Copy the **contents**, keeping the package flat:
 
 ```bash
 if [ ! -f "$PROJECT/app_info.xml" ] && [ ! -f "$PROJECT/app_config.xml" ]; then
-    cp "$REPO"/dist/milkyway_package/* "$PROJECT/" &&
-    sed -e 's/^package_dir=.*/package_dir=./' \
-        "$SLOT/knc_wrapper.cfg" > "$PROJECT/knc_wrapper.cfg" &&
+    cp "$PACKAGE"/* "$PROJECT/" &&
+    cat > "$PROJECT/knc_wrapper.cfg" <<'CFG' &&
+host=192.168.1.100
+user=root
+ssh_key=C:/Users/xuzhi/.ssh/xeon_phi_rsa
+known_hosts=C:/Users/xuzhi/Documents/gcc_knc/.work/_state/card/known_hosts
+ssh_path=C:/Windows/System32/OpenSSH/ssh.exe
+scp_path=C:/Windows/System32/OpenSSH/scp.exe
+remote_base=/tmp/claude/claude-knc-boinc
+package_dir=.
+app=milkyway_nbody.mic
+OMP_NUM_THREADS=240
+poll_interval=10
+snapshot_interval=5
+connect_timeout=10
+retry_limit=3
+checkpoint_timeout=60
+CFG
     cat > "$PROJECT/app_config.xml" <<'XML'
 <app_config>
   <project_max_concurrent>1</project_max_concurrent>
@@ -311,19 +336,26 @@ else
 fi
 ```
 
-The owner config reuses SSH/card settings proven offline, with `package_dir=.`
-for the flat project layout. The wrapper reads it beside its executable; a slot
+Verify these lab SSH/card settings with the offline sample first. The explicit
+`known_hosts=` file must be readable by the BOINC login; retain strict host-key
+checking. `package_dir=.` selects the flat project layout. The wrapper reads
+the config beside its executable; a slot
 config overrides it. The key stays outside the project. `app_info.xml` includes
 the MIC runtimes, host DLLs and graphics app as `graphics_app`. Both CPU fields
 reserve **1 host CPU**. The concurrency limit is essential: otherwise BOINC can
 launch several 240-thread jobs. It does not coordinate other projects/card users.
+BOINC's existing `--nthreads 12` is replaced by the config's `240` on the card;
+every other argument retains its order and value except resolved file paths.
 
 Restart BOINC. In Manager's Event Log (Advanced view), check anonymous-platform
-recognition and no missing-file/version/platform errors. Keep No new tasks
-until the contract review is complete. Then allow a small amount of standard
-N-body work and select No new tasks again after downloading. Expect one running
+recognition and no missing-file/version/platform/plan-class errors. Keep No new
+tasks selected. At the owner's chosen trial, resume one of the existing
+196/`mt` tasks, leaving the other three suspended. Expect one running
 task using **1 CPU**, elapsed time and progress advancing after remote polling
 (not necessarily smoothly). If waiting, inspect Activity/preferences and other tasks.
+The real 110,000-body task spent over an hour generating initial bodies on the
+laptop before reporting evolution progress. Card startup time is unmeasured;
+use process/CPU activity and logs alongside the progress display.
 Suspend the task: card CPU use should stop; resume should continue it and progress.
 Inspect the PID in the remote task directory's `pid` file and its state, using
 this command (it prompts for that numeric PID):

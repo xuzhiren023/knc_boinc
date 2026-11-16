@@ -1,0 +1,12 @@
+--- a/nbody/src/main.c
++++ b/nbody/src/main.c
+@@ -633,7 +633,8 @@
+         exit(EXIT_FAILURE);
+     }
+
+-    if (BOINC_APPLICATION && mwIsFirstRun())
++    /* The host wrapper returns standalone card stderr as the BOINC result. */
++    if ((BOINC_APPLICATION && mwIsFirstRun()) || getenv("KNC_WRAPPER_FILES"))
+     {
+         nbPrintVersion(TRUE, FALSE);
+     }

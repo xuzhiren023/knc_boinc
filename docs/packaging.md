@@ -38,6 +38,11 @@ scheduler RPC was used. Consequently the **current standard N-body command
 line, physical input names, and output file template could not be verified
 from the allowed public pages**. Obtain a current task definition before a
 live trial; do not substitute the historical Orbit Fitting template as fact.
+S7-02 subsequently captured the owner's four standard 196/`mt` workunits
+read-only from `C:/ProgramData/BOINC` on 2026-11-16. They use logical inputs
+`nbody_parameters.lua` and `histogram.txt`, with no declared result files;
+scientific results return in BOINC stderr. Exact commands, Lua body counts,
+evolve times and estimates are in the S7-02 ticket report and `runs/real/tasks.json`.
 
 ## Build and check
 
@@ -88,7 +93,7 @@ dangling refs, duplicate names, undeclared files and path traversal names.
 | `version_num` | `196`, encoding pinned standard N-body 1.96 as integer hundredths. The pin matches the advertised standard app version; the patched GCC-KNC binary still needs server validation. |
 | `platform` | `windows_x86_64`, describing the host wrapper, not k1om. |
 | `avg_ncpus`, `max_ncpus` | Both `1`. BOINC reserves one host CPU per wrapper task; the config's 240 card threads are not host CPUs. |
-| `plan_class` | Omitted: the plain CPU variant. `mt` would describe host multithreading, not remote MIC threads. No invented server plan class. |
+| `plan_class` | `mt`, matching the owner's already downloaded 196/mt tasks. Host CPU reservation remains 1; the wrapper replaces BOINC's `--nthreads 12` with its configured card count (240). |
 | `file_ref/file_name` | References each declared delivered file using its exact basename. Task input/output references belong to server task templates, not this app-version list. |
 | `file_ref/main_program` | Exactly one, pointing to `knc_wrapper.exe`. |
 | `file_ref/copy_file` | Every auxiliary file uses a real slot copy. DLL loading and ordinary C++ filesystem reads cannot interpret BOINC XML soft links. |
@@ -106,9 +111,9 @@ example's `package_dir=card` layout.
 
 ## Owner's anonymous-platform setup
 
-First set the project to no new tasks, finish/report existing tasks, stop the
+First set the project to no new tasks, keep existing tasks suspended, stop the
 client, and back up its data directory including any existing `app_info.xml`.
-Changing app versions under queued tasks can make them unusable. Never edit
+This manifest matches the captured tasks' 196/mt identity. Never edit
 `client_state.xml` as an installation shortcut.
 
 Copy the **contents** of `dist/milkyway_package/` to this project's directory
@@ -149,11 +154,12 @@ S2-04 adds task argument pass-through and file staging by the pinned option
 table; see [wrapper.md](wrapper.md) for the exact rules and limitations.
 Laptop tests cover a historical-forum-shaped command and the sample workunit
 with resolved input/output names. No scientific seed or Lua parameters are
-substituted for supplied task arguments. Current standard task arguments,
-logical file declarations and required result/stderr mapping still need a
-current task definition and an integration run. In particular the wrapper's
-captured logs use `nbody_stdout.txt` and `nbody_stderr.txt`; packaging alone
-cannot establish that these are the server's required results.
+substituted for supplied task arguments. S7-02 adds the owner's actual 117676
+command and input names, with configured card threads replacing host threads.
+The wrapper retains `nbody_stdout.txt` and `nbody_stderr.txt` as diagnostic
+captures and forwards complete science stderr to BOINC, as required by the
+captured results with no declared output files. Live-client binding and server
+validation still need an owner integration run.
 
 The server may refuse this anonymous
 platform/version or the scientific validator may reject its results. The

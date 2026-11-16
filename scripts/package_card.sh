@@ -15,7 +15,12 @@ while ((${#pending[@]})); do
     pending=("${pending[@]:1}")
     [[ -z ${seen[$file]:-} ]] || continue
     seen[$file]=1
-    while read -r name; do
+    # Keep parsing in this Bash process. On this supplied toolchain Cygwin
+    # Bash can find Git/MSYS sed; crossing those runtimes loses sed's \1.
+    while IFS= read -r line; do
+        [[ "$line" == *"(NEEDED)"*"["*"]"* ]] || continue
+        name=${line#*'['}
+        name=${name%%']'*}
         if [[ -f "$runtime/$name" ]]; then
             cp -L "$runtime/$name" "dist/card/$name"
             printf '%s <- %s\n' "$name" "$runtime/$name" >> dist/card/runtime-manifest.txt
@@ -26,7 +31,7 @@ while ((${#pending[@]})); do
                 *) echo "Unresolved non-system runtime: $name" >&2; exit 1 ;;
             esac
         fi
-    done < <("$readelf" -d "$file" | sed -n 's/.*(NEEDED).*\[\(.*\)\].*/\1/p')
+    done < <("$readelf" -d "$file")
 done
 chmod 755 dist/card/milkyway_nbody.mic
 chmod 644 dist/card/*.so* dist/card/runtime-manifest.txt

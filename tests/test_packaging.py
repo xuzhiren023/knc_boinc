@@ -34,11 +34,12 @@ def test_package():
     assert tree.findtext('app_version/avg_ncpus') == '1'
     assert tree.findtext('app_version/max_ncpus') == '1'
     assert tree.findtext('app_version/version_num') == '196'
+    assert tree.findtext('app_version/plan_class') == 'mt', 'existing 196/mt tasks must bind'
     # Isolate deliberate corruption; never modify the deliverable.
     with tempfile.TemporaryDirectory(dir=str(ROOT / 'build/tmp')) as scratch:
         copy = pathlib.Path(scratch) / 'package'
         mutations = ('missing_file', 'wrong_case', 'main_program', 'dangling_ref',
-                     'duplicate_name', 'unreferenced_file', 'graphics_marker', 'unsafe_name')
+                     'duplicate_name', 'unreferenced_file', 'graphics_marker', 'unsafe_name', 'plan_class')
         for mutation in mutations:
             shutil.copytree(PACKAGE, copy)
             xml = copy / 'app_info.xml'
@@ -64,6 +65,8 @@ def test_package():
                         ref.remove(marker)
             elif mutation == 'unreferenced_file':
                 (copy / 'extra.dll').write_bytes(b'extra')
+            elif mutation == 'plan_class':
+                r.find('app_version/plan_class').text = 'wrong'
             else:
                 r.find('file_info/name').text = '../escape'
             t.write(xml)

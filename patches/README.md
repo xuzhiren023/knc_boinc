@@ -7,7 +7,7 @@
   path rather than requiring a generated header inside the upstream tree.
   This allows the checked-in handwritten configuration in `config/`.
 
-Histogram capture uses upstream `--print-histogram`; no output patch is needed.
+Histogram capture uses upstream `--print-histogram`; no histogram output patch is needed.
 
 - `nbody-wrapper-files.patch` (S2-02): opt-in `KNC_WRAPPER_FILES=1` publishes
   progress at safe simulation steps and acknowledges requested checkpoints
@@ -17,6 +17,11 @@ Histogram capture uses upstream `--print-histogram`; no output patch is needed.
   removed. Both x86 and k1om use the same patch. S3-01 adds opt-in
   wall-clock snapshots at safe steps, using the shared S3-02 wire header,
   deterministic subsampling and atomic rename. No body evolution changes.
+- `nbody-result-contract.patch` (S7-02): when `KNC_WRAPPER_FILES` is enabled,
+  emit upstream's `<search_application>` banner in standalone science stderr.
+  The wrapper forwards that stream to BOINC, whose captured 196/mt results
+  declare no output files. Ordinary standalone output and science arithmetic
+  are unchanged.
 - `boinc/cygwin-win32.patch` uses the compiler's `__CYGWIN__` guard consistently
   for its compatibility changes, including upstream header/CRT branches; no
   synthetic `__CYGWIN32__` build definition is required.

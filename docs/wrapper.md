@@ -27,6 +27,7 @@ Unknown keys and invalid ranges fail the task with a diagnostic.
 | Key | Default / meaning |
 | --- | --- |
 | `host`, `user`, `ssh_key` | Required for real transport; host/user use simple DNS/account names, key is a Windows or Cygwin path |
+| `known_hosts` | Optional explicit host-key file for the BOINC login; lab path is in [TRY-IT.md](TRY-IT.md) |
 | `ssh_path`, `scp_path` | `C:/Windows/System32/OpenSSH/ssh.exe`, `scp.exe` in the same directory |
 | `remote_base` | `/tmp/knc-boinc`; absolute remote parent, never the directory removed by cleanup |
 | `package_dir` | `card` beside executable; explicit relative paths resolve against config directory |
@@ -50,7 +51,8 @@ operation already in progress must complete or time out first.
 
 The real BOINC API uses the S2-01 Win32 IPC variant with
 `direct_process_action=0`. Task arguments retain their order and values, except
-for file operands, which resolve through `boinc_resolve_filename` and become
+for the thread operand (always replaced by configured `OMP_NUM_THREADS`) and
+file operands, which resolve through `boinc_resolve_filename` and become
 absolute paths in a private remote `files/` directory. Physical basenames never
 determine remote names. Spaces, shell punctuation and aliases are quoted safely.
 Inputs are uploaded, outputs are downloaded to the resolved host names on
@@ -79,9 +81,10 @@ inferred from argv.
 
 Wrapper defaults for checkpoint, checkpoint interval and thread count are added
 before the task arguments only when the corresponding task option is absent.
-No task seed, Lua parameters, output option or thread setting is replaced.
-The environment still sets the configured `OMP_NUM_THREADS`; upstream's explicit
-`--nthreads` takes precedence. The checkpoint side-file protocol uses the task's
+An explicit `--nthreads`, `--nthreads=`, or `-n` operand is replaced in place
+by the configured count: the owner's BOINC `--nthreads 12` must launch 240
+threads on the card. No task seed, Lua parameter or output option is replaced.
+The environment also sets the configured `OMP_NUM_THREADS`. The checkpoint side-file protocol uses the task's
 selected checkpoint path; a checkpoint retained by upstream at successful exit
 is also returned to its resolved name. Existing zero-argument development slots
 retain the
@@ -90,11 +93,13 @@ legacy sample invocation (`params.lua`, `input.hist`, `histogram.txt`, seed
 `--fake-card DIR` is consumed only as the leading wrapper transport selector.
 
 The wrapper captures logs to resolved `nbody_stdout.txt` and `nbody_stderr.txt`.
-Separate N-body log names preserve the BOINC wrapper's own `stderr.txt`
-diagnostics. Current standard server output/log declarations remain unknown;
-these log names must be reconciled with a current task definition before a live
-trial. The 2024 Orbit Fitting example is historical evidence, not a verified
-current standard workunit contract; see [packaging.md](packaging.md).
+The entire downloaded science stderr is also forwarded, once at completion,
+to the wrapper's own BOINC `stderr.txt`, on success or scientific failure.
+The standalone card app emits upstream's `<search_application>` tag when the
+wrapper file protocol is enabled; likelihood and component tags retain upstream
+formatting. The owner's 2026-11-16 standard 196/`mt` tasks declare no result
+files: BOINC stderr is the result channel. The 117676 acceptance case uses the
+captured inputs and exact argv, with no invented histogram/body output option.
 
 Each task stages the executable and package `.so*` files and inputs in a unique
 `task-PID-TIMESTAMP` directory under `remote_base`. The slot's `knc_remote`

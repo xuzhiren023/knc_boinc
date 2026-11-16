@@ -32,10 +32,10 @@ def check(package):
     require(len(versions) == 1, 'expected one app_version')
     version = versions[0]
     for tag, value in [('app_name', 'milkyway_nbody'), ('version_num', '196'),
-                       ('platform', 'windows_x86_64'), ('avg_ncpus', '1'), ('max_ncpus', '1')]:
+                       ('platform', 'windows_x86_64'), ('plan_class', 'mt'),
+                       ('avg_ncpus', '1'), ('max_ncpus', '1')]:
         require(one_text(version, tag) == value, 'wrong ' + tag)
-    require(not version.findall('plan_class') and not version.findall('coproc'),
-            'package uses plain CPU plan, no coprocessor claim')
+    require(not version.findall('coproc'), 'package makes no BOINC coprocessor claim')
     declarations = {}
     for info in root.findall('file_info'):
         name = basename(one_text(info, 'name'))
@@ -79,7 +79,7 @@ def check(package):
                 'cyggcc_s-seh-1.dll', 'cygstdc++-6.dll', 'cygiconv-2.dll', 'cygintl-8.dll'}
     require(required <= set(declarations), 'required host/card/config files missing')
     require(any('.so' in n for n in declarations), 'card runtimes missing')
-    print('PASS app_info.xml: one milkyway_nbody version, 1 host CPU, {} files, wrapper main_program'.format(len(refs)))
+    print('PASS app_info.xml: milkyway_nbody 196/mt, 1 host CPU, {} files, wrapper main_program'.format(len(refs)))
 
 
 if __name__ == '__main__':

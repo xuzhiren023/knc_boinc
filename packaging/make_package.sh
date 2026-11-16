@@ -56,7 +56,8 @@ for name in files:
         ET.SubElement(info, 'executable')
 version = ET.SubElement(root, 'app_version')
 for key, value in [('app_name', 'milkyway_nbody'), ('version_num', '196'),
-                   ('platform', 'windows_x86_64'), ('avg_ncpus', '1'), ('max_ncpus', '1')]:
+                   ('platform', 'windows_x86_64'), ('plan_class', 'mt'),
+                   ('avg_ncpus', '1'), ('max_ncpus', '1')]:
     ET.SubElement(version, key).text = value
 for name in files:
     ref = ET.SubElement(version, 'file_ref')

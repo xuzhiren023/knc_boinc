@@ -41,15 +41,27 @@ def printed_histogram(output):
     raise ValueError('incomplete standalone histogram capture')
 
 
-def load_run(directory):
+def captured_output(directory):
     directory = pathlib.Path(directory)
-    output = (directory.read_text() if directory.is_file() else '\n'.join(
+    return (directory.read_text() if directory.is_file() else '\n'.join(
         (directory / name).read_text() for name in ('stdout.txt', 'stderr.txt')
         if (directory / name).exists()))
+
+
+def likelihood(output, directory):
     matches = re.findall(r'<search_likelihood>\s*([^<]+)\s*</search_likelihood>', output)
     if len(matches) != 1:
         raise ValueError('{}: expected exactly one search_likelihood'.format(directory))
-    likelihood = float(matches[0])
+    value = float(matches[0])
+    if not math.isfinite(value):
+        raise ValueError('{}: non-finite result'.format(directory))
+    return value
+
+
+def load_run(directory):
+    directory = pathlib.Path(directory)
+    output = captured_output(directory)
+    result_likelihood = likelihood(output, directory)
     rows, metadata = [], {}
     histogram = printed_histogram(output)
     if histogram is None:
@@ -71,10 +83,10 @@ def load_run(directory):
             rows.append(row)
     if not rows:
         raise ValueError('{}: empty histogram'.format(directory))
-    numbers = [likelihood] + [v for row in rows for v in row] + [v for row in metadata.values() for v in row]
+    numbers = [result_likelihood] + [v for row in rows for v in row] + [v for row in metadata.values() for v in row]
     if not all(math.isfinite(v) for v in numbers):
         raise ValueError('{}: non-finite result'.format(directory))
-    return likelihood, rows, metadata
+    return result_likelihood, rows, metadata
 
 
 def differences(a, b):
@@ -84,7 +96,15 @@ def differences(a, b):
     return absolute, relative
 
 
-def compare(a, b, tolerance):
+def compare(a, b, tolerance, likelihood_only=False):
+    if likelihood_only:
+        la, lb = (likelihood(captured_output(p), p) for p in (a, b))
+        ld = differences(la, lb)
+        print('likelihood: A={:.17g} B={:.17g} abs={:.17g} rel={:.17g}'.format(la, lb, *ld))
+        print('histogram: not requested (stderr-only task contract)')
+        print('{} (strict absolute < {:g}; likelihood verdict)'.format(
+            'PASS' if ld[0] < tolerance else 'FAIL', tolerance))
+        return 0 if ld[0] < tolerance else 1
     la, ra, ma = load_run(a)
     lb, rb, mb = load_run(b)
     schema_matches = ([len(row) for row in ra] == [len(row) for row in rb]
@@ -116,11 +136,13 @@ def main():
     parser.add_argument('A', type=pathlib.Path)
     parser.add_argument('B', type=pathlib.Path)
     parser.add_argument('--tolerance', type=float, default=TOLERANCE)
+    parser.add_argument('--likelihood-only', action='store_true',
+                        help='compare stderr-only tasks that request no histogram output')
     args = parser.parse_args()
     if not math.isfinite(args.tolerance) or args.tolerance <= 0:
         parser.error('tolerance must be positive and finite')
     try:
-        return compare(args.A, args.B, args.tolerance)
+        return compare(args.A, args.B, args.tolerance, args.likelihood_only)
     except (OSError, ValueError) as error:
         print('FAIL: {}'.format(error), file=sys.stderr)
         return 1
