@@ -1,0 +1,40 @@
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-0.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-0-functional --force
+functional: functional_mismatch
+1 mismatch(es) against expected outputs; first: {"where": "mem[0x60000020]+16", "got": "d28d437ec0994740", "want": "d18d437ec0994740"}
+result: twin/vector/vector-0-functional\result.json
+summary: twin/vector/vector-0-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-0.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-0-simulate --force
+timing_prediction: functional_mismatch
+candidate produced wrong results (1 mismatches); its timing is not reported as a valid result
+result: twin/vector/vector-0-simulate\result.json
+summary: twin/vector/vector-0-simulate\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/scalar-0.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/scalar-0-functional --force
+functional: functional_mismatch
+2 mismatch(es) against expected outputs; first: {"where": "mem[0x60000020]+16", "got": "d28d437ec0994740", "want": "d18d437ec0994740"}
+result: twin/vector/scalar-0-functional\result.json
+summary: twin/vector/scalar-0-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/scalar-0.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/scalar-0-simulate --force
+timing_prediction: functional_mismatch
+candidate produced wrong results (2 mismatches); its timing is not reported as a valid result
+result: twin/vector/scalar-0-simulate\result.json
+summary: twin/vector/scalar-0-simulate\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/vector-1024-functional --force
+functional: ok
+executed 654829 dynamic instructions; all 9 expected items match
+result: twin/vector/vector-1024-functional\result.json
+summary: twin/vector/vector-1024-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/vector-1024.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/vector-1024-simulate --force
+timing_prediction: ok
+predicted 3142632 core cycles (392829.000 per unit) for 654829 dynamic instructions on 1 context(s); unvalidated_scenario_estimate
+result: twin/vector/vector-1024-simulate\result.json
+summary: twin/vector/vector-1024-simulate\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/vector/scalar-1024.json --max-steps 2000000 --max-seconds 900 --trace --out twin/vector/scalar-1024-functional --force
+functional: functional_mismatch
+2 mismatch(es) against expected outputs; first: {"where": "mem[0x60000000]+8", "got": "69ab9aa33d856240", "want": "6aab9aa33d856240"}
+result: twin/vector/scalar-1024-functional\result.json
+summary: twin/vector/scalar-1024-functional\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/vector/scalar-1024.json --max-steps 2000000 --max-seconds 900 --profile card-7120-measured --no-issue-log --out twin/vector/scalar-1024-simulate --force
+timing_prediction: functional_mismatch
+candidate produced wrong results (2 mismatches); its timing is not reported as a valid result
+result: twin/vector/scalar-1024-simulate\result.json
+summary: twin/vector/scalar-1024-simulate\summary.md
