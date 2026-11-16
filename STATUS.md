@@ -59,5 +59,23 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 - 2026-11-16: card window 10 (gcc-knc turn claude-turn-s14-w10) closed at 11:15Z without our jobs (gcc-knc wait-loop bug). Staged jobs and conditions carry over to the next gcc-knc card turn; start only on its "go".
 
+- 2026-11-16 window 12 (23:03Z): 1.96 card builds on the large case, scalar chunk 4 and vector, both bit-identical
+  to x86 (-4980.4452402155885); card time 30.9 s vs 30.7 s, so the vector walk gives no gain on this case.
+  S7-02 (in progress): on real workunit 117676 (110k) our x86 build matches the stock 1.96 exe bit for bit
+  (-92.418153851030638); stock 98 min, ours 91 min on 12 laptop threads; 1 thread timed out at 2 h. Our stderr
+  lacked the `<search_application>` line; S7-02 adds patches/nbody-result-contract.patch.
+
+- 2026-11-16 owner task (via the GCC-KNC lead), starts after window 12's "boinc done": optimize N-body until
+  time-to-solution matches a 1-2 TFLOPS GPU. Use skill knc-optimize (6 steps; model step = gcc_knc
+  .claude/skills/model-first). First: fix one workunit, a GPU reference time (MilkyWay GPU app or published,
+  name the source), the FP precision kept, the KNC bound (references/machine.md); a Model table here plus a short
+  summary to the GCC-KNC lead; say so if FP64 puts the target out of reach. Rank one-core variants with knc-twin
+  (within ~20% is decided on the card; run twin-generated natives on the host first, T1-15). One staged run list
+  per window to the GCC-KNC lead. Compiler defects go to the GCC-KNC lead with a reduced repro.
+
+- 2026-11-16: twin T1-06 (x87 single rounding) merged and installed; the fmul repro now gives ...9f. After window
+  12: rerun the 128-body chunk scaling and the six gravity bodies (light Codex ticket), report any remaining
+  difference to the twin session.
+
 - Never edit tools/codex_run.sh while a session runs: bash reads scripts as it goes (S2-02 exit 127).
 - Do not remove a ticket worktree before its built artifacts (dist/, runs/) are no longer needed: they are gitignored.
