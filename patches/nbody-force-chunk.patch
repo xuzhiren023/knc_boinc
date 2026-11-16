@@ -32,36 +32,18 @@
      for (i = 0; i < nbody; ++i)      /* get force on each body */
 --- a/nbody/src/nbody_plain.c
 +++ b/nbody/src/nbody_plain.c
-@@ -27,6 +27,11 @@
- #include "nbody_checkpoint.h"
- #include "nbody_mass.h"
- #include "nbody_grav.h"
+@@ -29,0 +30,5 @@
 +
 +/* Preserve upstream scheduling unless the build selects a force chunk. */
 +#ifndef NBODY_FORCE_CHUNK
 +#define NBODY_FORCE_CHUNK (4096 / sizeof(accs[0]))
 +#endif
- #include "nbody_histogram.h"
- #include "nbody_likelihood.h"
- #include "nbody_devoptions.h"
-@@ -294,7 +299,7 @@
-     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
-
-   #ifdef _OPENMP
+@@ -297 +302 @@
 -    #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, 4096 / sizeof(accs[0]))
 +    #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, NBODY_FORCE_CHUNK)
-   #endif
-     for (i = 0; i < nbody; ++i)
-     {
-@@ -327,7 +332,7 @@
-     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
-
-   #ifdef _OPENMP
+@@ -330 +335 @@
 -    #pragma omp parallel for private(i) schedule(dynamic, 4096 / sizeof(accs[0]))
 +    #pragma omp parallel for private(i) schedule(dynamic, NBODY_FORCE_CHUNK)
-   #endif
-     for (i = 0; i < nbody; ++i)      /* loop over all bodies */
-     {
 --- a/nbody/src/nbody_shmem.c
 +++ b/nbody/src/nbody_shmem.c
 @@ -22,6 +22,11 @@

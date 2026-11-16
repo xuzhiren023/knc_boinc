@@ -36,9 +36,12 @@ actual=$(git -C "$dest" rev-parse HEAD)
 echo "$tag $actual"
 # Cygwin already declares glob_pattern_p, just as glibc does.
 for patchfile in "$PWD"/patches/*.patch; do
-    if patch -d "$dest" -p1 --forward --batch --dry-run --silent < "$patchfile" >/dev/null 2>&1; then
-        patch -d "$dest" --batch --forward -p1 < "$patchfile"
-    elif ! patch -d "$dest" -p1 -R --batch --dry-run --silent < "$patchfile" >/dev/null 2>&1; then
+    # This patch preserves nbody.c's upstream CRLF bytes alongside LF files.
+    patch_options=()
+    [[ "$patchfile" != */zz-nbody-phase-timers.patch ]] || patch_options+=(--binary)
+    if patch "${patch_options[@]}" -d "$dest" -p1 --forward --batch --dry-run --silent < "$patchfile" >/dev/null 2>&1; then
+        patch "${patch_options[@]}" -d "$dest" --batch --forward -p1 < "$patchfile"
+    elif ! patch "${patch_options[@]}" -d "$dest" -p1 -R --batch --dry-run --silent < "$patchfile" >/dev/null 2>&1; then
         echo "Source differs from expected patch state: $patchfile" >&2
         exit 1
     fi
