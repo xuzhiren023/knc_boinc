@@ -1,0 +1,408 @@
+{
+  "body_indices": [
+    1024,
+    1408,
+    1664,
+    3072,
+    3200,
+    3584
+  ],
+  "core_runs": [
+    {
+      "body": 1024,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "69ab9aa33d856240",
+            "want": "6aab9aa33d856240",
+            "where": "mem[0x60008000]+8"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-1024\\result.json",
+      "arithmetic_operations_checked": 23270,
+      "operation_differences": [
+        {
+          "id": "a404fd1",
+          "op": "mul",
+          "a": "bf3982440b271580",
+          "b": "3fc697fb0ebad540",
+          "twin": "bf1202b59a43239e",
+          "instruction": "fmul",
+          "ordinal": 3459,
+          "native": "bf1202b59a43239f"
+        },
+        {
+          "id": "a404f56",
+          "op": "add",
+          "a": "3fa7f4946e967801",
+          "b": "40620fbc58527e9b",
+          "twin": "4062113ba1996802",
+          "instruction": "faddl",
+          "ordinal": 16193,
+          "native": "4062113ba1996803"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    },
+    {
+      "body": 1408,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "f671a67973c008c0",
+            "want": "ee71a67973c008c0",
+            "where": "mem[0x6000b000]+16"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-1408\\result.json",
+      "arithmetic_operations_checked": 19792,
+      "operation_differences": [
+        {
+          "id": "a405015",
+          "op": "mul",
+          "a": "3f49d82e26996ede",
+          "b": "bf695631dbfa5068",
+          "twin": "bec476814edfebc4",
+          "instruction": "fmulp",
+          "ordinal": 1186,
+          "native": "bec476814edfebc3"
+        },
+        {
+          "id": "a40500d",
+          "op": "add",
+          "a": "3f78951da1df7801",
+          "b": "c030881481325037",
+          "twin": "c030868b2f583240",
+          "instruction": "faddl",
+          "ordinal": 11905,
+          "native": "c030868b2f58323f"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    },
+    {
+      "body": 1664,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "a8bcf9cb3bde4940",
+            "want": "a7bcf9cb3bde4940",
+            "where": "mem[0x6000d000]+8"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-1664\\result.json",
+      "arithmetic_operations_checked": 23692,
+      "operation_differences": [
+        {
+          "id": "a404fa8",
+          "op": "mul",
+          "a": "3eee5df343d55305",
+          "b": "bfc4f1e5733ed7c0",
+          "twin": "bec3e045582e54ec",
+          "instruction": "fmul",
+          "ordinal": 7165,
+          "native": "bec3e045582e54eb"
+        },
+        {
+          "id": "a404f8f",
+          "op": "mul",
+          "a": "3edca07563719c64",
+          "b": "bfc465aa8af9f800",
+          "twin": "beb23f3c616c194a",
+          "instruction": "fmul",
+          "ordinal": 11639,
+          "native": "beb23f3c616c1949"
+        },
+        {
+          "id": "a404ff5",
+          "op": "mul",
+          "a": "3eb639fc82d9cc66",
+          "b": "40e6561699eedea5",
+          "twin": "3faf075246bc521c",
+          "instruction": "fmul",
+          "ordinal": 14086,
+          "native": "3faf075246bc521b"
+        },
+        {
+          "id": "a405006",
+          "op": "sub",
+          "a": "4048dda15494aa27",
+          "b": "3f15a328e65c0072",
+          "twin": "4048dd9ea02f8d5c",
+          "instruction": "fsubrp",
+          "ordinal": 19325,
+          "native": "4048dd9ea02f8d5b"
+        },
+        {
+          "id": "a404fa3",
+          "op": "mul",
+          "a": "3f106e2ca5ff6466",
+          "b": "3fea7ac186215260",
+          "twin": "3f0b31175ce83e9e",
+          "instruction": "fmul",
+          "ordinal": 19358,
+          "native": "3f0b31175ce83e9d"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    },
+    {
+      "body": 3072,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "fb030bfe709661c0",
+            "want": "fc030bfe709661c0",
+            "where": "mem[0x60018000]+0"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-3072\\result.json",
+      "arithmetic_operations_checked": 23920,
+      "operation_differences": [
+        {
+          "id": "a404f5c",
+          "op": "mul",
+          "a": "3eb72262e63192c4",
+          "b": "4025309827fdf836",
+          "twin": "3eeea364f75237e0",
+          "instruction": "fmul",
+          "ordinal": 1940,
+          "native": "3eeea364f75237e1"
+        },
+        {
+          "id": "a405015",
+          "op": "mul",
+          "a": "412354ca2f8d6e28",
+          "b": "3e5a64b02af34694",
+          "twin": "3f8fe36f558391c6",
+          "instruction": "fmulp",
+          "ordinal": 11052,
+          "native": "3f8fe36f558391c7"
+        },
+        {
+          "id": "a404f0b",
+          "op": "mul",
+          "a": "bf7732827f632000",
+          "b": "bf7732827f632000",
+          "twin": "3f00d0eb5100c0c4",
+          "instruction": "fmul",
+          "ordinal": 11555,
+          "native": "3f00d0eb5100c0c5"
+        },
+        {
+          "id": "a404faf",
+          "op": "mul",
+          "a": "becc125094460383",
+          "b": "3fbbb4251798f800",
+          "twin": "be984d7b8c3da2b2",
+          "instruction": "fmul",
+          "ordinal": 12431,
+          "native": "be984d7b8c3da2b3"
+        },
+        {
+          "id": "a404ff7",
+          "op": "sub",
+          "a": "c062cc77867c8dd4",
+          "b": "3f2282351ce8006c",
+          "twin": "c062cc78ae9fdfa2",
+          "instruction": "fsubrp",
+          "ordinal": 14727,
+          "native": "c062cc78ae9fdfa3"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    },
+    {
+      "body": 3200,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0ea184676cd260c0",
+            "want": "0da184676cd260c0",
+            "where": "mem[0x60019000]+0"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-3200\\result.json",
+      "arithmetic_operations_checked": 24850,
+      "operation_differences": [
+        {
+          "id": "a404f0b",
+          "op": "mul",
+          "a": "bfb3d0141cce4180",
+          "b": "bfb3d0141cce4180",
+          "twin": "3f7888c1cf70166e",
+          "instruction": "fmul",
+          "ordinal": 7101,
+          "native": "3f7888c1cf70166f"
+        },
+        {
+          "id": "a404ff7",
+          "op": "sub",
+          "a": "c063ccc9c8214129",
+          "b": "bf333ee10aac0045",
+          "twin": "c063ccc760451fd4",
+          "instruction": "fsubrp",
+          "ordinal": 12971,
+          "native": "c063ccc760451fd3"
+        },
+        {
+          "id": "a404f84",
+          "op": "mul",
+          "a": "3ed746f3e4ba20a4",
+          "b": "bfcbab935c0eec80",
+          "twin": "beb420ac21328924",
+          "instruction": "fmul",
+          "ordinal": 20993,
+          "native": "beb420ac21328925"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    },
+    {
+      "body": 3584,
+      "status": "functional_mismatch",
+      "exit": 6,
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "b35c50a7b8ef3d40",
+            "want": "b45c50a7b8ef3d40",
+            "where": "mem[0x6001c000]+16"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "result": "twin\\multicore\\body-3584\\result.json",
+      "arithmetic_operations_checked": 20118,
+      "operation_differences": [
+        {
+          "id": "a405017",
+          "op": "sub",
+          "a": "4033e457069ce1f8",
+          "b": "3f22ea49d0d2fffd",
+          "twin": "4033e44d9177f98e",
+          "instruction": "fsubp",
+          "ordinal": 9445,
+          "native": "4033e44d9177f98f"
+        },
+        {
+          "id": "a404f4e",
+          "op": "mul",
+          "a": "401527f35f67a63a",
+          "b": "bfc6b8fe9897bf40",
+          "twin": "bfee0b8ab5f3650a",
+          "instruction": "fmul",
+          "ordinal": 9858,
+          "native": "bfee0b8ab5f36509"
+        }
+      ],
+      "scale": "core",
+      "contexts": [
+        0
+      ],
+      "engine_version": "0.4.0"
+    }
+  ],
+  "odd_one_out": "twin",
+  "first_operation": {
+    "id": "a404fd1",
+    "op": "mul",
+    "a": "bf3982440b271580",
+    "b": "3fc697fb0ebad540",
+    "twin": "bf1202b59a43239e",
+    "instruction": "fmul",
+    "ordinal": 3459,
+    "native": "bf1202b59a43239f"
+  },
+  "oracle_control_word": "0x027f",
+  "oracle": "native x87 replay of each arithmetic operation on the unchanged twin path",
+  "source_replay": {
+    "flags": "same COMMON_CFLAGS plus -mfpmath=387",
+    "control_word": "0x027f",
+    "matched_components": 18,
+    "body_results": {
+      "1024": [
+        "c01a931c6a06ad04",
+        "4062853da39aab6a",
+        "405945c711d74419"
+      ],
+      "1408": [
+        "c02bbf71ac26e066",
+        "405b55e10f159ce6",
+        "c008c07379a671ee"
+      ],
+      "1664": [
+        "c05cb441c971116f",
+        "4049de3bcbf9bca7",
+        "4054e6b87e01ee33"
+      ],
+      "3072": [
+        "c0619670fe0b03fc",
+        "c0410304bb03d003",
+        "c040b723282927e5"
+      ],
+      "3200": [
+        "c060d26c6784a10d",
+        "402452e8fb34ae10",
+        "c03d820267290c49"
+      ],
+      "3584": [
+        "c05ac7f6dc78c5cf",
+        "403f8cc939beaf59",
+        "403defb8a7505cb4"
+      ]
+    }
+  },
+  "rounding_proof": {
+    "exact_product_minus_binary64_midpoint": "-48721223/81129638414606681695789005144064",
+    "native_result_is_closer": true,
+    "F80_rounding_lands_on_binary64_midpoint": true,
+    "cause": "_x87_binop rounds to F80 (64 bits) then converts to F80_P53; double rounding is not innocuous"
+  }
+}
