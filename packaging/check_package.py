@@ -51,18 +51,27 @@ def check(package):
                 'missing, empty or nonregular file: ' + name)
     refs = set()
     mains = []
+    graphics = []
     for ref in version.findall('file_ref'):
         name = basename(one_text(ref, 'file_name'))
         require(name in declarations, 'undeclared file_ref: ' + name)
         require(name not in refs, 'duplicate file_ref: ' + name)
         refs.add(name)
-        require(not ref.findall('open_name'), 'flat package must not rename slot files')
+        if name == 'knc_nbody_graphics.exe':
+            require(one_text(ref, 'open_name') == 'graphics_app', 'graphics discovery requires open_name graphics_app')
+        else:
+            require(not ref.findall('open_name'), 'ordinary package files must not be renamed')
+        if ref.findall('graphics_app'):
+            require(len(ref.findall('graphics_app')) == 1, 'duplicate graphics_app')
+            graphics.append(name)
         if ref.findall('main_program'):
             require(len(ref.findall('main_program')) == 1, 'duplicate main_program')
             mains.append(name)
         else:
             require(len(ref.findall('copy_file')) == 1, 'ordinary reads need copy_file: ' + name)
     require(refs == set(declarations), 'every package file needs a file_ref')
+    require(graphics == ['knc_nbody_graphics.exe'], 'expected sole knc_nbody_graphics.exe graphics_app')
+    require(len(declarations['knc_nbody_graphics.exe'].findall('executable')) == 1, 'graphics app must be executable')
     require(mains == ['knc_wrapper.exe'], 'expected knc_wrapper.exe as sole main_program')
     require(len(declarations['knc_wrapper.exe'].findall('executable')) == 1,
             'main_program must be executable')

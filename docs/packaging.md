@@ -1,7 +1,7 @@
 # MilkyWay project-directory package
 
 `bash packaging/make_package.sh` builds `dist/milkyway_package/` from the
-repository's wrapper and card targets. It does not install files, request work,
+repository's wrapper, card and graphics targets. It does not install files, request work,
 connect to a card, or modify a BOINC installation. This is an experimental
 anonymous-platform package, not a demonstrated production MilkyWay client.
 
@@ -58,13 +58,13 @@ the supplied Cygwin bin directory. It performs no fetch itself. `scripts/fetch.s
 verifies the pinned revisions and applies the repository patches; it is the
 only source-fetch entry point. No CMake, MinGW, MSVC, or installations are used.
 
-The flat package contains `knc_wrapper.exe`, the transitive Cygwin DLL imports
-resolved from that executable (currently five), `knc_wrapper.cfg.example`,
+The flat package contains `knc_wrapper.exe`, `knc_nbody_graphics.exe`, the transitive Cygwin DLL imports
+resolved from both executables (currently five), `knc_wrapper.cfg.example`,
 `milkyway_nbody.mic`, its compiler-runtime `.so` closure, and `app_info.xml`.
 Windows system DLLs, Linux system libraries, private keys, workunit inputs,
 and build diagnostics are not included. Card lint/readelf/runtime provenance
-remain in `dist/card/`. There is no graphics app yet; a later graphics ticket
-must add its executable, dependencies and BOINC graphics declaration.
+remain in `dist/card/`. The graphics executable supports windowed and `--fullscreen` BOINC launches;
+see [graphics.md](graphics.md) for the format, demo and window checks.
 Rebuilding replaces the generated package directory; do not keep an edited
 configuration or other owner files there.
 
@@ -83,7 +83,7 @@ dangling refs, duplicate names, undeclared files and path traversal names.
 | --- | --- |
 | `app/name` | `milkyway_nbody`, the standard server application identifier; the human-readable title is not the identifier. |
 | `file_info/name` | Exact flat basenames for every delivered file. No absolute paths or directory separators; one declaration per file. |
-| `file_info/executable` | Only `knc_wrapper.exe` is a host executable BOINC should launch. The MIC ELF is data to the host and runs remotely. |
+| `file_info/executable` | `knc_wrapper.exe` and `knc_nbody_graphics.exe` are host executables BOINC can launch. The MIC ELF is data to the host and runs remotely. |
 | `app_version/app_name` | Refers to the single declared app. |
 | `version_num` | `197`, encoding the pinned locally built N-body 1.97 as integer hundredths. This is our experimental build identity, not a claim that standard N-body currently distributes 1.97 or that the patched binary equals the project's build. |
 | `platform` | `windows_x86_64`, describing the host wrapper, not k1om. |
@@ -92,9 +92,10 @@ dangling refs, duplicate names, undeclared files and path traversal names.
 | `file_ref/file_name` | References each declared delivered file using its exact basename. Task input/output references belong to server task templates, not this app-version list. |
 | `file_ref/main_program` | Exactly one, pointing to `knc_wrapper.exe`. |
 | `file_ref/copy_file` | Every auxiliary file uses a real slot copy. DLL loading and ordinary C++ filesystem reads cannot interpret BOINC XML soft links. |
-| `open_name` | Omitted: slot names equal physical package basenames. |
+| `open_name` | Graphics only: `graphics_app`, required for discovery by the pinned client. Other slot names equal package basenames. |
+| `file_ref/graphics_app` | Present on `knc_nbody_graphics.exe` as requested; pinned-client discovery also requires the open name above. |
 | Command line | No app-version override. It would not remove the server's workunit arguments; see the compatibility limitation below. |
-| Other optional fields | No GPU/coproc, performance estimate, graphics executable or API-version claim. None is established for this package. |
+| Other optional fields | No GPU/coproc, performance estimate or API-version claim. None is established for this package. |
 
 The pinned BOINC client's `client/app_start.cpp` obtains the main executable
 path in the project directory; S2-02 locates that executable via `/proc/self/exe`
