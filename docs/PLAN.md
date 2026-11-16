@@ -27,7 +27,7 @@ the guide, after the offline check passes.
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | Card app = upstream `milkyway_nbody`, pinned commit, built **without** BOINC (standalone), OpenMP, no OpenCL, `-O2 -march=knc -fopenmp` with GCC-KNC; shared runtimes in `lib/` beside `bin/` (RPATH `$ORIGIN/../lib`). | BOINC lives on the host; the card app only computes. -O2 is GCC-KNC's safe default (open -O3 ICEs). |
+| D1 | Card app = standard upstream `milkyway_nbody` **1.96**, tag `nbody_1.96`, commit `1e640779f1cabf88aaa49e4db569cfe7e09016c4`, built **without** BOINC (standalone), OpenMP, no OpenCL, `-O2 -march=knc -fopenmp` with GCC-KNC; shared runtimes in `lib/` beside `bin/` (RPATH `$ORIGIN/../lib`). | BOINC lives on the host; the card app only computes. -O2 is GCC-KNC's safe default (open -O3 ICEs). |
 | D2 | No CMake on the laptop: a hand-written Makefile plus a checked-in config header replaces upstream's CMake for both builds. | Only compilers present: GCC-KNC (k1om) and Cygwin g++ (x86). |
 | D3 | x86 reference = same sources built with Cygwin g++ (SSE2 double). | Same code, other ISA: the comparison isolates the compiler and FP model. |
 | D4 | Host wrapper = Windows exe built with Cygwin g++ and the BOINC API library. Sprint 2 starts with a spike on whether the BOINC API built this way uses the Win32 shared-memory protocol the Windows client expects. If not, the fallback is a portable MinGW-w64 toolchain, which needs the owner's OK to download. | No MinGW or MSVC on the laptop. |

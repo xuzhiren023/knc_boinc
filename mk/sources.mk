@@ -16,7 +16,7 @@ NBODY_SOURCES := \
  nbody/src/nbody_mass.c nbody/src/nbody_devoptions.c \
  nbody/src/nbody_likelihood.c nbody/src/nbody_histogram.c \
  nbody/src/nbody_caustic.c nbody/src/nbody_particle_data.c \
- nbody/src/nbody_king_model.c nbody/src/nbody_math_funcs.c \
+ nbody/src/nbody_king_model.c \
  nbody/src/nbody_lua.c nbody/src/nbody_lua_models.c \
  nbody/src/nbody_lua_util.c nbody/src/nbody_lua_misc.c \
  nbody/src/nbody_lua_types/nbody_lua_types.c \
@@ -34,7 +34,7 @@ MW_SOURCES := \
  milkyway/src/milkyway_util.c milkyway/src/milkyway_alloc.c \
  milkyway/src/milkyway_rename.c milkyway/src/milkyway_boinc_util.cc \
  milkyway/src/milkyway_show.c milkyway/src/milkyway_cpuid.c \
- milkyway/src/milkyway_timing.c milkyway/src/milkyway_math_funcs.c \
+ milkyway/src/milkyway_timing.c \
  milkyway/src/milkyway_lua_marshal.c milkyway/src/milkyway_lua_util.c \
  milkyway/src/milkyway_lua_math.c milkyway/src/milkyway_lua_vector.c \
  milkyway/src/milkyway_lua_dsfmt.c milkyway/src/milkyway_lua_types.c
@@ -61,7 +61,6 @@ COMMON_LDFLAGS := -fopenmp
 COMMON_LDLIBS := -lm
 NBODY_LUA_CPPFLAGS := -DNBODY_LUA_TYPES_COMPILATION
 MW_LUA_CPPFLAGS := -DMILKYWAY_LUA_COMPILATION
-MW_MATH_CPPFLAGS := -DMILKYWAY_MATH_COMPILATION
 
 # Exact bundled crlibm source list from crlibm/CMakeLists.txt.
 CRLIBM_SOURCES := $(addprefix crlibm/,crlibm_private.c triple-double.c \

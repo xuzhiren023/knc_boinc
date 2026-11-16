@@ -7,7 +7,7 @@ mkdir -p build/tmp
 export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
 make -C mk -j6 knc-wrapper boinc-api-test x86 graphics
 wrapper=$(cygpath -aw build/wrapper/knc_wrapper.exe)
-client=$(cygpath -au build/boinc/boinc_fake_client.exe)
+client=$(cygpath -am build/boinc/boinc_fake_client.exe)
 run=$(mktemp -d build/wrapper/test.XXXXXX)
 scenarios=("$@")
 if [[ ${#scenarios[@]} == 0 ]]; then

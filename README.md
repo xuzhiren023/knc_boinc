@@ -3,7 +3,10 @@
 Run a BOINC science app on an Intel Xeon Phi x100 (Knights Corner) card as **one BOINC task that uses all
 240 hardware threads**, with a working screensaver on the host.
 
-First target: MilkyWay@home N-body (`milkyway_nbody`), built for the card with GCC-KNC and OpenMP.
+First target: standard MilkyWay@home N-body **1.96** (`milkyway_nbody`, tag `nbody_1.96`,
+commit `1e640779`), built for the card with GCC-KNC and OpenMP. Package version 196
+uses host platform `windows_x86_64`. See [SOURCES.md](SOURCES.md) for pins and
+[the 1.96 regression](tests/nbody_196_matrix.py) for references and vector/chunk checks.
 
 ```
 BOINC client (laptop, Windows)

@@ -7,7 +7,7 @@ import zlib
 root = pathlib.Path(__file__).resolve().parents[1]
 scratch = root / 'build/graphics'
 source = scratch / 'converter-input.txt'
-source.write_text('simple_output = 1\n# type id x y z v_x v_y v_z mass\n-1, 1, 1.25, -2, 3, 0, 0, 0, 1\n1, 2, -4, 5, 6, 0, 0, 0, 1\n')
+source.write_text('simple_output = 1\n# ignore id x y z v_x v_y v_z mass\n1, 1, 1.25, -2, 3, 0, 0, 0, 1\n0, 2, -4, 5, 6, 0, 0, 0, 1\n')
 def convert(ok):
     r = subprocess.run([sys.executable, str(root/'tools/make_demo_snapshot.py'), str(source), str(scratch/'converted.snapshot'), '--time', '2.5', '--step', '42'], capture_output=True, text=True)
     assert (r.returncode == 0) == ok, r.stdout+r.stderr
@@ -18,7 +18,7 @@ assert struct.unpack_from('<4I', b) == (0x53434e4b, 1, 320048, 2)
 assert struct.unpack_from('<dQd', b, 24) == (2.5, 42, 1.0)
 assert struct.unpack_from('<fffI', b, 48) == (1.25, -2, 3, 0)
 assert struct.unpack_from('<fffI', b, 64) == (-4, 5, 6, 1)
-for bad in ['# type id x y z\n1, 1, nan, 0, 0\n', '# type id x y z\n'+ '1,1,0,0,0\n'*20001, 'not an upstream output']:
+for bad in ['# ignore id x y z\n1, 1, nan, 0, 0\n', '# ignore id x y z\n'+ '1,1,0,0,0\n'*20001, 'not an upstream output']:
     source.write_text(bad)
     convert(False)
 # OpenGL framebuffer capture from the real window, converted losslessly to PNG.

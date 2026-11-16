@@ -33,7 +33,7 @@ def test_package():
     assert graphics[0].findtext('open_name') == 'graphics_app'
     assert tree.findtext('app_version/avg_ncpus') == '1'
     assert tree.findtext('app_version/max_ncpus') == '1'
-    assert tree.findtext('app_version/version_num') == '197'
+    assert tree.findtext('app_version/version_num') == '196'
     # Isolate deliberate corruption; never modify the deliverable.
     with tempfile.TemporaryDirectory(dir=str(ROOT / 'build/tmp')) as scratch:
         copy = pathlib.Path(scratch) / 'package'

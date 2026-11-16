@@ -10,25 +10,25 @@
 +#define NBODY_FORCE_CHUNK (4096 / sizeof(accels[0]))
 +#endif
  #include "milkyway_util.h"
- 
+
  #ifdef _OPENMP
-@@ -170,7 +175,7 @@
+@@ -164,7 +169,7 @@
      }
- 
+
    #ifdef _OPENMP
 -    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 4096 / sizeof(accels[0]))
 +    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, NBODY_FORCE_CHUNK)
    #endif
      for (i = 0; i < nbody; ++i)      /* get force on each body */
      {
-@@ -285,7 +290,7 @@
+@@ -274,7 +279,7 @@
      }
- 
+
    #ifdef _OPENMP
 -    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 4096 / sizeof(accels[0]))
 +    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, NBODY_FORCE_CHUNK)
    #endif
- 
+
      for (i = 0; i < nbody; ++i)      /* get force on each body */
 --- a/nbody/src/nbody_plain.c
 +++ b/nbody/src/nbody_plain.c
@@ -44,18 +44,18 @@
  #include "nbody_histogram.h"
  #include "nbody_likelihood.h"
  #include "nbody_devoptions.h"
-@@ -369,7 +374,7 @@
+@@ -294,7 +299,7 @@
      const mwvector* accs = mw_assume_aligned(st->acctab, 16);
- 
+
    #ifdef _OPENMP
 -    #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, 4096 / sizeof(accs[0]))
 +    #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, NBODY_FORCE_CHUNK)
    #endif
      for (i = 0; i < nbody; ++i)
      {
-@@ -402,7 +407,7 @@
+@@ -327,7 +332,7 @@
      const mwvector* accs = mw_assume_aligned(st->acctab, 16);
- 
+
    #ifdef _OPENMP
 -    #pragma omp parallel for private(i) schedule(dynamic, 4096 / sizeof(accs[0]))
 +    #pragma omp parallel for private(i) schedule(dynamic, NBODY_FORCE_CHUNK)
@@ -78,7 +78,7 @@
  #include "nbody_shmem.h"
 @@ -524,7 +529,7 @@
      info->rootCenterOfMass[2] = (float) cmPos->z;
- 
+
    #ifdef _OPENMP
 -    #pragma omp parallel for private(i, b) schedule(guided, 4096 / sizeof(Body))
 +    #pragma omp parallel for private(i, b) schedule(guided, NBODY_FORCE_CHUNK)

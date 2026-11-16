@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := x86
 ROOT := ..
-UPSTREAM := $(ROOT)/third_party/milkywayathome_client
+UPSTREAM := $(ROOT)/third_party/milkywayathome_client_196
 TOOLCHAIN ?= /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin
 SHELL := $(TOOLCHAIN)/bash.exe
 # Use Cygwin make and tools, not MinGW/MSVC. Override TOOLCHAIN for another installation.
@@ -65,7 +65,6 @@ $(OUT)/%.cc.o: $(UPSTREAM)/%.cc sources.mk Makefile $(wildcard $(ROOT)/config/*.
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 $(filter $(OUT)/nbody/src/nbody_lua%,$(OBJECTS)): CPPFLAGS += $(NBODY_LUA_CPPFLAGS)
 $(filter $(OUT)/milkyway/src/milkyway_lua%,$(OBJECTS)): CPPFLAGS += $(MW_LUA_CPPFLAGS)
-$(OUT)/milkyway/src/milkyway_math_funcs.c.o: CPPFLAGS += $(MW_MATH_CPPFLAGS)
 -include $(OBJECTS:.o=.d)
 
 include boinc.mk

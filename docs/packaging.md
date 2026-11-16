@@ -85,7 +85,7 @@ dangling refs, duplicate names, undeclared files and path traversal names.
 | `file_info/name` | Exact flat basenames for every delivered file. No absolute paths or directory separators; one declaration per file. |
 | `file_info/executable` | `knc_wrapper.exe` and `knc_nbody_graphics.exe` are host executables BOINC can launch. The MIC ELF is data to the host and runs remotely. |
 | `app_version/app_name` | Refers to the single declared app. |
-| `version_num` | `197`, encoding the pinned locally built N-body 1.97 as integer hundredths. This is our experimental build identity, not a claim that standard N-body currently distributes 1.97 or that the patched binary equals the project's build. |
+| `version_num` | `196`, encoding pinned standard N-body 1.96 as integer hundredths. The pin matches the advertised standard app version; the patched GCC-KNC binary still needs server validation. |
 | `platform` | `windows_x86_64`, describing the host wrapper, not k1om. |
 | `avg_ncpus`, `max_ncpus` | Both `1`. BOINC reserves one host CPU per wrapper task; the config's 240 card threads are not host CPUs. |
 | `plan_class` | Omitted: the plain CPU variant. `mt` would describe host multithreading, not remote MIC threads. No invented server plan class. |
@@ -157,7 +157,7 @@ cannot establish that these are the server's required results.
 
 The server may refuse this anonymous
 platform/version or the scientific validator may reject its results. The
-pinned 1.97 code is newer than advertised standard 1.96; patched standalone
+pinned code is standard 1.96 (`1e640779`); patched standalone
 behavior, compiler numerics, remote checkpoints, stdout/stderr routing and
 real Windows BOINC service/sandbox behavior are not proven by packaging.
 The **owner decides whether to try** and accepts possible lost work or credit.

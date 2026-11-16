@@ -12,7 +12,7 @@ class ForceChunk(unittest.TestCase):
             ('plain', 'accs[0]', 'dynamic', 2),
             ('shmem', 'Body', 'guided', 1),
         ):
-            text = (ROOT / 'third_party/milkywayathome_client/nbody/src' /
+            text = (ROOT / 'third_party/milkywayathome_client_196/nbody/src' /
                     ('nbody_' + name + '.c')).read_text()
             self.assertTrue('#ifndef NBODY_FORCE_CHUNK\n#define NBODY_FORCE_CHUNK (4096 / sizeof(' + element + '))\n#endif' in text,
                             name + ': missing overridable upstream default')

@@ -24,9 +24,9 @@ if [[ "${1:-}" == boinc ]]; then
     exit 0
 fi
 repo=https://github.com/Milkyway-at-home/milkywayathome_client.git
-tag=nbody_1.97
-commit=d78c48fc9905ee309e28ae4b76ad2f6fda901ef8
-dest=third_party/milkywayathome_client
+tag=nbody_1.96
+commit=1e640779f1cabf88aaa49e4db569cfe7e09016c4
+dest=third_party/milkywayathome_client_196
 mkdir -p third_party
 if [[ ! -d "$dest/.git" ]]; then
     git -c core.autocrlf=false -c http.sslBackend=openssl clone --depth 1 --branch "$tag" --no-recurse-submodules "$repo" "$dest"
