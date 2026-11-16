@@ -7,6 +7,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 | 1 | Card run done 2026-11-16 (docs/sprints/sprint-1.md); S1-06/S1-07 merged, chunk scaling waits for knc-twin S14-37 |
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
+| 5 | S5-01 merged (twin cannot rank gravity flags: -O2 = -O2 -funroll-loops code, -O3 inlines; card A/B script ready); S5-02 merged (card force chunk 4, 26 x86 runs bit-identical; card before/after pending) |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
 
 ## Proven
@@ -33,6 +34,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   PC=53 matches SSE bit for bit.
 
 ## Not proven yet
+
+- Card speed-up of S5-02 (chunk 4) on medium/large: next card turn, with the end-to-end large run. Rebuild the card
+  objects in a clean build dir (make does not track the -D change).
 
 - End-to-end run on the card (S4-01): needs --benchmark admission and card_run's known_hosts first.
 - The real Windows BOINC client with the Cygwin-built API (Sprint 4, needs BOINC installed).
