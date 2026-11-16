@@ -21,7 +21,7 @@ class Acceptance(unittest.TestCase):
         self.assertEqual('fildl',first['op'])
         self.assertEqual(8,first['bytes_read']['bytes'])
         self.assertEqual(0,first['hand_expected_integer'])
-        self.assertEqual('functional_mismatch',json.loads((ROOT/'twin/fildl-repro/result.json').read_text())['status'])
+        self.assertEqual('ok',json.loads((ROOT/'twin/fildl-repro/result.json').read_text())['status'])
         self.assertIn('output=0000000000000000',(ROOT/'twin/fildl-host.txt').read_text())
         manifest=json.loads((ROOT/'twin/probe-manifest.json').read_text())
         self.assertEqual(20776,manifest['probe_rows'])
