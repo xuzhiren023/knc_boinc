@@ -45,6 +45,7 @@ the guide, after the offline check passes.
 | 2 | One task from the host | S2-01 BOINC API spike (D4); S2-02 `knc_wrapper` with a fake-card test mode; S2-03 `app_info.xml` and package layout |
 | 3 | Screensaver | S3-01 card snapshots and wrapper relay to graphics shared memory; S3-02 `knc_nbody_graphics` |
 | 4 | End to end and guide | S4-01 lead end-to-end card run (standalone BOINC API mode) and x86 comparison; S4-02 TRY-IT guide |
+| 5 | Speed on the card, twin first (owner 2026-11-16: card busy, use knc-twin) | S5-01 twin ranking of gravity compile flags; S5-02 KNC OpenMP chunk size (results unchanged) |
 
 Each ticket: acceptance written before work, red-then-green where a test can fail first, engineer report in the ticket,
 lead review against the acceptance (tests read, doubtful steps rerun), merge, sprint review note in `docs/sprints/`.
