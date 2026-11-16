@@ -29,6 +29,7 @@ static void wait_file(const char* name, HANDLE process) {
     throw std::runtime_error(name);
 }
 #include "knc_client_scenarios.h"
+#include "knc_client_e2e.h"
 int main(int argc, char** argv) {
     PROCESS_INFORMATION pi = {};
     HANDLE mapping = NULL;
@@ -64,15 +65,20 @@ int main(int argc, char** argv) {
         STARTUPINFOA si = {}; si.cb=sizeof(si);
         char command[4096];
         if (argc==4) {
-            const char* fake=getenv("KNC_FAKE_CARD"); require(fake,"KNC_FAKE_CARD missing");
             const char* task=getenv("KNC_TASK_ARGS");
-            snprintf(command,sizeof(command),"\"%s\" --fake-card \"%s\" %s",argv[1],fake,task?task:"");
+            if (!strcmp(argv[3], "e2e-card"))
+                snprintf(command,sizeof(command),"\"%s\" %s",argv[1],task?task:"");
+            else {
+                const char* fake=getenv("KNC_FAKE_CARD"); require(fake,"KNC_FAKE_CARD missing");
+                snprintf(command,sizeof(command),"\"%s\" --fake-card \"%s\" %s",argv[1],fake,task?task:"");
+            }
         } else snprintf(command,sizeof(command),"\"%s\"",argv[1]);
         require(CreateProcessA(NULL, command, NULL, NULL, FALSE, CREATE_NO_WINDOW,
             NULL, NULL, &si, &pi), "CreateProcess");
         CloseHandle(pi.hThread);
         if (argc==4) {
-            wrapper_scenario(argv[3],shm,ipc,pi,command);
+            if (!strcmp(argv[3], "e2e-card")) card_scenario(shm,ipc,pi,command);
+            else wrapper_scenario(argv[3],shm,ipc,pi,command);
             CloseHandle(pi.hProcess); pi.hProcess=NULL;
             detach_shmem(mapping,shm); return 0;
         }

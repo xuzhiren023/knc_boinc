@@ -28,4 +28,4 @@ knc-wrapper: $(ROOT)/build/wrapper/knc_wrapper.exe
 $(ROOT)/build/wrapper/knc_wrapper.exe: $(ROOT)/src/knc_wrapper.cpp $(ROOT)/src/knc_graphics_format.h $(BOINC_OUT)/libboinc_api.a boinc.mk
 	@$(TOOLCHAIN)/mkdir -p $(dir $@) ../build/tmp
 	$(CXX) $(BOINC_CPPFLAGS) $(BOINC_CXXFLAGS) $< -Wl,--gc-sections $(BOINC_OUT)/libboinc_api.a $(BOINC_LDLIBS) -o $@
-$(BOINC_OUT)/boinc_fake_client.exe: $(ROOT)/tests/knc_client_scenarios.h
+$(BOINC_OUT)/boinc_fake_client.exe: $(ROOT)/tests/knc_client_scenarios.h $(ROOT)/tests/knc_client_e2e.h
