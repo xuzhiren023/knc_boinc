@@ -52,3 +52,5 @@ $(OUT)/milkyway/src/milkyway_math_funcs.c.o: CPPFLAGS += $(MW_MATH_CPPFLAGS)
 -include $(OBJECTS:.o=.d)
 
 include boinc.mk
+
+include graphics.mk

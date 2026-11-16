@@ -20,7 +20,7 @@ def check(path, ok):
 
 def test_package():
     print(check(PACKAGE, True))
-    required = {'knc_wrapper.exe', 'knc_wrapper.cfg.example', 'milkyway_nbody.mic',
+    required = {'knc_nbody_graphics.exe', 'knc_wrapper.exe', 'knc_wrapper.cfg.example', 'milkyway_nbody.mic',
                 'cygwin1.dll', 'cyggcc_s-seh-1.dll', 'cygstdc++-6.dll',
                 'cygiconv-2.dll', 'cygintl-8.dll'}
     assert required <= {p.name for p in PACKAGE.iterdir()}
@@ -28,6 +28,9 @@ def test_package():
     tree = ET.parse(PACKAGE / 'app_info.xml')
     assert tree.findtext('app/name') == 'milkyway_nbody'
     assert len(tree.findall('app_version')) == 1
+    graphics = [ref for ref in tree.findall('app_version/file_ref') if ref.find('graphics_app') is not None]
+    assert len(graphics) == 1 and graphics[0].findtext('file_name') == 'knc_nbody_graphics.exe'
+    assert graphics[0].findtext('open_name') == 'graphics_app'
     assert tree.findtext('app_version/avg_ncpus') == '1'
     assert tree.findtext('app_version/max_ncpus') == '1'
     assert tree.findtext('app_version/version_num') == '197'
@@ -35,7 +38,7 @@ def test_package():
     with tempfile.TemporaryDirectory(dir=str(ROOT / 'build/tmp')) as scratch:
         copy = pathlib.Path(scratch) / 'package'
         mutations = ('missing_file', 'wrong_case', 'main_program', 'dangling_ref',
-                     'duplicate_name', 'unreferenced_file', 'unsafe_name')
+                     'duplicate_name', 'unreferenced_file', 'graphics_marker', 'unsafe_name')
         for mutation in mutations:
             shutil.copytree(PACKAGE, copy)
             xml = copy / 'app_info.xml'
@@ -54,6 +57,11 @@ def test_package():
                 r.find('app_version/file_ref/file_name').text = 'absent.exe'
             elif mutation == 'duplicate_name':
                 ET.SubElement(r, 'file_info').append(ET.fromstring('<name>knc_wrapper.exe</name>'))
+            elif mutation == 'graphics_marker':
+                for ref in r.findall('app_version/file_ref'):
+                    marker = ref.find('graphics_app')
+                    if marker is not None:
+                        ref.remove(marker)
             elif mutation == 'unreferenced_file':
                 (copy / 'extra.dll').write_bytes(b'extra')
             else:
