@@ -97,6 +97,12 @@ Lead-maintained. Last update: 2026-11-16 EST.
   The card force walk is already ~2x the laptop; the serial tree build is half the card time. Static integrator:
   bit-identical, saves 0.1 s. Parallel tree (S8-02) is the large-case fix; S8-03 the real-task fix.
 
+- Twin use (owner 2026-11-16): knc-twin 0.4 simulates 1 core or up to 8 detailed cores on the ring
+  (`simulate --scale ring`, `streams[].core`, 4 contexts per core; multicore results are
+  unvalidated_scenario_estimate). Use 1 core with 4 contexts for per-thread speed at 4 threads/core (the 82x
+  assumption in docs/research/s8-model.md) and to rank vector `fun` variants; 8-tile for the miss- and
+  ring-bound regions: parallel tree insertion (S8-02) and the force walk.
+
 - Force bound method (GCC-KNC lead): interactions per step (body-cell + body-body, from walk counters) x ~20-25
   FP64 ops / 1.2 TFLOPS FP64 = T_lb; compare with measured 13.0 s. Same count x a GPU's FP64/FP32 rate gives the
   GPU target. Twin only for the inner interaction loop.
