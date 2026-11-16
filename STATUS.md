@@ -97,6 +97,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   The card force walk is already ~2x the laptop; the serial tree build is half the card time. Static integrator:
   bit-identical, saves 0.1 s. Parallel tree (S8-02) is the large-case fix; S8-03 the real-task fix.
 
+- Force bound method (GCC-KNC lead): interactions per step (body-cell + body-body, from walk counters) x ~20-25
+  FP64 ops / 1.2 TFLOPS FP64 = T_lb; compare with measured 13.0 s. Same count x a GPU's FP64/FP32 rate gives the
+  GPU target. Twin only for the inner interaction loop.
+
 - 2026-11-16: twin T1-06 (x87 single rounding) merged and installed; the fmul repro now gives ...9f. After window
   12: rerun the 128-body chunk scaling and the six gravity bodies (light Codex ticket), report any remaining
   difference to the twin session.
