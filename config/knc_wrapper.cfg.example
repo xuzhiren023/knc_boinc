@@ -1,0 +1,16 @@
+# Put knc_wrapper.cfg in the BOINC slot or beside knc_wrapper.exe.
+host=mic0
+user=REPLACE_ME
+ssh_key=C:/Users/REPLACE_ME/.ssh/card_key
+ssh_path=C:/Windows/System32/OpenSSH/ssh.exe
+scp_path=C:/Windows/System32/OpenSSH/scp.exe
+remote_base=/tmp/knc-boinc
+# Relative to this config file; contents of dist/card from make -C mk card.
+package_dir=card
+app=milkyway_nbody.mic
+OMP_NUM_THREADS=240
+poll_interval=10
+connect_timeout=10
+retry_limit=3
+checkpoint_timeout=60
+bodies=64

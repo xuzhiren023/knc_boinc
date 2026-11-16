@@ -14,3 +14,13 @@
   This allows the checked-in handwritten configuration in `config/`.
 
 Histogram capture uses upstream `--print-histogram`; no output patch is needed.
+
+- `nbody-wrapper-files.patch` (S2-02): opt-in `KNC_WRAPPER_FILES=1` publishes
+  progress at safe simulation steps and acknowledges requested checkpoints
+  only after upstream's checkpoint writer succeeds. No science or checkpoint
+  layout changes. On wrapper restart it also rebuilds context softening arrays
+  from the same Lua input: upstream serializes their pointer values but not
+  their contents. Both x86 and k1om use the same patch.
+- `boinc/cygwin-win32.patch` uses the compiler's `__CYGWIN__` guard consistently
+  for its compatibility changes, including upstream header/CRT branches; no
+  synthetic `__CYGWIN32__` build definition is required.

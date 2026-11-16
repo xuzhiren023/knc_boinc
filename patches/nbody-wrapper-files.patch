@@ -1,0 +1,99 @@
+--- a/nbody/src/nbody_plain.c
++++ b/nbody/src/nbody_plain.c
+@@ -38,11 +38,24 @@
+   #include "blender_visualizer.h"
+ #endif
+
++/* Standalone wrapper file protocol. Called only at safe simulation steps. */
++static int kncPublish(const char* path, const char* tmp, double value)
++{
++    FILE* f = fopen(tmp, "w");
++    if (!f) return 1;
++    if (fprintf(f, "%.17g\n", value) < 0) { fclose(f); return 1; }
++    if (fclose(f)) return 1;
++    return rename(tmp, path) != 0;
++}
++
+ static void nbReportProgress(const NBodyCtx* ctx, NBodyState* st)
+ {
+     real frac = (real) st->step / (real) ctx->nStep;
+
+     mw_fraction_done(frac);
++    /* Opt in: ordinary standalone users do not acquire side files. */
++    if (getenv("KNC_WRAPPER_FILES"))
++        kncPublish("progress", "progress.tmp", (double) frac);
+
+     if (st->reportProgress)
+     {
+@@ -59,13 +72,26 @@
+
+ static NBodyStatus nbCheckpoint(const NBodyCtx* ctx, NBodyState* st)
+ {
+-    if (nbTimeToCheckpoint(ctx, st))
++    int requested = 0;
++    if (getenv("KNC_WRAPPER_FILES"))
++    {
++        FILE* request = fopen("checkpoint.request", "r");
++        if (request) { requested = 1; fclose(request); }
++    }
++    if (requested || nbTimeToCheckpoint(ctx, st))
+     {
+         if (nbWriteCheckpoint(ctx, st))
+         {
+             return NBODY_CHECKPOINT_ERROR;
+         }
+
++        if (requested)
++        {
++            /* nbWriteCheckpoint publishes the complete checkpoint first. */
++            remove("checkpoint.request");
++            if (kncPublish("checkpoint.ready", "checkpoint.ready.tmp", 1.0))
++                return NBODY_CHECKPOINT_ERROR;
++        }
+         mw_checkpoint_completed();
+     }
+
+--- a/nbody/src/nbody_lua.c
++++ b/nbody/src/nbody_lua.c
+@@ -681,3 +681,20 @@
+     return rc;
+ }
+
++
++/* The pinned checkpoint header stores these arrays as raw process pointers.
++ * Wrapper restarts have the identical Lua input available; rebuild only its
++ * context arrays, never the checkpoint bodies or simulation step. */
++int nbRestoreWrapperSoftening(NBodyCtx* ctx, NBodyState* st, const NBodyFlags* nbf)
++{
++    NBodyCtx fresh = EMPTY_NBODYCTX;
++    lua_State* luaSt = nbOpenLuaStateWithScript(nbf, NULL);
++    if (!luaSt) return 1;
++    int rc = nbEvaluateContext(luaSt, &fresh);
++    lua_close(luaSt);
++    if (rc || fresh.eps2_size != ctx->eps2_size) return 1;
++    ctx->eps2 = fresh.eps2;
++    ctx->eps2_index = fresh.eps2_index;
++    nbCacheEps2Indices(ctx, st);
++    return 0;
++}
+--- a/nbody/include/nbody_lua.h
++++ b/nbody/include/nbody_lua.h
+@@ -36,6 +36,7 @@
+
+ lua_State* nbLuaOpen(mwbool debug);
+ lua_State* nbOpenLuaStateWithScript(const NBodyFlags* nbf, NBodyState* st);
++int nbRestoreWrapperSoftening(NBodyCtx* ctx, NBodyState* st, const NBodyFlags* nbf);
+ int nbSetup(NBodyCtx* ctx, NBodyState* st, const NBodyFlags* nbf);
+
+ /* required for softening_length_multitype_test */
+--- a/nbody/src/nbody.c
++++ b/nbody/src/nbody.c
+@@ -76,6 +76,8 @@
+         }
+         else
+         {
++            if (getenv("KNC_WRAPPER_FILES") && nbRestoreWrapperSoftening(ctx, st, nbf))
++                return NBODY_CHECKPOINT_ERROR;
+             mw_report("Resumed from checkpoint '%s'\n", nbf->checkpointFileName);
+         }
+     }
