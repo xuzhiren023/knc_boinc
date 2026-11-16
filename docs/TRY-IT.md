@@ -1,0 +1,419 @@
+# Try KNC BOINC on this Windows laptop
+
+Draft, 2026-11-16. Run the offline sample first. The lead's S4-01 card run,
+measured times, numerical comparison and installed-client/screensaver checks
+are still pending; this guide does not claim they passed. The acceptance test
+for S4-02 is the lead following **Offline sample** verbatim and recording its
+exit status and comparison below. See [wrapper.md](wrapper.md),
+[packaging.md](packaging.md) and [graphics.md](graphics.md) for implementation details.
+
+## Prerequisites and shell
+
+You need an operational Knights Corner card with MPSS/Linux, network access,
+SSH enabled and enough free RAM and `/tmp` space. Card bring-up is outside this
+repository. This laptop's lab card is `192.168.1.100`, login `root`; confirm those
+values with its owner. Reserve exclusive card use before running a 240-thread
+task. Do not run the offline sample alongside BOINC or another card job.
+
+Use **Git for Windows Bash** for every command below, starting in this ticket's
+worktree. No PowerShell commands are embedded in the blocks. A source build
+needs the existing GCC-KNC and Cygwin toolchain, Git, make and Python 3; do not
+install CMake, MinGW or MSVC. The owner may instead use the lead's already-built
+`dist/milkyway_package/` plus the matching x86 reference binary in `build/x86/`.
+Keep the repository's sample inputs and comparison scripts with that package.
+Do not mix artifacts from different revisions.
+
+```bash
+cd /c/Users/xuzhi/Documents/knc-boinc/.work/S4-02
+export REPO="$PWD"
+export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin:$PATH"
+mkdir -p build/tmp
+export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
+export SSH=/c/Windows/System32/OpenSSH/ssh.exe
+export SSH_KEY=C:/Users/xuzhi/.ssh/xeon_phi_rsa
+export CARD_HOST=192.168.1.100 CARD_USER=root
+export REMOTE_BASE=/tmp/knc-boinc
+```
+
+The default remote base is `/tmp/knc-boinc`. **This shared lab instead requires
+files under `/tmp/claude` with names beginning `claude-`.** On this lab card run
+this override before continuing; elsewhere retain the default:
+
+```bash
+export REMOTE_BASE=/tmp/claude/claude-knc-boinc
+```
+
+### SSH key and host identity, including a fresh laptop
+
+Windows OpenSSH Client must already be available (or enabled by the owner in
+Windows Optional Features). This laptop already has the card in
+`~/.ssh/known_hosts` and the key `~/.ssh/xeon_phi_rsa`; skip key creation when
+that file exists. A fresh laptop can create a dedicated key as follows:
+
+```bash
+mkdir -p "$HOME/.ssh"
+if [ ! -f "$HOME/.ssh/xeon_phi_rsa" ]; then
+    /c/Windows/System32/OpenSSH/ssh-keygen.exe -t rsa -b 3072 \
+        -f "$SSH_KEY" -C knc-boinc
+fi
+cat "$HOME/.ssh/xeon_phi_rsa.pub"
+"$SSH" -i "$SSH_KEY" "$CARD_USER@$CARD_HOST" 'uname -a'
+```
+
+Have the card owner authorize the displayed **public** key in the login's
+`~/.ssh/authorized_keys`. Never copy the private key to the card, repository or
+package. At the first SSH connection, compare the displayed host fingerprint
+with one obtained independently from the card owner before accepting it; this
+creates the Windows login's known_hosts entry. Do not disable host-key checking.
+A changed fingerprint requires investigation, not blindly deleting the entry.
+For unattended use, arrange noninteractive key access (an agent available to
+the same login, or an owner-approved dedicated key without a passphrase).
+The wrapper cannot answer password/passphrase prompts. Verify its batch mode:
+
+```bash
+"$SSH" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 \
+    -i "$SSH_KEY" "$CARD_USER@$CARD_HOST" 'uname -m; df -h /tmp'
+```
+
+Expect `k1om` on the card and sufficient free space. These commands and BOINC
+must run as an account that can read the key and its known_hosts. The recommended
+first trial runs the BOINC client in the interactive Windows login. A BOINC
+service account has different permissions/profile and needs separate provisioning;
+a successful interactive SSH test does not prove service access.
+
+## Build or use the package
+
+If the lead supplied a matching package and x86 executable, skip the build
+block. Otherwise, from the shell above (scratch exports must precede compilation):
+
+```bash
+cd "$REPO"
+bash scripts/fetch.sh
+make -C mk x86
+bash packaging/make_package.sh
+```
+
+Only `scripts/fetch.sh` fetches the pinned sources in [SOURCES.md](../SOURCES.md).
+The builder produces the wrapper, graphics app, MIC executable, host DLLs,
+card runtimes and `app_info.xml`. It builds nothing on the card. Rebuilding
+replaces `dist/milkyway_package/`, so keep owner configuration outside it.
+Validate the supplied or built package **before** adding any owner files:
+
+```bash
+cd "$REPO"
+python packaging/check_package.py dist/milkyway_package
+test -s build/x86/milkyway_nbody.exe
+```
+
+## Offline sample (no BOINC account, scheduler or result upload)
+
+This uses real SSH/card transport and the wrapper's standalone mode on the
+64-body sample, followed by the identical x86 sample. BOINC need not be installed
+or running. It creates a fresh slot so old checkpoints cannot contaminate it.
+Keep this shell open: later blocks reuse its variables. A failing command is a
+reason to stop and consult Troubleshooting, not to enable live work.
+
+```bash
+cd "$REPO"
+export SLOT="$(mktemp -d "$REPO/build/try-it.XXXXXX")"
+cp workunits/small/params.lua workunits/small/input.hist "$SLOT/"
+export PACKAGE="$(cygpath -am "$REPO/dist/milkyway_package")"
+cat > "$SLOT/knc_wrapper.cfg" <<CFG
+host=$CARD_HOST
+user=$CARD_USER
+ssh_key=$SSH_KEY
+ssh_path=C:/Windows/System32/OpenSSH/ssh.exe
+scp_path=C:/Windows/System32/OpenSSH/scp.exe
+remote_base=$REMOTE_BASE
+package_dir=$PACKAGE
+app=milkyway_nbody.mic
+OMP_NUM_THREADS=240
+poll_interval=10
+snapshot_interval=5
+connect_timeout=10
+retry_limit=3
+checkpoint_timeout=60
+bodies=64
+CFG
+printf 'Offline slot: %s\n' "$SLOT"
+(
+    cd "$SLOT" || exit
+    "$PACKAGE/knc_wrapper.exe" > wrapper_stdout.txt 2> wrapper_stderr.txt
+)
+wrapper_status=$?
+printf '%s\n' "$wrapper_status" > "$SLOT/exit.txt"
+if [ "$wrapper_status" -ne 0 ]; then
+    cat "$SLOT/wrapper_stderr.txt" "$SLOT/knc_wrapper.log"
+    (exit "$wrapper_status")
+else
+    test -s "$SLOT/histogram.txt" &&
+    test -f "$SLOT/nbody_stdout.txt" &&
+    test -s "$SLOT/nbody_stderr.txt" &&
+    bash scripts/run_x86.sh small 1 &&
+    cat "$SLOT/nbody_stdout.txt" "$SLOT/nbody_stderr.txt" > "$SLOT/card-result.txt" &&
+    python scripts/compare.py runs/x86/small-1 "$SLOT/card-result.txt" \
+        > "$SLOT/comparison.txt" && cat "$SLOT/comparison.txt" || {
+            printf 'FAIL: inspect the slot logs and comparison.txt before continuing.\n' >&2
+            false
+        }
+fi
+```
+
+The zero-argument wrapper uses `params.lua`, `input.hist`, seed 670828913,
+64 bodies and `--print-histogram`. It is intentional for this standalone sample;
+a server task uses its actual arguments instead. A successful run has exit 0,
+`histogram.txt`, the two N-body logs, `knc_wrapper.log` and comparison **PASS**
+with strict absolute likelihood difference **< 1e-10**. Histogram differences
+are diagnostic only. x86 small's recorded reference is approximately
+`-438.534790192227661`; the comparator, not rounded text, determines the verdict.
+A PASS on this sample does not establish production scientific correctness.
+The N-body stdout file may be empty; the science diagnostics normally go to
+stderr. No timing estimate or card result is available yet.
+
+The standalone test has no BOINC Manager task or client IPC controls. For
+suspend/resume/checkpoint and live graphics integration, the lead runs S4-01;
+the laptop-only regression is `bash tests/wrapper.sh graphics` (real x86 app,
+fake transport). It is not evidence of real-card acceptance.
+
+In a second Git Bash window, repeat the shell variable setup above and inspect
+the card while the offline wrapper is running (a small task may finish quickly):
+
+```bash
+"$SSH" -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$SSH_KEY" \
+    "$CARD_USER@$CARD_HOST" top
+```
+
+Press `q` to leave top. Look for `milkyway_nbody` and CPU activity; display and
+CPU percentage conventions vary. Do not kill unrelated users' jobs. The wrapper
+log records its unique `task-PID-TIMESTAMP` directory. Successful completion
+removes only that task directory, leaving the remote base. Inspect the base:
+
+```bash
+"$SSH" -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$SSH_KEY" \
+    "$CARD_USER@$CARD_HOST" "ls -la '$REMOTE_BASE'"
+cat "$SLOT/knc_wrapper.log"
+```
+
+Retain the slot for review. The lead records date, package revision, slot path,
+wrapper exit, comparison, wall time and remote cleanup. **Pending S4-01:** add
+measured card results and observed failures here after the lead's run; no
+real-card failures have been reported in this ticket.
+
+## Owner decision before installing BOINC
+
+**Attaching to MilkyWay@home and returning results is the owner's decision.**
+The following steps can download work and later upload scientific results.
+This experimental package may be refused by the scheduler or validator, lose
+work/credit, or produce incorrect results. Its pinned N-body 1.97 and patched
+standalone behavior are not established as equivalent to the standard server
+application. SSH/service permissions, checkpoint portability, real-client
+staging and output declarations still require verification. An offline PASS
+is insufficient to establish production readiness. Stop here for an offline-only trial.
+
+## Capture a stock task before switching
+
+1. Obtain the Windows installer from [boinc.berkeley.edu](https://boinc.berkeley.edu/).
+   Install BOINC Manager/client and the BOINC screensaver. For the initial trial,
+   choose an interactive user installation rather than protected/service mode.
+   Record the installer's **data directory**, distinct from Program Files.
+   The usual location is `C:/ProgramData/BOINC` (ProgramData is hidden).
+2. If the owner elects a live trial, use Manager's Add Project flow and the
+   official MilkyWay@home project. With the stock app, allow one standard N-body
+   task to download, then immediately select **No new tasks** for the project.
+   Suspend the downloaded task while inspecting it. Orbit Fitting is a different
+   app; its contract does not establish standard N-body's contract.
+3. Exit Manager and explicitly stop the **client**, choosing to stop running
+   tasks when prompted. Closing Manager alone can leave it running. If installed
+   as a service, stop BOINC through Windows Services. Confirm no `boinc.exe` or
+   stock science process remains in Task Manager before reading/backing up state.
+
+Change BOINC_DATA if necessary. This read-only extractor prints application,
+command line, input/output references and result names; it never edits state:
+
+```bash
+export BOINC_DATA=/c/ProgramData/BOINC
+export BOINC_STATE="$(cygpath -am "$BOINC_DATA/client_state.xml")"
+python - <<'PY'
+import os
+import xml.etree.ElementTree as ET
+root = ET.parse(os.environ['BOINC_STATE']).getroot()
+# BOINC writes project records followed by sibling app/workunit/result records.
+project = None
+for item in root:
+    if item.tag == 'project':
+        project = item.findtext('master_url')
+        print('PROJECT', project)
+    elif item.tag == 'workunit':
+        print('WORKUNIT', item.findtext('name'), 'APP', item.findtext('app_name'))
+        print('COMMAND_LINE', item.findtext('command_line', default=''))
+        for ref in item.findall('file_ref'):
+            print('INPUT', ET.tostring(ref, encoding='unicode').strip())
+    elif item.tag == 'result':
+        print('RESULT', item.findtext('name'), 'WORKUNIT', item.findtext('wu_name'))
+        for ref in item.findall('file_ref'):
+            print('OUTPUT', ET.tostring(ref, encoding='unicode').strip())
+    elif item.tag == 'app_version':
+        print('APP_VERSION', item.findtext('app_name'), item.findtext('version_num'),
+              'COMMAND_LINE', item.findtext('command_line', default=''))
+PY
+```
+
+Retain a state backup and the project's downloaded inputs. An absent workunit
+command line is not a license to invent one: inspect app-version command lines
+and the stock slot's `init_data.xml` if necessary. Logical `open_name` can differ
+from physical `file_name`. Preserve exact seed, numeric parameters and ordered
+argv; XML entities must be decoded, as the extractor does. Never paste arbitrary
+server text into a shell for execution. The historical 2024 example in
+[packaging.md](packaging.md) is not a current standard task definition.
+
+Have the lead reconcile the capture with the wrapper's file-option rules and
+server output/log declarations **before enabling experimental work**. The
+wrapper captures `nbody_stdout.txt` and `nbody_stderr.txt`; confirm whether the
+server expects those files, other outputs, or BOINC stderr. Files referenced
+only inside Lua or visualizer strings are not automatically staged.
+Do not edit `client_state.xml` or replace an executable under a queued task.
+Restart stock BOINC, finish/report the stock task (or explicitly abort it at
+the owner's choice), and drain other project tasks with No new tasks set.
+Stop the client again before installation.
+
+## Install the anonymous-platform package
+
+Back up the whole data directory outside it while stopped. Use a shell with
+permission to access the directory; resolve ACL problems deliberately rather
+than running BOINC as administrator to bypass key permissions.
+
+```bash
+cd "$REPO"
+export BACKUP="$(mktemp -d "$REPO/build/boinc-backup.XXXXXX")"
+cp -a "$BOINC_DATA/." "$BACKUP/"
+export PROJECT="$BOINC_DATA/projects/milkyway.cs.rpi.edu_milkyway"
+test -d "$PROJECT" && printf 'Project: %s\nBackup: %s\n' "$PROJECT" "$BACKUP"
+```
+
+Use the actual folder under `projects/` if the attached URL produced another
+name. Existing `app_info.xml` or `app_config.xml` must be reviewed/merged first;
+the commands below assume neither exists. This manifest declares only
+`milkyway_nbody` and replaces the project's automatic application selection.
+Copy the **contents**, keeping the package flat:
+
+```bash
+if [ ! -f "$PROJECT/app_info.xml" ] && [ ! -f "$PROJECT/app_config.xml" ]; then
+    cp "$REPO"/dist/milkyway_package/* "$PROJECT/" &&
+    sed -e 's/^package_dir=.*/package_dir=./' \
+        "$SLOT/knc_wrapper.cfg" > "$PROJECT/knc_wrapper.cfg" &&
+    cat > "$PROJECT/app_config.xml" <<'XML'
+<app_config>
+  <project_max_concurrent>1</project_max_concurrent>
+</app_config>
+XML
+else
+    printf 'Existing manifests: review and merge before installing.\n'
+fi
+```
+
+The owner config reuses SSH/card settings proven offline, with `package_dir=.`
+for the flat project layout. The wrapper reads it beside its executable; a slot
+config overrides it. The key stays outside the project. `app_info.xml` includes
+the MIC runtimes, host DLLs and graphics app as `graphics_app`. Both CPU fields
+reserve **1 host CPU**. The concurrency limit is essential: otherwise BOINC can
+launch several 240-thread jobs. It does not coordinate other projects/card users.
+
+Restart BOINC. In Manager's Event Log (Advanced view), check anonymous-platform
+recognition and no missing-file/version/platform errors. Keep No new tasks
+until the contract review is complete. Then allow a small amount of standard
+N-body work and select No new tasks again after downloading. Expect one running
+task using **1 CPU**, elapsed time and progress advancing after remote polling
+(not necessarily smoothly). If waiting, inspect Activity/preferences and other tasks.
+Suspend the task: card CPU use should stop; resume should continue it and progress.
+Inspect the PID in the remote task directory's `pid` file and its state, using
+this command (it prompts for that numeric PID):
+
+```bash
+read -r -p 'Card task PID: ' CARD_PID
+if [[ "$CARD_PID" =~ ^[0-9]+$ ]]; then
+    "$SSH" -o BatchMode=yes -o StrictHostKeyChecking=yes -i "$SSH_KEY" \
+        "$CARD_USER@$CARD_HOST" "ps -o pid,stat,args -p $CARD_PID"
+fi
+```
+
+Suspended state includes `T`. Use Manager controls for the test. A stopped job's
+wall-clock timer is not scientific progress.
+
+## Graphics and screensaver
+
+In Manager select the running task and click **Show graphics**. Expect N-body
+particles, gold light matter and blue dark matter, with status and progress.
+Snapshots default to five seconds and are retrieved on polling; an idle scene
+before the first snapshot is normal. Suspended work keeps its last body frame;
+missing/stale data show an idle scene. Escape closes graphics without stopping science.
+
+In Windows **Settings → Personalization → Lock screen → Screen saver settings**,
+select **BOINC**, choose a wait time and open its **Settings**. Enable project
+application graphics (use a nonzero project-graphics duration if offered).
+Set any blank-screen timeout longer than the preview interval. Use **Preview**,
+then let the machine become idle with a running task. Labels vary by installed
+version. Review Manager's Activity menu and computing preferences if computation
+is allowed only while idle. A service/session mismatch or graphics policy can
+prevent project graphics; test Show graphics in the interactive login first.
+Fullscreen exits on input after a short grace period. Graphics do not prove
+numerical correctness or server validation.
+
+## Stop, clean up and roll back
+
+Select No new tasks first. Prefer finishing and reporting experimental tasks
+only if the owner has chosen to return results. To stop without returning them,
+suspend network activity as well, then quit the client with running tasks stopped;
+retain the data directory for review. Quitting requests a checkpoint and remote
+cleanup. Allow acknowledgement and transfer before powering off the card, and
+inspect `knc_wrapper.log`. An unreachable card or temporary exit can retain a
+remote job and lease for reattachment. Do not erase its slot or `knc_remote`
+lease while it may own a process. Manager's Abort kills the remote app and
+removes its directory when reachable; it discards the work.
+
+For an interrupted standalone sample, do not assume Ctrl+C cleaned the card.
+Retain `$SLOT`, inspect its log/lease and the card with the owner; recover the
+same slot rather than starting duplicate work. Restore connectivity before
+resolving an unreachable job. Never recursively delete `remote_base` or kill
+all N-body processes. Remove only the verified task folder after confirming
+its process ended; leave unfamiliar jobs to their owner.
+
+For stock BOINC rollback, drain/report or deliberately abort experimental tasks,
+stop the client, and back up current state again. If there was no previous
+anonymous configuration, remove these files with the client stopped:
+
+```bash
+rm -f -- "$PROJECT/app_info.xml" "$PROJECT/app_config.xml" "$PROJECT/knc_wrapper.cfg"
+```
+
+If there were previous configurations, restore those specific files from
+`$BACKUP` instead. Do not restore an old `client_state.xml` over later reported
+results. Restart and inspect the Event Log; the project should supply stock
+apps on subsequent work requests. Retain logs, backup and local slot until
+review finishes. There is no need to delete the sample slot to run BOINC.
+
+## Troubleshooting
+
+These are recorded repository/laptop issues and anticipated integration checks.
+S4-01's real-card failure list is pending: the lead should append each observed
+failure, diagnostic and verified remedy after that run.
+
+| Symptom | Check / remedy |
+| --- | --- |
+| Compiler absent, Cygwin temp/traversal error | Use Git Bash, supplied Cygwin PATH and all three scratch exports above. Do not substitute compilers. |
+| Fetch network/Schannel or pinned-source/patch failure | Retain the diagnostic; retry only `bash scripts/fetch.sh` after connectivity recovers. Do not bypass verification. An earlier stale Cygwin-target build failed on `direct.h`; use matching clean artifacts. |
+| Windows relink executable-lock error | Close the graphics/wrapper process owning the output and retry; avoid concurrent builds into one output tree. |
+| Missing host DLL | Validate the package; keep all DLLs beside its executables. Development commands require supplied Cygwin PATH. Do not download DLLs. |
+| SSH timeout, refused, Permission denied, prompt or host-key failure | Verify card/network, host/user and batch command above, key access and known_hosts for the actual BOINC login. Verify changed fingerprints with the owner. |
+| SSH works interactively but fails in BOINC | Inspect slot `knc_wrapper.log`, config precedence, OpenSSH paths, service ACLs and key/profile. Real service operation is unproven. |
+| Repeated temporary exits | Bounded retries lead to a 60-second BOINC temporary exit. Keep lease, restore connectivity and let it reattach; do not start duplicates. |
+| Remote permission, disk-space or runtime loader error | Check remote base ownership/lab rule and `df -h /tmp`; validate MIC runtime closure. k1om runs on the card, Windows executables on host. Do not replace packaged runtimes with older card GCC libraries. |
+| Missing input, unknown option or required output absent | Compare current argv and logical/physical refs with pinned option rules; retain logs. Do not use the sample fallback for server work. |
+| `NBODY_TREE_STRUCTURE_ERROR` on restore | The old implementation restored raw softening pointers; current patched code reconstructs them. Verify matching patched build and unchanged inputs. Retain checkpoint/logs; never reuse another task's checkpoint or assume x86/card portability. |
+| Checkpoint timeout / lost heartbeat | Preserve lease/logs and restore connectivity. A fresh acknowledgement is required before cleanup; an old checkpoint file is not proof. |
+| Comparator missing/ambiguous likelihood or histogram | Check wrapper exit and both N-body logs; compare `card-result.txt`, not wrapper stderr. Both sides need `--print-histogram`: saved best-step and printed final histograms differ. Use the sample input; legacy four-column histograms are incompatible. |
+| Likelihood difference >= 1e-10 | Stop; preserve inputs, seed, threads, package and logs for the lead. Do not loosen tolerance. Histogram diagnostics do not decide the verdict. |
+| Missing file/version/platform or stock app starts | Stop client, verify actual project folder, flat inventory, `app_info.xml`, `windows_x86_64` and Event Log. Identity 197 is experimental. |
+| Multiple tasks/card processes | Suspend new work; check `app_config.xml` and other card users. The manifest does not serialize access. Do not kill unrelated jobs. |
+| Progress initially zero or frozen on suspend | Expected before polling/safe simulation steps or while stopped. If still frozen after resume, inspect card CPU, log and connectivity. |
+| Show graphics absent/idle, screensaver blank | Verify graphics app/open name, running slot, snapshot, user session and screensaver durations. A helper launched outside its live slot has no mapping. Earlier blank screenshots were a capture issue; an image alone does not prove live attachment. |
+| Scheduler/validator rejection | Keep logs/state, stop requesting work; local package/sample checks cannot establish production acceptance. Owner decides whether to roll back. |
