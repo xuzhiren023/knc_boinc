@@ -25,8 +25,8 @@ build/graphics/knc_nbody_graphics.exe --demo build/graphics/demo.snapshot
 build/graphics/knc_nbody_graphics.exe --fullscreen --demo build/graphics/demo.snapshot
 ```
 
-The converter accepts upstream's `# type id x y z ...` header and comma-delimited
-body rows, maps negative types to dark (0) and nonnegative types to light (1),
+The converter accepts 1.96's `# ignore id x y z ...` header and comma-delimited
+body rows, maps ignore=1 to dark (0) and ignore=0 to light (1),
 and rejects nonfinite coordinates and more than 20000 bodies. It reads actual
 body output, not a histogram or checkpoint. `--time` and `--step` default to
 zero because upstream's body file does not record those values. Fraction done

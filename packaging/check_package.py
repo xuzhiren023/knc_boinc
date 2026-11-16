@@ -31,7 +31,7 @@ def check(package):
     versions = root.findall('app_version')
     require(len(versions) == 1, 'expected one app_version')
     version = versions[0]
-    for tag, value in [('app_name', 'milkyway_nbody'), ('version_num', '197'),
+    for tag, value in [('app_name', 'milkyway_nbody'), ('version_num', '196'),
                        ('platform', 'windows_x86_64'), ('avg_ncpus', '1'), ('max_ncpus', '1')]:
         require(one_text(version, tag) == value, 'wrong ' + tag)
     require(not version.findall('plan_class') and not version.findall('coproc'),

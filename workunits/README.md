@@ -1,7 +1,7 @@
 # Reproducible standalone workunits
 
 Both cases use unmodified `nbody/tests/orphan_models/model_1.lua` from
-`nbody_1.97`, copied as `params.lua`. The model takes its particle count from
+`nbody_1.96`, copied as `params.lua`. The model takes its particle count from
 the command line; `small` uses 64 and `medium` uses 1024. Both use seed
 670828913 (upstream's `RunTestUnits.lua:25`) and the original evolution time
 3.945, timestep calculation, external potential and quadrupole tree settings.
@@ -128,3 +128,14 @@ python scripts/compare.py runs/x86/small-1 runs/card/small-60.txt
 python scripts/compare.py runs/x86/medium-1 runs/card/medium-240.txt
 python scripts/compare.py runs/x86/large-1 runs/card/large-240.txt
 ```
+
+## S7-01 standard 1.96 references
+
+The inputs now come from 1.96 itself: `calculateTimestep(mass, radius)` and
+`eps2 = {sp_l, sp_cross, sp_d}`. The histograms are unchanged upstream data.
+`tests/references/nbody-1.96.json` records six 1/12-thread likelihoods, input
+hashes and exact scientific/saved-histogram hashes. With the build temp
+variables and Cygwin PATH above, run `python tests/nbody_196_matrix.py` to
+verify those references, scalar chunk 4 and vector chunk 4, including 4096
+first-force XYZ acceleration triples. `--record` explicitly replaces the
+baseline only after all identity checks pass.

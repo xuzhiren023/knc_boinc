@@ -1,0 +1,65 @@
+{
+  "tag": "nbody_1.96",
+  "commit": "1e640779f1cabf88aaa49e4db569cfe7e09016c4",
+  "seed": 670828913,
+  "references": {
+    "small-1": {
+      "likelihood": [
+        "-448.326489453582383"
+      ],
+      "science_sha256": "81b2546e398494b2884f63bf1daf56ee85d9f283f030f6ca3ea9b2dd3d9fe0b8",
+      "saved_histogram_sha256_without_generated_timestamp": "39e95e19567482cd47ccc80578d0bcef9008724a095c9760c057d2ede40eab3e"
+    },
+    "small-12": {
+      "likelihood": [
+        "-448.326489453582383"
+      ],
+      "science_sha256": "81b2546e398494b2884f63bf1daf56ee85d9f283f030f6ca3ea9b2dd3d9fe0b8",
+      "saved_histogram_sha256_without_generated_timestamp": "39e95e19567482cd47ccc80578d0bcef9008724a095c9760c057d2ede40eab3e"
+    },
+    "medium-1": {
+      "likelihood": [
+        "-505.390029265708733"
+      ],
+      "science_sha256": "fcf5b1397f7d485953b3855a7604c7c74560a0a3861474b422725be12d7f72f9",
+      "saved_histogram_sha256_without_generated_timestamp": "229083c59ea5acd3e48c13ed1f78a1a088033125fb6a2053302be767738fd654"
+    },
+    "medium-12": {
+      "likelihood": [
+        "-505.390029265708733"
+      ],
+      "science_sha256": "fcf5b1397f7d485953b3855a7604c7c74560a0a3861474b422725be12d7f72f9",
+      "saved_histogram_sha256_without_generated_timestamp": "229083c59ea5acd3e48c13ed1f78a1a088033125fb6a2053302be767738fd654"
+    },
+    "large-1": {
+      "likelihood": [
+        "-4980.445240215588456"
+      ],
+      "science_sha256": "6782f3a1a2c9f5287b7e6e179850806dbd3940b4529e0dcd7f689ee655630ff8",
+      "saved_histogram_sha256_without_generated_timestamp": "0fd65213779b437b23bccac9c361f7b9d00a95aa9783990bf392553c66c387d4"
+    },
+    "large-12": {
+      "likelihood": [
+        "-4980.445240215588456"
+      ],
+      "science_sha256": "6782f3a1a2c9f5287b7e6e179850806dbd3940b4529e0dcd7f689ee655630ff8",
+      "saved_histogram_sha256_without_generated_timestamp": "0fd65213779b437b23bccac9c361f7b9d00a95aa9783990bf392553c66c387d4"
+    }
+  },
+  "inputs": {
+    "workunits/small/params.lua": "ddf948ffe85c0aa9caa3da17566622cdcb49079df27268dbb1c93d22dea43d03",
+    "workunits/small/input.hist": "3dd3fcb589c551efa29c048469c069528b19eece09d389c1b6192ac514328f0a",
+    "workunits/medium/params.lua": "ddf948ffe85c0aa9caa3da17566622cdcb49079df27268dbb1c93d22dea43d03",
+    "workunits/medium/input.hist": "3dd3fcb589c551efa29c048469c069528b19eece09d389c1b6192ac514328f0a",
+    "workunits/large/params.lua": "2efaf33fe3e8b8540ebabc0138828f2275c4ad5dc8e0e926d22052811058c342",
+    "workunits/large/input.hist": "3dd3fcb589c551efa29c048469c069528b19eece09d389c1b6192ac514328f0a"
+  },
+  "accelerations": {
+    "default-1": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b",
+    "default-12": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b",
+    "chunk4-1": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b",
+    "chunk4-12": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b",
+    "vector4-1": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b",
+    "vector4-12": "9cb731b88e1c1b5bed6365b61c1bf5c171568153553b46b45caf0431978afa5b"
+  }
+}

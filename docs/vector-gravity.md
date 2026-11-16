@@ -1,3 +1,11 @@
+S7-01: the current source is standard N-body 1.96. Its vector patch selects
+softening from the fixed three-value table using node/body type sums, exactly
+as the 1.96 scalar walk does. Run `python tests/nbody_196_matrix.py` for current
+whole-run and first-force host identity. `bash scripts/build-vector-gravity.sh`
+rebuilds/lints both 1.96 card variants and leaves lead-only commands.
+The S6-03 twin captures, timings and range audit below are historical 1.97
+evidence; they have not been regenerated for the changed 1.96 layouts.
+
 # Eight-lane gravity (S6-01 / S6-03)
 
 `NBODY_VECTOR_GRAVITY=0` remains the default on both architectures. The patch

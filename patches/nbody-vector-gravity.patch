@@ -1,9 +1,9 @@
 --- a/nbody/src/nbody_grav.c
 +++ b/nbody/src/nbody_grav.c
-@@ -141,9 +141,156 @@
+@@ -135,9 +135,156 @@
      return acc0;
  }
- 
+
 +/* Eight independent threaded walks. No horizontal FP reduction. */
 +#if NBODY_VECTOR_GRAVITY
 +typedef real nb_vec8 __attribute__((vector_size(64)));
@@ -61,9 +61,9 @@
 +                    else
 +                    {
 +                        hit[l] = 1;
-+                        soft[l] = isCell(node) ? ctx->eps2_min :
-+                            ctx->eps2[((const Body *)node)->eps2Index *
-+                                      (int)ctx->eps2_size + first[l].eps2Index];
++                        /* 1.96 selects LM/cross/DM for cells and bodies alike. */
++                        int types = node->type + first[l].bodynode.type;
++                        soft[l] = ctx->eps2[types == -2 ? 2 : types == 2 ? 0 : 1];
 +                        mass[l] = Mass(node);
 +                        if (ctx->useQuad && isCell(node))
 +                        {
@@ -157,10 +157,10 @@
      const int nbody = st->nbody;  /* Prevent reload on each loop */
      mwvector LMCx = ZERO_VECTOR;
      mwvector a = ZERO_VECTOR, externAcc = ZERO_VECTOR;
-@@ -174,11 +321,27 @@
+@@ -168,11 +315,27 @@
  	    lmcscale2 = 1.0;
      }
- 
+
 +#if NBODY_VECTOR_GRAVITY
 +  #ifdef _OPENMP
 +    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 1)
@@ -185,7 +185,7 @@
          /* Repeat the base hackGrav part in each case or else GCC's
           * -funswitch-loops doesn't happen. Without that this constant
           * gets checked on every body on every step which is dumb.  */
-@@ -187,7 +350,11 @@
+@@ -181,7 +344,11 @@
              case EXTERNAL_POTENTIAL_DEFAULT:
                  //mw_printf("DEFAULT POTENTIAL - TREE\n");
                  b = &bodies[i];
@@ -197,8 +197,8 @@
                  externAcc = mw_addv(nbExtAcceleration(&ctx->pot, Pos(b), barTime), LMCAcceleration(lmcfunction, Pos(b), LMCx, lmcmass, lmcscale, lmcscale2));
                  /** WARNING!: Adding any code to this section may cause the checkpointing to randomly bug out. I'm not
                      sure what causes this, but if you ever plan to add another gravity calculation outside of a new potential,
-@@ -206,12 +373,20 @@
- 
+@@ -200,12 +367,20 @@
+
              case EXTERNAL_POTENTIAL_NONE:
                  //mw_printf("NULL POTENTIAL - TREE\n");
 +#if NBODY_VECTOR_GRAVITY
@@ -207,7 +207,7 @@
                  accels[i] = nbGravity(ctx, st, &bodies[i]);
 +#endif
                  break;
- 
+
              case EXTERNAL_POTENTIAL_CUSTOM_LUA:
                  //mw_printf("CUSTOM POTENTIAL - TREE\n");
 +#if NBODY_VECTOR_GRAVITY
@@ -218,7 +218,7 @@
                  nbEvalPotentialClosure(st, Pos(&bodies[i]), &externAcc);
                  mw_incaddv(externAcc, LMCAcceleration(lmcfunction, Pos(&bodies[i]), LMCx, lmcmass, lmcscale, lmcscale2));
                  mw_incaddv(a, externAcc);
-@@ -223,6 +398,9 @@
+@@ -217,6 +392,9 @@
                  mw_fail("Bad external potential type: %d\n", ctx->potentialType);
          }
      }
@@ -226,5 +226,5 @@
 +    }
 +#endif
  }
- 
+
  static mwvector nbGravity_Exact(const NBodyCtx* ctx, NBodyState* st, const Body* p)

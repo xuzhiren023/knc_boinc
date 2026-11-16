@@ -25,7 +25,7 @@ def scientific_tokens(path):
 
 def main():
     for case in ('medium', 'large'):
-        reference = ROOT/f'runs/force-chunk/{case}-chunkvector-off-t12'
+        reference = ROOT/f'runs/force-chunk/{case}-chunk196-default-t12'
         want = scientific_tokens(reference)
         for variant in ('off', 'on'):
             actual = ROOT/f'runs/card/vector/{variant}-{case}.txt'

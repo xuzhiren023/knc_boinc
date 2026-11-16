@@ -164,8 +164,8 @@ The zero-argument wrapper uses `params.lua`, `input.hist`, seed 670828913,
 a server task uses its actual arguments instead. A successful run has exit 0,
 `histogram.txt`, the two N-body logs, `knc_wrapper.log` and comparison **PASS**
 with strict absolute likelihood difference **< 1e-10**. Histogram differences
-are diagnostic only. x86 small's recorded reference is approximately
-`-438.534790192227661`; the comparator, not rounded text, determines the verdict.
+are diagnostic only. x86 small's recorded 1.96 reference is
+in `tests/references/nbody-1.96.json`; the comparator, not rounded text, determines the verdict.
 A PASS on this sample does not establish production scientific correctness.
 The N-body stdout file may be empty; the science diagnostics normally go to
 stderr. No timing estimate or card result is available yet.
@@ -204,7 +204,7 @@ real-card failures have been reported in this ticket.
 **Attaching to MilkyWay@home and returning results is the owner's decision.**
 The following steps can download work and later upload scientific results.
 This experimental package may be refused by the scheduler or validator, lose
-work/credit, or produce incorrect results. Its pinned N-body 1.97 and patched
+work/credit, or produce incorrect results. Its pinned standard N-body 1.96 and patched
 standalone behavior are not established as equivalent to the standard server
 application. SSH/service permissions, checkpoint portability, real-client
 staging and output declarations still require verification. An offline PASS
@@ -412,7 +412,7 @@ failure, diagnostic and verified remedy after that run.
 | Checkpoint timeout / lost heartbeat | Preserve lease/logs and restore connectivity. A fresh acknowledgement is required before cleanup; an old checkpoint file is not proof. |
 | Comparator missing/ambiguous likelihood or histogram | Check wrapper exit and both N-body logs; compare `card-result.txt`, not wrapper stderr. Both sides need `--print-histogram`: saved best-step and printed final histograms differ. Use the sample input; legacy four-column histograms are incompatible. |
 | Likelihood difference >= 1e-10 | Stop; preserve inputs, seed, threads, package and logs for the lead. Do not loosen tolerance. Histogram diagnostics do not decide the verdict. |
-| Missing file/version/platform or stock app starts | Stop client, verify actual project folder, flat inventory, `app_info.xml`, `windows_x86_64` and Event Log. Identity 197 is experimental. |
+| Missing file/version/platform or stock app starts | Stop client, verify actual project folder, flat inventory, `app_info.xml`, `windows_x86_64` and Event Log. Identity 196 selects standard N-body 1.96. |
 | Multiple tasks/card processes | Suspend new work; check `app_config.xml` and other card users. The manifest does not serialize access. Do not kill unrelated jobs. |
 | Progress initially zero or frozen on suspend | Expected before polling/safe simulation steps or while stopped. If still frozen after resume, inspect card CPU, log and connectivity. |
 | Show graphics absent/idle, screensaver blank | Verify graphics app/open name, running slot, snapshot, user session and screensaver durations. A helper launched outside its live slot has no mapping. Earlier blank screenshots were a capture issue; an image alone does not prove live attachment. |

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Convert upstream nbWriteBodies output (-o FILE) final Cartesian positions.
 
-Both simple_output variants put type,id,x,y,z first (nbody_io.c).
+Both 1.96 simple_output variants put ignore,id,x,y,z first (nbody_io.c).
 Simulation time and step are supplied explicitly: upstream does not write them.
 """
 import argparse
@@ -22,9 +22,9 @@ def main():
         bodies = []
         header = False
         for line in args.input.read_text().splitlines():
-            if line.lstrip().startswith('# type'):
+            if line.lstrip().startswith('# ignore'):
                 columns = line.lstrip('# ').split()
-                if columns[:5] != ['type', 'id', 'x', 'y', 'z']:
+                if columns[:5] != ['ignore', 'id', 'x', 'y', 'z']:
                     raise ValueError('expected upstream Cartesian body columns')
                 header = True
                 continue
@@ -37,7 +37,7 @@ def main():
             xyz = tuple(float(v) for v in fields[2:5])
             if not all(math.isfinite(v) for v in xyz):
                 raise ValueError('nonfinite coordinate')
-            bodies.append(struct.pack('<fffI', *xyz, 0 if kind < 0 else 1))
+            bodies.append(struct.pack('<fffI', *xyz, 0 if kind else 1))
             if len(bodies) > 20000:
                 raise ValueError('more than 20000 bodies')
         if not header:

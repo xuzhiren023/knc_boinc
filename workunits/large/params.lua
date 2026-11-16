@@ -26,13 +26,9 @@ sp_l, sp_cross, sp_d = calculateEps2Dwarf(dwarf, dwarf, nbody, nbody) --assuming
 
 function makeContext()
    return NBodyCtx.create{
-      timestep   = calculateTimestepPlummerTest(dwarfMass, dwarfRadius),
-      -- Bounded production-count regression: keep the tree/model settings,
-      -- evolve 0.05 Gyr so both required x86 references are practical.
+      timestep   = calculateTimestep(dwarfMass, dwarfRadius),
       timeEvolve = 0.05,
-      eps2        = {sp_l, sp_cross, sp_cross, sp_d},
-      eps2_index  = {1, -1},
-      eps2_size   = 2,
+      eps2       = {sp_l, sp_cross, sp_d},
       criterion  = "sw93",
       useQuad    = true,
       theta      = 1.0,
@@ -56,8 +52,6 @@ function makeBodies(ctx, potential)
       potential = potential,
       position  = lbrToCartesian(ctx, Vector.create(218, 53.5, 28.8)),
       velocity  = Vector.create(-170, 94, 108),
-      -- Match the bounded forward integration so the dwarf reaches the
-      -- observed sky region and produces a finite, populated histogram.
       tstop     = 0.05,
       dt        = ctx.timestep / 10.0
    }

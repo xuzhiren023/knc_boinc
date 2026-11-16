@@ -55,7 +55,7 @@ for name in files:
     if name in ('knc_wrapper.exe', 'knc_nbody_graphics.exe'):
         ET.SubElement(info, 'executable')
 version = ET.SubElement(root, 'app_version')
-for key, value in [('app_name', 'milkyway_nbody'), ('version_num', '197'),
+for key, value in [('app_name', 'milkyway_nbody'), ('version_num', '196'),
                    ('platform', 'windows_x86_64'), ('avg_ncpus', '1'), ('max_ncpus', '1')]:
     ET.SubElement(version, key).text = value
 for name in files:
