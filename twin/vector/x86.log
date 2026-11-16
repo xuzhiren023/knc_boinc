@@ -1,0 +1,21 @@
+small-1 macro off vs on:
+likelihood: A=-438.53479019222766 B=-438.53479019222766 abs=0 rel=0
+histogram: rows=34/34 schema_matches=True max_abs=0 max_rel=0
+PASS (strict absolute < 1e-10; likelihood verdict; histogram diagnostic only)
+small-12 macro off vs on:
+likelihood: A=-438.53479019222766 B=-438.53479019222766 abs=0 rel=0
+histogram: rows=34/34 schema_matches=True max_abs=0 max_rel=0
+PASS (strict absolute < 1e-10; likelihood verdict; histogram diagnostic only)
+medium-1 macro off vs on:
+likelihood: A=-450.77212158403989 B=-450.77212158403989 abs=0 rel=0
+histogram: rows=34/34 schema_matches=True max_abs=0 max_rel=0
+PASS (strict absolute < 1e-10; likelihood verdict; histogram diagnostic only)
+medium-12 macro off vs on:
+likelihood: A=-450.77212158403989 B=-450.77212158403989 abs=0 rel=0
+histogram: rows=34/34 schema_matches=True max_abs=0 max_rel=0
+PASS (strict absolute < 1e-10; likelihood verdict; histogram diagnostic only)
+large-12 macro off vs on:
+likelihood: A=-4894.200373110275 B=-4894.200373110275 abs=0 rel=0
+histogram: rows=34/34 schema_matches=True max_abs=0 max_rel=0
+PASS (strict absolute < 1e-10; likelihood verdict; histogram diagnostic only)
+S6-01: exact host cases 5/5; acceleration bytes 98304 exact=True; twin/codegen gates remain failed

@@ -34,3 +34,18 @@ flags/*
 !flags/run.log
 !flags/build-manifest.json
 !flags/run-native.sh
+# S6-01 regenerable snapshots, full binary extracts and traces.
+vector/capture/
+vector/capture.json
+vector/replay.bin
+vector/replay_blocks.h
+vector/actual.bin
+vector/*-full.json
+vector/vector-0.json
+vector/vector-1024.json
+vector/scalar-0.json
+vector/scalar-1024.json
+vector/*/final-memory.json
+vector/*/trace.json
+vector/*/result.json
+vector/vector-current.json

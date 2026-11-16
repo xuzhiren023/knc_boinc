@@ -1,0 +1,216 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -141,9 +141,142 @@
+     return acc0;
+ }
+ 
++/* Eight independent threaded walks. No horizontal FP reduction. */
++#if NBODY_VECTOR_GRAVITY
++typedef real nb_vec8 __attribute__((vector_size(64)));
++typedef unsigned long long nb_mask8 __attribute__((vector_size(64)));
++unsigned nbGravity8(mwvector *out, const NBodyCtx *ctx, NBodyState *st,
++                const Body *first, unsigned count)
++{
++    const NBodyNode *q[8];
++    int seen[8] = {0}, hit[8], quad[8];
++    real px[8], py[8], pz[8], x[8], y[8], z[8], d[8];
++    real mass[8], soft[8], r[8], m[8];
++    nb_vec8 ax = {0}, ay = {0}, az = {0};
++    real xx[8], xy[8], xz[8], yy[8], yz[8], zz[8];
++    unsigned l;
++    int active;
++    unsigned missing = 0;
++    for (l = 0; l < 8; ++l)
++    {
++        q[l] = l < count ? (const NBodyNode *) st->tree.root : NULL;
++        px[l] = l < count ? Pos(first+l).x : 0;
++        py[l] = l < count ? Pos(first+l).y : 0;
++        pz[l] = l < count ? Pos(first+l).z : 0;
++    }
++    do
++    {
++        active = 0;
++        /* Pointer gathers are guarded: never read Rcrit2/Quad on a body. */
++        for (l = 0; l < 8; ++l)
++        {
++            active |= q[l] != NULL;
++            x[l] = q[l] ? Pos(q[l]).x : px[l];
++            y[l] = q[l] ? Pos(q[l]).y : py[l];
++            z[l] = q[l] ? Pos(q[l]).z : pz[l];
++        }
++        if (!active) break;
++        for (l = 0; l < 8; ++l)
++        {
++            x[l] = x[l] - px[l];
++            y[l] = y[l] - py[l];
++            z[l] = z[l] - pz[l];
++            /* mw_sqrv: mw_mad(z,z,mw_mad(y,y,x*x)), contraction off. */
++            d[l] = z[l]*z[l] + (y[l]*y[l] + x[l]*x[l]);
++        }
++        for (l = 0; l < 8; ++l)
++        {
++            const NBodyNode *node = q[l];
++            hit[l] = quad[l] = 0;
++            mass[l] = soft[l] = 0;
++            xx[l] = xy[l] = xz[l] = yy[l] = yz[l] = zz[l] = 0;
++            if (node)
++            {
++                if (isBody(node) || d[l] >= Rcrit2(node))
++                {
++                    if ((const Body *) node == first+l) seen[l] = 1;
++                    else
++                    {
++                        hit[l] = 1;
++                        soft[l] = isCell(node) ? ctx->eps2_min :
++                            ctx->eps2[((const Body *)node)->eps2Index *
++                                      (int)ctx->eps2_size + first[l].eps2Index];
++                        mass[l] = Mass(node);
++                        if (ctx->useQuad && isCell(node))
++                        {
++                            quad[l] = 1;
++                            xx[l] = Quad(node).xx; xy[l] = Quad(node).xy;
++                            xz[l] = Quad(node).xz; yy[l] = Quad(node).yy;
++                            yz[l] = Quad(node).yz; zz[l] = Quad(node).zz;
++                        }
++                    }
++                    q[l] = Next(node);
++                }
++                else q[l] = More(node);
++            }
++        }
++        for (l = 0; l < 8; ++l)
++        {
++            if (hit[l]) d[l] += soft[l];
++            else d[l] = 1; /* inert lanes cannot introduce divide-by-zero */
++        }
++        /* KNC lowers vector sqrt/div through FMA and reciprocal seeds.
++         * Keep this stage scalar under S6-01's strict instruction rule. */
++        #pragma GCC novector
++        for (l = 0; l < 8; ++l)
++        {
++            r[l] = mw_sqrt(d[l]);
++            m[l] = (mass[l] / r[l]) / d[l];
++        }
++        {
++            nb_vec8 vx, vy, vz, vm;
++            nb_mask8 mask;
++            for (l = 0; l < 8; ++l)
++            {
++                vx[l] = x[l]; vy[l] = y[l]; vz[l] = z[l]; vm[l] = m[l];
++                mask[l] = hit[l] ? ~0ULL : 0ULL;
++            }
++            /* Bit selection preserves untouched accumulator bits, even -0.
++             * Vector casts reinterpret equal-sized types; they do not convert. */
++            ax = (nb_vec8)((mask & (nb_mask8)(ax + vm*vx)) | (~mask & (nb_mask8)ax));
++            ay = (nb_vec8)((mask & (nb_mask8)(ay + vm*vy)) | (~mask & (nb_mask8)ay));
++            az = (nb_vec8)((mask & (nb_mask8)(az + vm*vz)) | (~mask & (nb_mask8)az));
++        }
++        for (l = 0; l < 8; ++l)
++        {
++            if (quad[l])
++            {
++                real qx = (xx[l]*x[l] + xy[l]*y[l]) + xz[l]*z[l];
++                real qy = (xy[l]*x[l] + yy[l]*y[l]) + yz[l]*z[l];
++                real qz = (xz[l]*x[l] + yz[l]*y[l]) + zz[l]*z[l];
++                real dot = (qx*x[l] + qy*y[l]) + qz*z[l];
++                real inv = 1.0 / ((d[l]*d[l]) * r[l]);
++                real phi = (2.5 * (inv * dot)) / d[l];
++                ax[l] += phi * x[l];
++                ay[l] += phi * y[l];
++                az[l] += phi * z[l];
++                ax[l] -= inv * qx;
++                ay[l] -= inv * qy;
++                az[l] -= inv * qz;
++            }
++        }
++    } while (active);
++    for (l = 0; l < count; ++l)
++    {
++        if (!seen[l]) missing |= 1u << l;
++        out[l] = (mwvector) ZERO_VECTOR;
++        out[l].x = ax[l]; out[l].y = ay[l]; out[l].z = az[l];
++    }
++    return missing;
++}
++#endif
++
+ static inline void nbMapForceBody(const NBodyCtx* ctx, NBodyState* st)
+ {
+     int i;
++#if NBODY_VECTOR_GRAVITY
++    int base;
++#endif
+     const int nbody = st->nbody;  /* Prevent reload on each loop */
+     mwvector LMCx = ZERO_VECTOR;
+     mwvector a = ZERO_VECTOR, externAcc = ZERO_VECTOR;
+@@ -174,11 +307,27 @@
+ 	    lmcscale2 = 1.0;
+     }
+ 
++#if NBODY_VECTOR_GRAVITY
++  #ifdef _OPENMP
++    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 1)
++  #endif
++    for (base = 0; base < nbody; base += 8)
++    {
++        mwvector group[8];
++        unsigned count = nbody-base < 8 ? nbody-base : 8;
++        unsigned missing = nbGravity8(group, ctx, st, bodies+base, count);
++        unsigned lane;
++        for (lane = 0; lane < count; ++lane)
++            if (missing & (1u << lane)) nbReportTreeIncest(ctx, st);
++        for (i = base; i < base+(int)count; ++i)
++        {
++#else
+   #ifdef _OPENMP
+     #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, NBODY_FORCE_CHUNK)
+   #endif
+     for (i = 0; i < nbody; ++i)      /* get force on each body */
+     {
++#endif
+         /* Repeat the base hackGrav part in each case or else GCC's
+          * -funswitch-loops doesn't happen. Without that this constant
+          * gets checked on every body on every step which is dumb.  */
+@@ -187,7 +336,11 @@
+             case EXTERNAL_POTENTIAL_DEFAULT:
+                 //mw_printf("DEFAULT POTENTIAL - TREE\n");
+                 b = &bodies[i];
++#if NBODY_VECTOR_GRAVITY
++                a = group[i-base];
++#else
+                 a = nbGravity(ctx, st, b);
++#endif
+                 externAcc = mw_addv(nbExtAcceleration(&ctx->pot, Pos(b), barTime), LMCAcceleration(lmcfunction, Pos(b), LMCx, lmcmass, lmcscale, lmcscale2));
+                 /** WARNING!: Adding any code to this section may cause the checkpointing to randomly bug out. I'm not
+                     sure what causes this, but if you ever plan to add another gravity calculation outside of a new potential,
+@@ -206,12 +359,20 @@
+ 
+             case EXTERNAL_POTENTIAL_NONE:
+                 //mw_printf("NULL POTENTIAL - TREE\n");
++#if NBODY_VECTOR_GRAVITY
++                accels[i] = group[i-base];
++#else
+                 accels[i] = nbGravity(ctx, st, &bodies[i]);
++#endif
+                 break;
+ 
+             case EXTERNAL_POTENTIAL_CUSTOM_LUA:
+                 //mw_printf("CUSTOM POTENTIAL - TREE\n");
++#if NBODY_VECTOR_GRAVITY
++                a = group[i-base];
++#else
+                 a = nbGravity(ctx, st, &bodies[i]);
++#endif
+                 nbEvalPotentialClosure(st, Pos(&bodies[i]), &externAcc);
+                 mw_incaddv(externAcc, LMCAcceleration(lmcfunction, Pos(&bodies[i]), LMCx, lmcmass, lmcscale, lmcscale2));
+                 mw_incaddv(a, externAcc);
+@@ -223,6 +384,9 @@
+                 mw_fail("Bad external potential type: %d\n", ctx->potentialType);
+         }
+     }
++#if NBODY_VECTOR_GRAVITY
++    }
++#endif
+ }
+ 
+ static mwvector nbGravity_Exact(const NBodyCtx* ctx, NBodyState* st, const Body* p)

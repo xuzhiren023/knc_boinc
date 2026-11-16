@@ -1,0 +1,32 @@
+{
+  "bodies": 4096,
+  "primitive_operations": 79854572,
+  "subnormal_results": 0,
+  "nonfinite_results": 0,
+  "min_nonzero_abs": 5.095619795767879e-19,
+  "max_abs": 226086426043.44855,
+  "expected_xyz_sha256": "2e98eae2837234c811ee2a563477020814fa4961dcb681c47dc46ec3d45d0415",
+  "scope": "first large force step only; Python binary64 scalar order, independently matched to all captured XYZ bytes",
+  "group_visits": {
+    "0": [
+      497,
+      555,
+      602,
+      447,
+      433,
+      193,
+      523,
+      539
+    ],
+    "1024": [
+      563,
+      569,
+      590,
+      522,
+      489,
+      476,
+      464,
+      562
+    ]
+  }
+}

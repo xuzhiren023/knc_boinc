@@ -1,0 +1,10 @@
+{
+  "cases": [
+    "small-1",
+    "small-12",
+    "medium-1",
+    "medium-12",
+    "large-12"
+  ],
+  "all_exact": true
+}

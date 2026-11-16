@@ -26,6 +26,9 @@ CPPFLAGS := $(COMMON_CPPFLAGS) -I$(ROOT)/config -I$(ROOT)/src $(addprefix -I$(UP
 ifneq ($(strip $(FORCE_CHUNK)),)
 CPPFLAGS += -DNBODY_FORCE_CHUNK=$(FORCE_CHUNK)
 endif
+# S6-01 is opt-in; enabling the card default remains the lead's call.
+VECTOR_GRAVITY ?= 0
+CPPFLAGS += -DNBODY_VECTOR_GRAVITY=$(VECTOR_GRAVITY)
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
@@ -37,6 +40,15 @@ ifeq ($(TARGET),card)
 COMMON_LDFLAGS += -Wl,--disable-new-dtags,-rpath,'$$ORIGIN:$$ORIGIN/../lib'
 endif
 .PHONY: x86 card program
+# Reusing an OUT directory must not silently keep the other macro setting.
+.PHONY: vector-config-check
+vector-config-check:
+$(OUT)/.vector-gravity: vector-config-check
+	@$(TOOLCHAIN)/mkdir -p $(OUT)
+	@printf '%s\n' '$(VECTOR_GRAVITY)' > $@.tmp
+	@$(TOOLCHAIN)/cmp -s $@.tmp $@ || $(TOOLCHAIN)/cp $@.tmp $@
+	@$(TOOLCHAIN)/rm -f $@.tmp
+$(OUT)/nbody/src/nbody_grav.c.o: $(OUT)/.vector-gravity
 x86:
 	$(MAKE) TARGET=x86 program
 card:
