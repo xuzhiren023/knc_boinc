@@ -8,7 +8,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
 | 5 | S5-01 merged (twin cannot rank gravity flags: -O2 = -O2 -funroll-loops code, -O3 inlines; card A/B script ready); S5-02 merged (card force chunk 4, 26 x86 runs bit-identical; card before/after pending) |
-| 6 | S6-01 merged as an opt-in hybrid prototype (off): x86 bit-identical; sqrt/div/quad still x87; waits for S14-37 and the gcc-knc answer on vector FP64 div/sqrt; S6-02 (test hygiene) running |
+| 6 | S6-03 merged: full vector gravity walk (opt-in, off by default), x86 bit-identical, twin functional ok on 4 groups (~272-293k predicted cycles/body, lanes 79-94% busy); scalar twin comparison waits for S14-37 |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
 
 ## Proven
@@ -35,6 +35,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   PC=53 matches SSE bit for bit.
 
 ## Not proven yet
+
+- Next card turn batch (about 40 min): from .work/S6-03 `scripts/vector-card-commands.sh` = medium and large at 240,
+  card-off (scalar, chunk 4: S5-02 after) and card-on (vector, S6-03), then `scripts/check_vector_card.py`
+  (bit-exact vs x86); then from .work/S4-03 `scripts/e2e_card.sh --case large --threads 240 --in-granted-turn`.
+  Baseline (chunk 128, scalar) is the Sprint 1 run: medium 1,225 s, large 61 s.
 
 - Card speed-up of S5-02 (chunk 4) on medium/large: next card turn, with the end-to-end large run. Rebuild the card
   objects in a clean build dir (make does not track the -D change).
