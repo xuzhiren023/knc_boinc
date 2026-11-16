@@ -1,0 +1,204 @@
+{
+  "requested_bodies_per_context": 128,
+  "bodies_per_context_configured": 128,
+  "requested_experiment_complete": false,
+  "blocker": "knc-twin 0.4.0 x87 double rounding fails native PC53 arithmetic; no valid 1-to-8-core ratio",
+  "build": {
+    "constant_relocations": [
+      {
+        "id": "a404fe3",
+        "old": 5018460,
+        "new": 5018716,
+        "bytes": 4
+      }
+    ],
+    "callee_identical_except_linker_relocations": true,
+    "retained_adapter_records_unchanged": true
+  },
+  "runs": {
+    "baseline": {
+      "status": "budget_exhausted",
+      "message": "python time budget exhausted during functional execution (context 0, step 595200)",
+      "scale": "unit",
+      "python_execution_seconds": 60.336,
+      "functional_check": {
+        "status": "not_run"
+      },
+      "result_class": null,
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {},
+      "argv": [
+        "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+        "simulate",
+        "twin/multicore/chunk-baseline.json",
+        "--scale",
+        "unit",
+        "--profile",
+        "card-7120-measured",
+        "--max-steps",
+        "10000000",
+        "--max-seconds",
+        "60",
+        "--no-issue-log",
+        "--out",
+        "twin/multicore/chunk-baseline",
+        "--force"
+      ],
+      "profile_hash": "c6fec8a100f70fa2b9b027bc95457cd8b3b132987ef48568c8969d043bcc2c0c",
+      "unit_of_work": {
+        "count": 512,
+        "description": "contiguous bodies in distinct 128-body chunks; equal bodies per context"
+      }
+    },
+    "unit": {
+      "status": "budget_exhausted",
+      "message": "python time budget exhausted during functional execution (context 0, step 574976)",
+      "scale": "unit",
+      "python_execution_seconds": 60.7084,
+      "functional_check": {
+        "status": "not_run"
+      },
+      "result_class": null,
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {},
+      "argv": [
+        "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+        "simulate",
+        "twin/multicore/chunk-unit.json",
+        "--scale",
+        "unit",
+        "--profile",
+        "card-7120-measured",
+        "--max-steps",
+        "10000000",
+        "--max-seconds",
+        "60",
+        "--no-issue-log",
+        "--out",
+        "twin/multicore/chunk-unit",
+        "--force"
+      ],
+      "profile_hash": "c6fec8a100f70fa2b9b027bc95457cd8b3b132987ef48568c8969d043bcc2c0c",
+      "unit_of_work": {
+        "count": 4096,
+        "description": "contiguous bodies in distinct 128-body chunks; equal bodies per context"
+      }
+    },
+    "ring": {
+      "status": "budget_exhausted",
+      "message": "python time budget exhausted during functional execution (context 0, step 544512)",
+      "scale": "ring",
+      "python_execution_seconds": 60.5152,
+      "functional_check": {
+        "status": "not_run"
+      },
+      "result_class": null,
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {},
+      "argv": [
+        "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+        "simulate",
+        "twin/multicore/chunk-ring.json",
+        "--scale",
+        "ring",
+        "--profile",
+        "card-7120-measured",
+        "--max-steps",
+        "10000000",
+        "--max-seconds",
+        "60",
+        "--no-issue-log",
+        "--out",
+        "twin/multicore/chunk-ring",
+        "--force"
+      ],
+      "profile_hash": "c6fec8a100f70fa2b9b027bc95457cd8b3b132987ef48568c8969d043bcc2c0c",
+      "unit_of_work": {
+        "count": 4096,
+        "description": "contiguous bodies in distinct 128-body chunks; equal bodies per context"
+      }
+    },
+    "compare-unit": {
+      "status": "incompatible",
+      "message": "results are not comparable: unit of work differs: {'count': 512, 'description': 'contiguous bodies in distinct 128-body chunks; equal bodies per context'} vs {'count': 4096, 'description': 'contiguous bodies in distinct 128-body chunks; equal bodies per context'}; baseline status is budget_exhausted, not ok; candidate status is budget_exhausted, not ok",
+      "scale": null,
+      "python_execution_seconds": 0.01,
+      "functional_check": {
+        "status": "not_run"
+      },
+      "result_class": null,
+      "assumptions": [
+        "baseline functional check: not_run (its timing stands without a verified result)",
+        "candidate functional check: not_run (its timing stands without a verified result)"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "parameters_used": {},
+      "argv": [
+        "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+        "compare",
+        "twin/multicore/chunk-baseline/result.json",
+        "twin/multicore/chunk-unit/result.json",
+        "--out",
+        "twin/multicore/chunk-compare-unit",
+        "--force"
+      ],
+      "profile_hash": null,
+      "unit_of_work": null
+    },
+    "compare-ring": {
+      "status": "incompatible",
+      "message": "results are not comparable: scale differs: 'unit' vs 'ring'; unit of work differs: {'count': 512, 'description': 'contiguous bodies in distinct 128-body chunks; equal bodies per context'} vs {'count': 4096, 'description': 'contiguous bodies in distinct 128-body chunks; equal bodies per context'}; baseline status is budget_exhausted, not ok; candidate status is budget_exhausted, not ok",
+      "scale": null,
+      "python_execution_seconds": 0.009,
+      "functional_check": {
+        "status": "not_run"
+      },
+      "result_class": null,
+      "assumptions": [
+        "baseline functional check: not_run (its timing stands without a verified result)",
+        "candidate functional check: not_run (its timing stands without a verified result)"
+      ],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "parameters_used": {},
+      "argv": [
+        "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+        "compare",
+        "twin/multicore/chunk-baseline/result.json",
+        "twin/multicore/chunk-ring/result.json",
+        "--out",
+        "twin/multicore/chunk-compare-ring",
+        "--force"
+      ],
+      "profile_hash": null,
+      "unit_of_work": null
+    }
+  }
+}

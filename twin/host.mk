@@ -14,3 +14,9 @@ capture-layout:
 
 ../build/capture_log.o: ../twin/capture_log.c
 	$(CC) $(CFLAGS) -c $< -o $@
+# S1-07: same gravity source, host x87 precision-control replay.
+.PHONY: x87-host
+../build/x87_grav.o: ../build/x87_grav.c ../twin/x87_capture.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) -mfpmath=387 -I../twin -c $< -o $@
+x87-host: $(OBJECTS) ../build/x87_grav.o
+	$(CXX) $(COMMON_LDFLAGS) $(filter-out $(OUT)/nbody/src/nbody_grav.c.o,$(OBJECTS)) ../build/x87_grav.o $(COMMON_LDLIBS) -o ../build/x87_gravity.exe

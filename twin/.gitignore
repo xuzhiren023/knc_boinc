@@ -23,3 +23,8 @@ multicore/*/final-memory.json
 multicore/*/trace.json
 # Core envelope embeds one hash entry per input block; report has compact evidence.
 multicore/core/result.json
+# S1-07 regenerated isolated kernels / large result input manifests.
+multicore/body-*.json
+multicore/body-*/
+multicore/chunk-*.json
+multicore/chunk-*/

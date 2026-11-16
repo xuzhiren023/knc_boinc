@@ -1,0 +1,74 @@
+{
+  "schema": "knc-twin.kernel/1",
+  "entry": "function",
+  "name": "x87 PC53 double rounding: mul",
+  "numerical_policy": {
+    "rounding": "rn",
+    "ftz": false,
+    "daz": false,
+    "x87_control_word": "0x027f"
+  },
+  "init": {
+    "memory": [
+      {
+        "addr": "0x1000",
+        "u64": [
+          "0xbf3982440b271580",
+          "0x3fc697fb0ebad540"
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "memory": [
+      {
+        "addr": "0x2000",
+        "u64": [
+          "0xbf1202b59a43239f"
+        ]
+      }
+    ]
+  },
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "load",
+          "op": "fldl",
+          "ops": [
+            {
+              "disp": 4096,
+              "abs": true
+            }
+          ]
+        },
+        {
+          "id": "operation",
+          "op": "fmull",
+          "ops": [
+            {
+              "disp": 4104,
+              "abs": true
+            }
+          ]
+        },
+        {
+          "id": "store",
+          "op": "fstpl",
+          "ops": [
+            {
+              "disp": 8192,
+              "abs": true
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "op": "ret",
+          "ops": []
+        }
+      ]
+    }
+  ]
+}
