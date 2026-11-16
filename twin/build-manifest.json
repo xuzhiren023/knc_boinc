@@ -1,8 +1,8 @@
 [
   {
     "file": "build/x86/milkyway_nbody.exe",
-    "bytes": 13440318,
-    "sha256": "b16b3dacf4b31cfd41c7fc5959c693538eac0ca46f9e279c5e94b200573ac56f"
+    "bytes": 13416348,
+    "sha256": "a6b48cec07cfe6833cd540a2537cc8cad795079cc9fcc5082457c3703acfdc3c"
   },
   {
     "file": "dist/card/knc-lint.txt",
@@ -25,19 +25,34 @@
     "sha256": "1120d2f82a4e574617e5e4976da2850ad278037edb2067ea93980df79dc0cec7"
   },
   {
+    "file": "dist/card/libm_probe.mic",
+    "bytes": 3990784,
+    "sha256": "f1efeeb59b97005a167a38bef42f1feea0d3d50790c82a073b7c5e82075f56ae"
+  },
+  {
     "file": "dist/card/libstdc++.so.6",
     "bytes": 32323605,
     "sha256": "a5df32142bd695e2711e106f8d8dc4841567ab50d9bf75c46c31504d518aed8c"
   },
   {
     "file": "dist/card/milkyway_nbody.mic",
-    "bytes": 12331236,
-    "sha256": "56b848e6fbe84dbde09c17eb9d8727bbc1009ae9ab8442403526b1a28f283b6b"
+    "bytes": 12324727,
+    "sha256": "fb6713b55f3752d361174c2d1328c9d636ed1f2bc9eb871f5371332b95b9a24b"
+  },
+  {
+    "file": "dist/card/probe-commands.sh",
+    "bytes": 434,
+    "sha256": "2fef1a3e72d33306f9045dda1d91eb6598e26d3f7845142105e7441a10881b85"
+  },
+  {
+    "file": "dist/card/probe-knc-lint.txt",
+    "bytes": 22,
+    "sha256": "b73320b35490eeb81e4e10e121b1bed936f7bb6accec2f31da08bb1b10c254f7"
   },
   {
     "file": "dist/card/readelf.txt",
     "bytes": 2783,
-    "sha256": "50c5b2d9e8da50ae5bf7264e8eec4291d4bae3ef04b97905d32b049ec1a857a6"
+    "sha256": "1356e07ffef0699792890a73b26c4e6eca4db4ef17ab9c05cbff22b1bd33cc3f"
   },
   {
     "file": "dist/card/runtime-manifest.txt",

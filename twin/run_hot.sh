@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # The measured overall hotspot, in addition to the ticket's gravity kernel.
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")/.."
 TWIN_HOME=${TWIN_HOME:-C:/Users/xuzhi/.claude/skills/knc-twin}
 python twin/log_overlay.py

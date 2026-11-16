@@ -1,0 +1,95 @@
+{
+  "artifacts": {
+    "final_state": "twin\\log-cases\\fixed-1\\final-state.json",
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-1",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-1\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-1\\summary.md"
+  },
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
+    "OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged"
+  ],
+  "calibration_status": null,
+  "engine_version": "0.3.1",
+  "functional_check": {
+    "checked": 1,
+    "mismatches": [
+      {
+        "got": "0x43c628b76e3a7b61",
+        "want": "0x3fe62e42fefa39ef",
+        "where": "ctx0.zmm0[0]"
+      }
+    ],
+    "status": "mismatch"
+  },
+  "input": {
+    "hash_sha256": "b4359d52a0c6f3edd41d71bc878403f410835f1d8635a9fe123a9f63bbd7df25",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 1333
+      },
+      "loop": null,
+      "name": "milkyway_nbody__log_rn",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "one log_rn call, first real small input"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-cases\\fixed-1.json"
+  },
+  "invocation": {
+    "argv": [
+      "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+      "functional",
+      "twin\\log-cases\\fixed-1.json",
+      "--trace",
+      "--out",
+      "twin\\log-cases\\fixed-1",
+      "--force"
+    ],
+    "command": "functional",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "python": "3.8.5"
+  },
+  "limiting_constraints": [],
+  "message": "1 mismatch(es) against expected outputs; first: {\"where\": \"ctx0.zmm0[0]\", \"got\": \"0x43c628b76e3a7b61\", \"want\": \"0x3fe62e42fefa39ef\"}",
+  "prediction": null,
+  "profile": null,
+  "python_execution_seconds": 1.3074,
+  "representation_evaluated": "normalized-records",
+  "result_type": "functional",
+  "scale": "region",
+  "schema": "knc-twin.result/1",
+  "status": "functional_mismatch",
+  "timestamp_utc": "2026-11-16T06:13:46Z",
+  "unsupported": []
+}

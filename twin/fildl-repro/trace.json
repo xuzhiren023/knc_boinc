@@ -1,0 +1,66 @@
+{
+  "0": [
+    {
+      "addr": 4096,
+      "ctx": 0,
+      "id": "load",
+      "lines": [
+        4096
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fildl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": 8192,
+      "ctx": 0,
+      "id": "store",
+      "lines": [
+        8192
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstpl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r7"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": 8192,
+      "ctx": 0,
+      "id": "return_value",
+      "lines": [
+        8192
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "vbroadcastsd",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727544,
+      "ctx": 0,
+      "id": "return",
+      "lines": [
+        139637976727488
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "ret",
+      "taken": true,
+      "x87": null
+    }
+  ]
+}

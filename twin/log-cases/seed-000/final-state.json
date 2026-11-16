@@ -1,0 +1,51 @@
+{
+  "0": {
+    "fcw": "0x027f",
+    "flags": {
+      "CF": 0,
+      "OF": 0,
+      "PF": 0,
+      "SF": 0,
+      "ZF": 0
+    },
+    "gpr": {
+      "rax": "0x3fea1f7300004000",
+      "rcx": "0x3fea1f73ec6906a6",
+      "rdi": "0xfffffd9f",
+      "rdx": "0x1440",
+      "rsi": "0xa2",
+      "rsp": "0x7f0000000000"
+    },
+    "k": {
+      "k0": "0xffff",
+      "k1": "0x1",
+      "k2": "0x0",
+      "k3": "0x0",
+      "k4": "0x0",
+      "k5": "0x0",
+      "k6": "0x0",
+      "k7": "0x0"
+    },
+    "x87": [],
+    "zmm": {
+      "zmm0": [
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad",
+        "0xfe8ee0da",
+        "0x43c626ad"
+      ]
+    }
+  }
+}

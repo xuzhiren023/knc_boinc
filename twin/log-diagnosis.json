@@ -1,0 +1,4922 @@
+{
+  "verdict": "Twin ISA defect: fildl reads 8 bytes, but opcode DB /0 loads a signed 32-bit integer. Tables are present and match ELF; no uninitialized read bytes on audited paths.",
+  "binary_sha256": "fb6713b55f3752d361174c2d1328c9d636ed1f2bc9eb871f5371332b95b9a24b",
+  "engine_isa_sha256": "9c81b0a553abe432fb9855f790223a49ec53f2661adbc4b798f5fe1dfd3a9b6c",
+  "first_divergence": {
+    "step": 31,
+    "id": "a49727d",
+    "op": "fildl",
+    "bytes_read": {
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    "hand_expected_integer": 0,
+    "twin_value": "4.6071824188000174e+18",
+    "before": {
+      "gpr": {
+        "rax": "0x3ff0000000000000",
+        "rcx": "0x3ff0000000000000",
+        "rsp": "0x7effffffff88"
+      },
+      "k": {
+        "k0": "0xffff",
+        "k1": "0x1",
+        "k2": "0x0",
+        "k3": "0x0",
+        "k4": "0x0",
+        "k5": "0x0",
+        "k6": "0x0",
+        "k7": "0x0"
+      },
+      "zmm": {
+        "zmm0": [
+          "0x00000000",
+          "0x3ff00000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000"
+        ]
+      },
+      "flags": {
+        "ZF": 1,
+        "SF": 0,
+        "CF": 0,
+        "OF": 0,
+        "PF": 1
+      },
+      "x87": [
+        {
+          "f80": "0x1fff8000000000000000",
+          "f64": "1.0"
+        }
+      ],
+      "fcw": "0x027f"
+    },
+    "after": {
+      "gpr": {
+        "rax": "0x3ff0000000000000",
+        "rcx": "0x3ff0000000000000",
+        "rsp": "0x7effffffff88"
+      },
+      "k": {
+        "k0": "0xffff",
+        "k1": "0x1",
+        "k2": "0x0",
+        "k3": "0x0",
+        "k4": "0x0",
+        "k5": "0x0",
+        "k6": "0x0",
+        "k7": "0x0"
+      },
+      "zmm": {
+        "zmm0": [
+          "0x00000000",
+          "0x3ff00000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000"
+        ]
+      },
+      "flags": {
+        "ZF": 1,
+        "SF": 0,
+        "CF": 0,
+        "OF": 0,
+        "PF": 1
+      },
+      "x87": [
+        {
+          "f80": "0x201e7fc0000000000000",
+          "f64": "4.6071824188000174e+18"
+        },
+        {
+          "f80": "0x1fff8000000000000000",
+          "f64": "1.0"
+        }
+      ],
+      "fcw": "0x027f"
+    }
+  },
+  "cases": [
+    {
+      "case": "fixed-0",
+      "input_bits": "3ff0000000000000",
+      "expected_bits": "0000000000000000",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c628b76e3a7b61",
+            "want": "0x0000000000000000",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "fixed-1",
+      "input_bits": "4000000000000000",
+      "expected_bits": "3fe62e42fefa39ef",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c628b76e3a7b61",
+            "want": "0x3fe62e42fefa39ef",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "fixed-2",
+      "input_bits": "3fe0000000000000",
+      "expected_bits": "bfe62e42fefa39ef",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c628b76e93346d",
+            "want": "0xbfe62e42fefa39ef",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "fixed-3",
+      "input_bits": "4005bf0a8b145769",
+      "expected_bits": "3ff0000000000000",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c62ab540fd9258",
+            "want": "0x3ff0000000000000",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "fixed-4",
+      "input_bits": "01a56e1fc2f8f359",
+      "expected_bits": "c085963447f87fb5",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c62a993610aeaa",
+            "want": "0xc085963447f87fb5",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "fixed-5",
+      "input_bits": "7e37e43c8800759c",
+      "expected_bits": "4085963447f87fb5",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c625e80668ab5c",
+            "want": "0x4085963447f87fb5",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 138
+      }
+    },
+    {
+      "case": "fixed-6",
+      "input_bits": "0000000000000001",
+      "expected_bits": "c0874385446d71c3",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c628b76e93346c",
+            "want": "0xc0874385446d71c3",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 147
+      }
+    },
+    {
+      "case": "seed-000",
+      "input_bits": "19da1f73ec6906a6",
+      "expected_bits": "c07a6545de94439c",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c626adfe8ee0da",
+            "want": "0xc07a6545de94439c",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 138
+      }
+    },
+    {
+      "case": "seed-001",
+      "input_bits": "6e31af6fc6c8067d",
+      "expected_bits": "4080083b8318a15c",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c6294cf43de4b1",
+            "want": "0x4080083b8318a15c",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "seed-002",
+      "input_bits": "0e0122140689a848",
+      "expected_bits": "c0814e0ca441c4ed",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c6291bf7213cb9",
+            "want": "0xc0814e0ca441c4ed",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "seed-003",
+      "input_bits": "485848feb9fdcdf7",
+      "expected_bits": "40575322c86f0918",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c6260af1ed94d6",
+            "want": "0x40575322c86f0918",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 138
+      }
+    },
+    {
+      "case": "seed-004",
+      "input_bits": "6d8de8d3c6f53eba",
+      "expected_bits": "407f9ee0cb5ce0ec",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c627fdf3e9e8d3",
+            "want": "0x407f9ee0cb5ce0ec",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 138
+      }
+    },
+    {
+      "case": "seed-005",
+      "input_bits": "2deb627b54e3ce01",
+      "expected_bits": "c068f90749b8da98",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c6271df2cec811",
+            "want": "0xc068f90749b8da98",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 138
+      }
+    },
+    {
+      "case": "seed-006",
+      "input_bits": "15922e36193a367c",
+      "expected_bits": "c07d5d3767eaa1f7",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c62978e4a25c09",
+            "want": "0xc07d5d3767eaa1f7",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "seed-007",
+      "input_bits": "2e442c5fcdd6991b",
+      "expected_bits": "c0687db9608c87b8",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c62a29b37ddece",
+            "want": "0xc0687db9608c87b8",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    },
+    {
+      "case": "captured",
+      "input_bits": "3ff0000000000000",
+      "expected_bits": "0000000000000000",
+      "status": "functional_mismatch",
+      "functional_check": {
+        "checked": 1,
+        "mismatches": [
+          {
+            "got": "0x43c628b76e3a7b61",
+            "want": "0x0000000000000000",
+            "where": "ctx0.zmm0[0]"
+          }
+        ],
+        "status": "mismatch"
+      },
+      "dynamic_instructions": {
+        "0": 136
+      }
+    }
+  ],
+  "memory_reads": [
+    {
+      "case": "fixed-0",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49728a",
+      "addr": "0x8ec900",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497294",
+      "addr": "0x8ec908",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49729a",
+      "addr": "0x8ec910",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0000000000f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "72793a6eb728c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "2676e2bd9aeb0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "617b3a6eb728c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-0",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "0000000000000040",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "0000000000000040",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "010000000000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49728a",
+      "addr": "0x8ec900",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497294",
+      "addr": "0x8ec908",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49729a",
+      "addr": "0x8ec910",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0000000000f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "72793a6eb728c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "2676e2bd9aeb0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "617b3a6eb728c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-1",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "000000000000e03f",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000e03f",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "ffffffff0000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49728a",
+      "addr": "0x8ec900",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497294",
+      "addr": "0x8ec908",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49729a",
+      "addr": "0x8ec910",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0000800000f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "7e32936eb728c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "84435ebe9aeb0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "6d34936eb728c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-2",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "6957148b0abf0540",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "6957148b0abf0540",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000abff53f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "010000000abff53f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49728a",
+      "addr": "0x8ed480",
+      "bytes": 4,
+      "hex": "60523c3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497294",
+      "addr": "0x8ed488",
+      "bytes": 8,
+      "hex": "b24969b54da6d33f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49729a",
+      "addr": "0x8ed490",
+      "bytes": 8,
+      "hex": "50b67e6e76616cbc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "6957148b0abff53f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "00000085dffacf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "50b67e6e76616cbc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "6990fd40b52ac643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "7064c92362ee0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "5892fd40b52ac643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-3",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "59f3f8c21f6ea501",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "59f3f8c21f6ea501",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000001f6ef53f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "1bfcffff1f6ef53f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49728a",
+      "addr": "0x8ed3e0",
+      "bytes": 4,
+      "hex": "30113f3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497294",
+      "addr": "0x8ed3e8",
+      "bytes": 8,
+      "hex": "d4a3b8662eb9d23f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49729a",
+      "addr": "0x8ed3f0",
+      "bytes": 8,
+      "hex": "897d586cdb9e70bc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "59f3f8c21f6ef53f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "feffff0fb7facf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "897d586cdb9e70bc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "bbac1036992ac643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "813372023bee0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "aaae1036992ac643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-4",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "9c7500883ce4377e",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "9c7500883ce4377e",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000003ce4e73f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "e50300003ce4e73f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49728a",
+      "addr": "0x8ed8c0",
+      "bytes": 4,
+      "hex": "708fab3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497294",
+      "addr": "0x8ed8c8",
+      "bytes": 8,
+      "hex": "eb88dcc4f2bed2bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49729a",
+      "addr": "0x8ed8d0",
+      "bytes": 8,
+      "hex": "f7d597099b885fbc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "9c7500883ce4e73f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0200001ef2f3cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "f7d597099b885fbc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "6ea96806e825c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "aece7de5aee70e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "5cab6806e825c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-5",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "0100000000000000",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "0100000000000000",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49720a",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "0100000000000000",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497212",
+      "addr": "0x8ee9e8",
+      "bytes": 4,
+      "hex": "00008059",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49721c",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "0000000000001000",
+      "sources": [
+        "store by a497218"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "cefbffff0000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49728a",
+      "addr": "0x8ec900",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497294",
+      "addr": "0x8ec908",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49729a",
+      "addr": "0x8ec910",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "feff7f0000f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "7d32936eb728c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "82435ebe9aeb0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "6c34936eb728c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "fixed-6",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "a60669ec731fda19",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "a60669ec731fda19",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "00000000731fea3f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "9ffdffff731fea3f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49728a",
+      "addr": "0x8edd40",
+      "bytes": 4,
+      "hex": "e0c89c3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497294",
+      "addr": "0x8edd48",
+      "bytes": 8,
+      "hex": "209508e7c2f6c9bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49729a",
+      "addr": "0x8edd50",
+      "bytes": 8,
+      "hex": "cf335b60335843bc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "a60669ec731fea3f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "ffffffb90ff5cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "cf335b60335843bc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "ebde8efead26c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "c415a423c3e80e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "dae08efead26c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-000",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "7d06c8c66faf316e",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "7d06c8c66faf316e",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000006faff13f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "e40200006faff13f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49728a",
+      "addr": "0x8ecc60",
+      "bytes": 4,
+      "hex": "7093673f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497294",
+      "addr": "0x8ecc68",
+      "bytes": 8,
+      "hex": "c138207645abb93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49729a",
+      "addr": "0x8ecc70",
+      "bytes": 8,
+      "hex": "624cfad5e3fd563c",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "7d06c8c66faff13f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "010080b7d7f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "624cfad5e3fd563c",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "c2e23df44c29c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "3e4952626bec0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "b1e43df44c29c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-001",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "48a889061422010e",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "48a889061422010e",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000001422f13f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "e1fcffff1422f13f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49728a",
+      "addr": "0x8ecb40",
+      "bytes": 4,
+      "hex": "b02e6f3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497294",
+      "addr": "0x8ecb48",
+      "bytes": 8,
+      "hex": "f397a38e3e65b13f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49729a",
+      "addr": "0x8ecb50",
+      "bytes": 8,
+      "hex": "d76ccabadd0937bc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "48a889061422f13f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "feff7f0a91f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "d76ccabadd0937bc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "ca3a21f71b29c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "8024af0627ec0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "b93c21f71b29c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-002",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "f7cdfdb9fe485848",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "f7cdfdb9fe485848",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "00000000fe48e83f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "87000000fe48e83f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49728a",
+      "addr": "0x8ed9a0",
+      "bytes": 4,
+      "hex": "1079a83f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497294",
+      "addr": "0x8ed9a8",
+      "bytes": 8,
+      "hex": "b3b49b8f6a95d1bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49729a",
+      "addr": "0x8ed9b0",
+      "bytes": 8,
+      "hex": "268c09b7cf406fbc",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "f7cdfdb9fe48e83f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0000007f24f4cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "268c09b7cf406fbc",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "e892edf10a26c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "0c47889fdfe70e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "d694edf10a26c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-003",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "ba3ef5c6d3e88d6d",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "ba3ef5c6d3e88d6d",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "00000000d3e8ed3f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "da020000d3e8ed3f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49728a",
+      "addr": "0x8ee4e0",
+      "bytes": 4,
+      "hex": "80d1883f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497294",
+      "addr": "0x8ee4e8",
+      "bytes": 8,
+      "hex": "11e7ca33440eb1bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49729a",
+      "addr": "0x8ee4f0",
+      "bytes": 8,
+      "hex": "8677198d5a4a5a3c",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "ba3ef5c6d3e8ed3f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "01008069f4f6cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "8677198d5a4a5a3c",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "e4e6e9f3fd27c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "3c45efed97ea0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "d3e8e9f3fd27c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-004",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "01cee3547b62eb2d",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "01cee3547b62eb2d",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000007b62eb3f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "e0feffff7b62eb3f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49728a",
+      "addr": "0x8edfc0",
+      "bytes": 4,
+      "hex": "20a0953f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497294",
+      "addr": "0x8edfc8",
+      "bytes": 8,
+      "hex": "6813990541fbc3bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49729a",
+      "addr": "0x8edfd0",
+      "bytes": 8,
+      "hex": "9042e4cee0a86d3c",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "01cee3547b62eb3f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "ffffff3db1f5cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "9042e4cee0a86d3c",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "22c6cef21d27c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "897ea05b5fe90e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "11c8cef21d27c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-005",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "7c363a19362e9215",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "7c363a19362e9215",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "00000000362ef23f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "5afdffff362ef23f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49728a",
+      "addr": "0x8ecd60",
+      "bytes": 4,
+      "hex": "b035613f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497294",
+      "addr": "0x8ecd68",
+      "bytes": 8,
+      "hex": "e665ca8a1167c03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49729a",
+      "addr": "0x8ecd70",
+      "bytes": 8,
+      "hex": "339c54b484776a3c",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "7c363a19362ef23f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "ffff7f1b17f9cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "339c54b484776a3c",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "1a5aa2e47829c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "db251fb2a8ec0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "095ca2e47829c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-006",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "1b99d6cd5f2c442e",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "1b99d6cd5f2c442e",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000005f2cf43f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "e5feffff5f2cf43f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49728a",
+      "addr": "0x8ed160",
+      "bytes": 4,
+      "hex": "e0e54a3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497294",
+      "addr": "0x8ed168",
+      "bytes": 8,
+      "hex": "a603acd0b7c1cd3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49729a",
+      "addr": "0x8ed170",
+      "bytes": 8,
+      "hex": "923efaff9d0f683c",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "1b99d6cd5f2cf43f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "ffffff2f16facf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "923efaff9d0f683c",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "dfdc7db3292ac643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "92eb14699fed0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "cede7db3292ac643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "seed-007",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a4971d5",
+      "addr": "0x7effffffffd0",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a4971cd"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a4971dc",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a4971d9"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a497275",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a49727d",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497279",
+        "store by a49726c"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a49728a",
+      "addr": "0x8ec900",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a497294",
+      "addr": "0x8ec908",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a49729a",
+      "addr": "0x8ec910",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972a4",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "000000000000f03f",
+      "sources": [
+        "store by a497290"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972b1",
+      "addr": "0x4c9dc4",
+      "bytes": 4,
+      "hex": "0000803f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972cf",
+      "addr": "0x8ee950",
+      "bytes": 8,
+      "hex": "2ce9daf69f99c93f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972d7",
+      "addr": "0x8ee958",
+      "bytes": 8,
+      "hex": "551655555555d53f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972e3",
+      "addr": "0x8ee960",
+      "bytes": 8,
+      "hex": "8f4d087c5b55c5bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972eb",
+      "addr": "0x8ee968",
+      "bytes": 8,
+      "hex": "b270ffffffffcf3f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a4972fd",
+      "addr": "0x4ca2e0",
+      "bytes": 8,
+      "hex": "000000000000e0bf",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a49730b",
+      "addr": "0x7effffffff98",
+      "bytes": 8,
+      "hex": "0000000000f8cf43",
+      "sources": [
+        "store by a497283"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a49730f",
+      "addr": "0x8e3468",
+      "bytes": 8,
+      "hex": "0038fafe422ee63f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a497319",
+      "addr": "0x8ee970",
+      "bytes": 8,
+      "hex": "0068c79357f32e3d",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a497343",
+      "addr": "0x7effffffffa8",
+      "bytes": 8,
+      "hex": "0000000000000000",
+      "sources": [
+        "store by a4972a0"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a49735f",
+      "addr": "0x7effffffffa0",
+      "bytes": 8,
+      "hex": "72793a6eb728c643",
+      "sources": [
+        "store by a497321"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a497363",
+      "addr": "0x7effffffff90",
+      "bytes": 8,
+      "hex": "2676e2bd9aeb0e41",
+      "sources": [
+        "store by a497327"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a497376",
+      "addr": "0x8ee978",
+      "bytes": 8,
+      "hex": "110441100441f03f",
+      "sources": [
+        "init.memory[0] section .rodata"
+      ],
+      "section": ".rodata",
+      "matches_ELF": true
+    },
+    {
+      "case": "captured",
+      "instruction": "a497566",
+      "addr": "0x7effffffff88",
+      "bytes": 8,
+      "hex": "617b3a6eb728c643",
+      "sources": [
+        "store by a49736d"
+      ],
+      "section": null,
+      "matches_ELF": null
+    },
+    {
+      "case": "captured",
+      "instruction": "a497571",
+      "addr": "0x7efffffffff8",
+      "bytes": 8,
+      "hex": "0000e141714e5e7d",
+      "sources": [
+        "store by entry sentinel"
+      ],
+      "section": null,
+      "matches_ELF": null
+    }
+  ]
+}

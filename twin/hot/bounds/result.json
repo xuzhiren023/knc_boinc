@@ -1,8 +1,8 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\hot\\bounds",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\hot\\bounds\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\hot\\bounds\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\hot\\bounds\\summary.md"
   },
   "assumptions": [
     "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
@@ -87,7 +87,7 @@
     "status": "mismatch"
   },
   "input": {
-    "hash_sha256": "e70dbe9ca2f69dfb7941c2ec3d760ee80f5ee83b06536aca39a6270832e2a9c2",
+    "hash_sha256": "21e6c240e39d823a0019ef74adaa9bd1986b13581de0da085908f3500edfad9e",
     "kernel": {
       "contexts": [
         0
@@ -128,7 +128,7 @@
         "description": "one log_rn call, first real small input"
       }
     },
-    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\log-kernel.json"
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\log-kernel.json"
   },
   "invocation": {
     "argv": [
@@ -142,7 +142,7 @@
       "--force"
     ],
     "command": "bounds",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
@@ -238,12 +238,12 @@
     "synthetic": false,
     "version": "0.3.0"
   },
-  "python_execution_seconds": 0.5461,
+  "python_execution_seconds": 0.7273,
   "representation_evaluated": "normalized-records",
   "result_type": "analytical_bound",
   "scale": "core",
   "schema": "knc-twin.result/1",
   "status": "functional_mismatch",
-  "timestamp_utc": "2026-11-16T05:44:43Z",
+  "timestamp_utc": "2026-11-16T05:56:56Z",
   "unsupported": []
 }

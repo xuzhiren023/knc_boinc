@@ -1,0 +1,4 @@
+functional: functional_mismatch
+1 mismatch(es) against expected outputs; first: {"where": "ctx0.zmm0[0]", "got": "0x43c62978e4a25c09", "want": "0xc07d5d3767eaa1f7"}
+result: twin\log-cases\seed-006\result.json
+summary: twin\log-cases\seed-006\summary.md

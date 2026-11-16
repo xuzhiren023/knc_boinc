@@ -52,7 +52,7 @@ BUNDLED_SOURCES := $(LUA_SOURCES) dSFMT/dSFMT.c \
  popt/src/popthelp.c popt/src/poptint.c
 SOURCES := $(NBODY_SOURCES) $(MW_SOURCES) $(BUNDLED_SOURCES)
 # IEEE math, no host-specific ISA flags; scalar dSFMT also builds on KNC.
-COMMON_CFLAGS := -O2 -g -fopenmp -fno-strict-aliasing -ffp-contract=off
+COMMON_CFLAGS := -O2 -g -fopenmp -fno-strict-aliasing -ffp-contract=off -fno-math-errno
 COMMON_CPPFLAGS := -D_GNU_SOURCE -DDOUBLEPREC=1 -DDSFMT_MEXP=19937 -DHAVE_CONFIG_H
 INCLUDE_DIRS := milkyway/include nbody/include lua/include lua/src popt/include dSFMT
 C_LANGUAGE_FLAGS := -std=gnu99

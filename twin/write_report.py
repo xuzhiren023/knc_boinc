@@ -1,222 +1,237 @@
-"""Render the verdict from the actual tool envelopes, never partial cycle values."""
+"""S1-04: render evidence and all returned status fields without guessed timing."""
 import hashlib
 import json
 from pathlib import Path
-root = Path(__file__).resolve().parents[1]
-def read(path):
-    return json.loads((root/path).read_text())
-def fields(path):
-    k = read(path)
-    names = ('status','result_class','functional_check','assumptions','unsupported',
-             'limiting_constraints','calibration_status','parameters_used')
-    return '\n'.join('- `' + name + '`: `' + json.dumps(k.get(name,'<absent>'),sort_keys=True) + '`'
-                     for name in names)
-profile_rows = {}
-for line in (root/'twin/profile/gprof.txt').read_text().splitlines():
-    columns = line.split()
-    if len(columns) >= 6 and columns[-1] in ('log_rn','pow_rn','nbGravity','_mcount_private','__fentry__'):
-        try:
-            float(columns[0]); float(columns[2])
-        except ValueError:
-            continue
-        profile_rows.setdefault(columns[-1],(columns[0],columns[2]))
-m = read('twin/capture-manifest.json')
-conv = read('twin/conversion.json')['provenance']
-hot = read('twin/log-conversion.json')['provenance']
-s = '''# S1-03: real pre-card twin verdict
+ROOT=Path(__file__).resolve().parents[1]
+def read(name): return json.loads((ROOT/name).read_text())
+def fields(name):
+    r=read(name)
+    keys=('status','result_class','functional_check','assumptions','unsupported','limiting_constraints','calibration_status','parameters_used')
+    return '\n'.join('- `'+k+'`: `'+json.dumps(r.get(k,'<absent>'),sort_keys=True)+'`' for k in keys)
+d=read('twin/log-diagnosis.json')
+first=d['first_divergence']
+profile={}
+for line in (ROOT/'twin/profile/gprof.txt').read_text().splitlines():
+    cols=line.split()
+    if len(cols)>=4 and cols[-1] in ('log_rn','pow_rn','nbGravity','_mcount_private','__fentry__'):
+        try: float(cols[0]);float(cols[2])
+        except ValueError: continue
+        profile.setdefault(cols[-1],(cols[0],cols[2]))
+# Every distinct dynamically read range and all its byte origins. Full reads
+# (including bytes, call case and instruction) stay in log-diagnosis.json.
+ranges={}
+for row in d['memory_reads']:
+    key=(int(row['addr'],16),row['bytes'])
+    entry=ranges.setdefault(key,{'sources':set(),'insns':set(),'cases':set(),'sections':set()})
+    entry['sources'].update(row['sources']);entry['insns'].add(row['instruction']);entry['cases'].add(row['case'])
+    if row['section']:entry['sections'].add(row['section'])
+lines=['# Dynamic log_rn / p_accu memory inventory','',
+       'All ranges are half-open. Byte-for-byte initialization/store provenance is audited independently of the engine\'s line-granular allocation. Full read values and case identifiers: `log-diagnosis.json`. These are extraction/functional metadata, not cycle results.','',
+       '| Range | Read bytes | Section | Origin(s) / instruction(s) |',
+       '| --- | ---: | --- | --- |']
+for (a,n),entry in sorted(ranges.items()):
+    lines.append('| `0x%x..0x%x` | %d | %s | %s; reads: %s |'%(a,a+n,n,', '.join(sorted(entry['sections'])) or 'stack', '; '.join(sorted(entry['sources'])), ', '.join(sorted(entry['insns']))))
+(ROOT/'twin/log-memory.md').write_text('\n'.join(lines)+'\n')
+refs=[]
+for case,threads in [('small',1),('small',4),('medium',1),('medium',4),('large',1),('large',12)]:
+    p=ROOT/f'runs/x86/{case}-{threads}'
+    r={'case':case,'threads':threads,'kind':'host_reference_after_fno_math_errno'}
+    for name in ('exit.txt','seconds.txt','command.txt'):
+        r[name]=(p/name).read_text().strip() if (p/name).exists() else None
+    r['histogram_present']=(p/'histogram.txt').exists()
+    r['histogram_sha256']=hashlib.sha256((p/'histogram.txt').read_bytes()).hexdigest() if r['histogram_present'] else None
+    refs.append(r)
+(ROOT/'twin/reference-runs.json').write_text(json.dumps(refs,indent=2)+'\n')
+s='''# S1-04: logarithm mismatch diagnosis and card handoff
 
-**The compiled gravity kernel has not been shown to match x86.** Its four twin
-commands return `unsupported`. The measured overall hotspot, `log_rn`, has a
-complete extraction and validates, but returns `functional_mismatch` against
-its captured x86 result. Neither experiment supplies a valid predicted
-per-call cycle figure or a bound. Card validation remains necessary.
+**Verdict: the observed log_rn twin mismatch is a twin ISA/model defect.**
+The tables are present and correctly loaded. `fildl` incorrectly reads eight
+bytes instead of four. This finding does not prove the card binary is correct;
+the native card probe awaits the lead. Gravity still returns `unsupported`,
+now for the error routine's `fprintf` call after `sqrt` became inline `fsqrt`.
+There is no valid predicted per-call cycle figure or bound for either kernel.
 
-This replaces the earlier network-blocked report. The pinned sources verify
-offline; the card and x86 binaries now build. The negative twin verdicts are
-actual tool results, not missing experiments. The ticket expressly allows
-unsupported behavior as a result; no instruction, branch or callee was removed
-to manufacture a pass, and no unmeasured callee cost was supplied.
+## Input completeness
 
-## Profiling and scope
+`twin/log-memory.md` lists every distinct range read across the rerun paths;
+`twin/log-diagnosis.json` records **every dynamic read**, its instruction,
+input case, byte value, and per-byte initialization/store provenance.
+`twin/diagnose_log.py` instruments a read-only import of the unchanged engine.
+It rejects reads of any uninitialized byte, including holes within a memory
+line (the engine itself checks only whether the line exists). No audited read
+is uninitialized. Every `.rodata` read matches the linked card ELF exactly.
 
-Cygwin GCC `-O2 -g -pg -fopenmp -fno-strict-aliasing -ffp-contract=off`, followed
-by Cygwin `gprof`, profiled the full seeded `small` run with one OpenMP thread.
-See `twin/profile/{gmon.out,gprof.txt,stdout.txt,stderr.txt,histogram.txt}`.
-The flat profile reports `log_rn` at {{log_rn_percent}}% self time ({{log_rn_seconds}} sampled host seconds),
-`pow_rn` at {{pow_rn_percent}}% ({{pow_rn_seconds}} sampled host seconds), and `nbGravity` at {{nbGravity_percent}}%
-({{nbGravity_seconds}} sampled host seconds). These are **host sampling measurements**, not twin
-result classes or card predictions. Profiling overhead is substantial:
-`_mcount_private` is {{_mcount_private_percent}}% and `__fentry__` is {{__fentry___percent}}%. The gravity routine is
-not the overall hotspot in this workunit. Both the requested force routine and
-the actual measured hotspot were checked; the profile is not used to invent
-callee costs or a whole-program speed forecast.
+The adapter loads the full allocated `.rodata` section as inline hex in
+`init.memory[0]`, including crlibm argument-reduction tables and constants;
+`init.memory[1]` is the ELF's zero-initialized `.bss`. The table inventory names
+the actual accessed offsets; no table is synthesized from host values.
+`init.memory[2]` loads `capture/log-input.bin` at `0x60000000`; it is archival
+input storage and is not dereferenced by the function. The scalar argument is
+the exact captured bits in low zmm0. For generated probe cases only this ABI
+argument and the independent expected output change. The entry stack contains
+the interpreter's caller-return sentinel, followed by actual stores from the
+unaltered prologue/body. Stack reads cite those defining store instructions.
+No `memory_default` is used. `p_accu` is included in the complete extraction;
+only paths actually executed by the unchanged twin are claimed by this audit,
+not all paths that correct hardware could take after the first divergence.
+None of these faulty-model executions enters p_accu; it has no dynamic reads
+in this run, although its complete compiled body remains included.
 
-## Capture and ABI evidence
-
-`twin/prepare_capture.py` creates an instrumented copy of `nbody_grav.c` under
-`build/`; the pinned source remains untouched. The first real gravity call on
-`small` dumps the context, state, softening matrix and every node reachable
-through the tree's next/more pointers. The dump occurs before computation;
-the expected acceleration comes from the x86 function's returned value.
-`twin/capture_helper.h` records the live x87 control word. Only physical x/y/z
-acceleration bytes are compared: upstream vector padding w is unspecified.
-
-`twin/capture_log.c` uses the linker's `--wrap=log_rn` to record the first real
-scalar input and the return value from the original function, without rewriting
-its implementation. The first captured input is 1.0 and the independent host
-output is +0.0 (captured data, not timing estimates). The scalar K1OM ABI uses
-the low double of zmm0; inactive lanes start at zero and are not compared.
-The original raw input is also retained as an `init.memory` file block;
-`log_overlay.py` loads the ABI argument and expected return bits from the files.
-No synthetic input or twin-produced expected value is used.
-
-The gravity ABI has hidden return storage in rdi, ctx in rsi, state in rdx and
-body in rcx. Host pointers are preserved. `twin/layout.c` is compiled for both
-host and card; its array agrees on every declared size/offset, including all
-fields read by gravity and the included error routine. Trailing zero COFF
-section alignment is excluded from that comparison. Layout values and every
-capture file's SHA-256 are in `twin/capture-manifest.json`. These are **capture
-and extraction metadata**, not prediction result classes. Raw context/state
-blocks contain other pointers; no uncaptured memory may be silently read:
-`memory_default` is removed from both extracted kernels.
-
-The captured control word is `0x027f` (53-bit x87 precision, round-to-nearest),
-matching the application's crlibm initialization. FTZ and DAZ are false.
-The comparison tolerance is **zero**: exact output bits for gravity's x/y/z,
-and the low scalar double returned by correctly rounded `log_rn`. This does
-not imply agreement at a looser tolerance; gravity never reaches comparison.
-The log mismatch is large and remains unresolved: this experiment cannot tell
-whether the defect lies in the twin/adapter or in the compiled card code.
+## First divergent instruction and minimal repro
 
 '''
-s += 'Gravity capture: **capture metadata**, ' + str(m['blocks']) + ' file blocks; expected acceleration ' + json.dumps(m['expected_acceleration']) + '.\n\n'
-s += '## Binary coverage and unsupported closure\n\n'
-s += ('K1OM objdump disassembles `build/card/milkyway_nbody.mic`; its SHA-256 is `' + conv['source_sha256'] + '` (**binary metadata**). '
-      'The entire `nbGravity` and `nbReportTreeIncest` are included: ' + str(conv['coverage']['instructions']) + ' instructions (**extraction metadata**). '
-      'All extracted mnemonics have functional and timing support; `fildll` is the documented ISA alias of `fildq`. '
-      'No timing-only mnemonic is silently accepted. The remaining callees are `sqrt` and `fprintf`.\n\n')
-s += '''`twin/closure-attempt.txt` records the attempt to include their compiled PLT
-entries. The adapter refuses the indirect jump through the GOT (`*0xb09bb0`).
-`sqrt` is dynamically linked and the tree-error routine tail-calls `fprintf`.
-No sourced per-call runtime costs are available. The main extraction retains
-these calls, so the four commands faithfully reject the region on the first
-undeclared callee (`sqrt`). They do not execute a truncated kernel. The empty
-`unsupported` mnemonic coverage array is not proof of a supported call closure.
+s+=f'''For the 1.0 input, dynamic step `{first['step']}` at `{first['id']}` is
+`fildl 0x8(%rsp)` (machine bytes `db 44 24 08`). The preceding 64-bit store
+put `0x3ff0000000000000` in that slot; the subsequent **32-bit** store of edi
+wrote zero into its low four bytes. Earlier state follows the integer
+exponent calculation `(0x3ff00000 >> 20) - 1023 = 0`; the snapshots retain all
+preceding register/stack results. `fildl` must load the signed low 32-bit
+integer **0**, regardless of the old high bytes. The engine's ISA table
+assigns it `mem_size=8`, loading **{first['twin_value']}** instead.
+This introduces the huge exponent term in the logarithm calculation.
+The retained intermediate snapshots are `twin/log-cases/log-one-intermediates.json`.
 
 '''
-s += ('For the measured hotspot, the entire `log_rn` and `p_accu` are included: ' + str(hot['coverage']['instructions']) +
-      ' instructions (**extraction metadata**), no unresolved symbols or undeclared callees, no unsupported or timing-only instructions, and no stubs. '
-      'The functional check reports got `0x43c628b76e3a7b61` versus expected `0x0000000000000000` in `ctx0.zmm0[0]` (**functional output bits**, not cycle results).\n\n')
-s += '''The binary also contains a different local function named `p_accu`. Before
-hotspot extraction, `twin/disambiguate.py` gives duplicate local symbol
-annotations unique address-based names. It asserts that addresses, raw bytes,
-and instruction text are unchanged after removing the annotations. The actual
-logarithm callee at `0x495480` is included; the unrelated local function at
-`0x4a76c0` is excluded. `twin/symbol-aliases.json` records this adapter input
-normalization. The observed mismatch persists with the faithful call closure.
+s+='''The independent Cygwin x86 executable from `probes/fildl_host.c` executes
+`fildl` on that same eight-byte slot and returns bits `0x0000000000000000`;
+`twin/fildl-host.txt` retains its output. The four-instruction standalone
+`twin/fildl-repro.json` has no crlibm dependency: unchanged engine functional
+execution returns `functional_mismatch` (`0x43cff80000000000` vs zero).
+The engine's integer x87 width table also gives `filds` four bytes rather
+than two; that is source inspection, not a separately executed repro.
+No shared skill, ISA table, compiler or toolchain file was modified. Forward
+the minimal JSON, result/trace, x86 source/output and engine ISA SHA-256 in
+`log-diagnosis.json` to the twin owner. DB /0 denotes m32int; floating-point
+`fldl` is correctly m64fp and must not receive the integer-width correction.
 
-## Verbatim result status fields
+The full `log_rn`/`p_accu` extraction has no unresolved symbols or undeclared
+callees. Its unchanged validate/functional/simulate/bounds reruns are under
+`twin/hot/`. The original captured input and all fixed/seeded cases below
+were executed with the unchanged engine. Expected bits are from the x86 probe,
+never from the twin. Functional bits and instruction counts are **functional
+metadata**, not timing predictions. A separate local diagnostic changes only the copied per-instruction fildl
+specification from eight bytes to four and reruns the captured log(1.0).
+`twin/fildl-width-diagnostic.json` records an exact +0.0 match. This establishes
+causality for the original mismatch; it is not an unchanged-engine result or
+a timing prediction. The shared engine and the production kernels remain
+untouched.
 
-Each command has its own `result.json` and `summary.md`. `"<absent>"` below
-means the field is absent in that engine envelope, not returned as JSON null.
-In particular these envelopes do not contain `result_class`; no class is
-invented for a validation error or failed functional check. No cycle prediction
-or partial trace number is promoted to a result. Any numbers embedded in copied
-calibration text describe the model's calibration, not this kernel's accuracy.
-No assumed/derived `parameters_used` rows were returned for these experiments.
-
-'''
-for prefix in ('','hot/'):
-    for command in ('validate','functional','simulate','bounds'):
-        s += '### ' + ('Measured hotspot ' if prefix else 'Gravity ') + command + '\n\n'
-        s += fields('twin/'+prefix+command+'/result.json')+'\n\n'
-s += '''## Cycle comparison and assumptions
-
-Predicted gravity cycles per call: **unavailable**, result_class **absent**,
-status `unsupported`. Predicted `log_rn` cycles per call: **unavailable**,
-result_class **absent**, status `functional_mismatch`. Bounds are likewise
-unavailable. There is no valid numeric figure for the lead to compare to card
-cycles. This is a negative pre-card result, not a performance claim.
-
-Both scenarios declare one context, cold memory with line tracking and
-all-predicted branches, warm instruction cache, and one captured call as the
-unit of work. Neither declares a validated N-body/logarithm shape. A successful
-future simulation would still require the appropriate result classification;
-the skill's held-out validation does not calibrate these shapes. No whole-card
-or whole-program estimate is made. The captured calls do not establish
-correctness for all timesteps, body types, special inputs, or thread counts.
-
-## Builds, reference runs and card handoff
-
-Fresh card package: `dist/card/milkyway_nbody.mic`, compiler runtime closure,
-`runtime-manifest.txt`, `readelf.txt`, and passing `knc-lint.txt`.
-`dist/card/lead-commands.sh` contains the commands printed by
-`scripts/card-check.sh`; `scripts/card-launch.sh` launches the packaged binary.
-No card access was attempted. The lead must run those commands and retain
-card receipts/results. The artifact package and reference runs are gitignored
-local deliverables; source capture bytes and twin JSON/Markdown are in `twin/`.
-
-Reference run status (**host execution metadata**, not twin predictions):
-
-| case / threads | exit | histogram present | elapsed host seconds |
+| Probe case | Input bits | Expected x86 log bits | Twin status |
 | --- | --- | --- | --- |
 '''
-for case,threads in (('small',1),('small',4),('medium',1),('medium',4),('large',1),('large',12)):
-    p = root/'runs/x86'/('%s-%s'%(case,threads))
-    def txt(name):
-        f=p/name
-        return f.read_text().strip() if f.is_file() and f.stat().st_size else 'pending'
-    s += '| %s / %s | %s | %s | %s |\n'%(case,threads,txt('exit.txt'),(p/'histogram.txt').is_file(),txt('seconds.txt'))
-s += '''
-The run directories contain command, stdout/stderr, exit code, elapsed time
-and histogram. `*-compare.txt` records the between-thread comparison using the
-repository's strict absolute likelihood threshold of 1e-10; histogram values
-are diagnostic. Capture and profiling histograms were also compared against
-the uninstrumented small reference. Failed files from the earlier session are
-replaced only by successful fresh runs; do not use a directory marked pending.
+for c in d['cases']:s+=f"| {c['case']} | `{c['input_bits']}` | `{c['expected_bits']}` | `{c['status']}` |\n"
+s+='''
+## Card probe and compare
 
-## Reproduce
+`probes/libm_probe.c` prints input and output bits for 1.0, 2.0, 0.5,
+the nearest double to e, 1e-300, 1e300, the minimum positive subnormal,
+384 deterministic seeded finite positive values, and the exact captured log
+input. The captured row uses the actual eight-byte file; there was no captured
+pow argument pair in S1-03. Other functions are tested on that same scalar plus
+the documented fixed binary arguments, not falsely described as captured calls.
+The probe includes every linked crlibm family used through milkyway's double
+math mappings and the application's linked libm math functions (including
+complex sqrt/pow, sincos, exp2/exp10 and hypot). See
+`twin/app-undefined-symbols.txt` for the linked libm inventory. Non-math
+library dependencies such as fegetround are not numerical result probes.
+The row format is `case function input_bits second_argument_bits result_bits`;
+frexp/modf put the returned exponent/integer part in the fourth field. For
+complex pow the fixed exponent is 1.2345+0.25i and the input is x+0.5i;
+real and imaginary outputs get separate rows.
 
-Run from Git Bash in this worktree:
+Both targets use `mk/sources.mk` flags, `crlibm_init`/`crlibm_exit`, and link the
+**same existing crlibm object files as their respective application**.
+`twin/probe-manifest.json` records object/probe hashes and the host row count.
+The card executable is `dist/card/libm_probe.mic`, with the app's packaged
+compiler runtimes and a successful `dist/card/probe-knc-lint.txt` check.
+`scripts/probe-launch.sh` sets the staged runtime path and runs the probe.
+`scripts/probe-commands.sh` only prints the card_run/compare commands; its
+output is saved in `dist/card/probe-commands.sh`. The compare tool accepts the
+runner's final successful JSON receipt, rejects malformed/empty/failed output,
+and reports the first 20 exact-bit differences plus the total. It compares
+NaN payloads/signs exactly too: a domain-result difference alone is not a
+wrong-code diagnosis. The lead must preserve stdout, stderr and the receipt.
+No card access was attempted and no native card outcome is claimed.
+
+## Gravity and upstream flags
+
+Upstream `third_party/milkywayathome_client/CMakeLists.txt:288-300` defines
+`extra_gcc_math_flags` with `-fno-math-errno` and applies it to GCC/Clang C builds;
+the following C++ block applies the same list. Adopted this flag in the common
+flags for both builds (and the profiling-build override). All objects rebuilt.
+The new card disassembly of `nbGravity` contains two `fsqrt` instructions and
+no sqrt call. Its full error routine still tail-calls `fprintf`. The adapter
+cannot include the indirect PLT/GOT closure; `twin/closure-attempt.txt` retains
+the diagnostic. All four gravity steps were rerun and now report fprintf as
+the unsupported callee. No branch or error routine was removed; no callee
+cycle cost was invented. Thus full gravity functional agreement and timing
+remain unproven even though the sqrt blocker was removed.
+
+Fresh x86 reference execution after this flag (process metadata):
+
+| Workunit / threads | Exit | Histogram present | Host elapsed seconds |
+| --- | --- | --- | --- |
+'''
+for r in refs:s+=f"| {r['case']} / {r['threads']} | {r['exit.txt'] or 'pending'} | {r['histogram_present']} | {r['seconds.txt'] or 'pending'} |\n"
+s+='''
+`runs/x86/*-compare.txt` retain strict between-thread likelihood comparisons
+(absolute difference < 1e-10, histogram values diagnostic). Histograms include
+a generation timestamp, so their raw file hashes are identities, not a
+numerical comparison. The new small/1 result also matches the historical
+profile reference exactly (build/errno-small-reference-compare.txt). The capture and historical profile remain the independent
+S1-03 measurements. The new binary/package identities are in
+`twin/build-manifest.json`; the new references are in `twin/reference-runs.json`.
+
+## Historical host profile and numerical policy
+
+'''
+for name,(pct,sec) in profile.items():s+=f'- `{name}`: {pct}% self time, {sec} sampled host seconds.\n'
+s+='''
+Those are the inherited S1-03 Cygwin gprof **host sampling measurements**,
+not new card/twin predictions; profiling overhead is substantial. No unfilled
+template placeholders remain. The captured x87 control word remains `0x027f`
+(53-bit precision, nearest rounding), FTZ/DAZ false. Expected low-double output
+comparison is exact. One function call is the unit of work. Cold line-tracked
+memory, all-predicted branches, warm instruction cache and one context remain
+the declared scenario; no N-body or logarithm timing shape is calibrated.
+
+## Verbatim engine result fields
+
+`"<absent>"` means absent in the returned envelope, not a returned JSON null.
+No error/partial trace is used as a cycle figure. Calibration numbers below
+belong to the engine profile, not to this experiment's measured accuracy.
+
+'''
+for label,path in [('Gravity',''),('Measured hotspot','hot/')]:
+    for cmd in ('validate','functional','simulate','bounds'):
+        s+=f'### {label} {cmd}\n\n'+fields(f'twin/{path}{cmd}/result.json')+'\n\n'
+s+='### Minimal fildl repro functional\n\n'+fields('twin/fildl-repro/result.json')+'\n\n'
+s+='''## Reproduce
+
+From Git Bash at the worktree root:
 
 ```bash
-# Rebuild, profile, recapture, rerun all references and twin checks:
-bash twin/reproduce.sh
-# Or rerun only the two twin experiments on the existing binary/capture:
-bash twin/run.sh            # exit 1: unsupported is the recorded finding
-bash twin/run_hot.sh        # exit 1: functional mismatch is the recorded finding
+bash probes/reproduce.sh       # rebuild both apps, probes, six references, twin reruns
+# Or, with existing built app/captures:
+bash probes/build.sh
+bash twin/run.sh               # expected exit 1: unsupported fprintf
+bash twin/run_hot.sh           # expected exit 1: functional_mismatch
+python twin/diagnose_log.py    # unchanged functional cases + minimal repro + memory audit
 python twin/write_report.py
+python tests/test_libm_probe.py
 python tests/test_twin.py
-python -m unittest discover -s tests -p test_card.py -v
-python -m unittest discover -s tests -p test_compare.py -v
+# Lead only, prints commands without contacting the card:
+bash scripts/probe-commands.sh
+# Small standalone repro, no application build needed:
+python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py functional twin/fildl-repro.json --trace --out build/fildl-check --force
 ```
 
-The reproduction script creates `build/tmp` and exports TMPDIR, TMP and TEMP
-before compiling; it uses only the prescribed Cygwin host tools and KNC tools.
-`run.sh` refreshes capabilities, extracts the built function and included
-callee, audits every mnemonic and capture file, records the rejected library
-closure, and invokes validate/functional/simulate/bounds with the measured
-profile for timing and bounds. `run_hot.sh` checks the actual profiled hotspot
-with its complete callee. Tool failures are intentionally preserved and do not
-prevent the remaining requested commands from producing their own envelopes.
-The report is generated from those envelopes, not from hand-entered statuses.
+All build entry scripts create build/tmp and export TMPDIR, TMP and TEMP to
+$PWD/build/tmp before compiling. Builds use the prescribed Cygwin and KNC tools.
+All source/probe/rerun changes are left for lead review; no git write commands,
+installs, alternate downloads or shared toolchain writes were performed.
 '''
-# Refresh host evidence without inventing a twin result classification.
-reference_rows = []
-for case,threads in (('small',1),('small',4),('medium',1),('medium',4),('large',1),('large',12)):
-    directory = root/'runs/x86'/('%s-%s'%(case,threads))
-    row = {'case':case,'threads':threads,'kind':'host_reference'}
-    for name in ('exit.txt','seconds.txt','command.txt','stdout.txt'):
-        path = directory/name
-        row[name] = path.read_text().strip() if path.is_file() else None
-    path = directory/'histogram.txt'
-    row['histogram_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
-    reference_rows.append(row)
-(root/'twin/reference-runs.json').write_text(json.dumps(reference_rows,indent=2)+'\n')
-files = [root/'build/x86/milkyway_nbody.exe'] + list((root/'dist/card').glob('*'))
-manifest = [{'file':p.relative_to(root).as_posix(),'bytes':p.stat().st_size,
-             'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(files) if p.is_file()]
-(root/'twin/build-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-for key,(percent,seconds) in profile_rows.items():
-    s = s.replace('{{'+key+'_percent}}',percent).replace('{{'+key+'_seconds}}',seconds)
-(root/'docs/twin-check.md').write_text(s,encoding='utf-8')
+(ROOT/'docs/twin-check.md').write_text(s,encoding='utf-8')
+files=[ROOT/'build/x86/milkyway_nbody.exe']+list((ROOT/'dist/card').glob('*'))
+manifest=[{'file':p.relative_to(ROOT).as_posix(),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(files) if p.is_file()]
+(ROOT/'twin/build-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

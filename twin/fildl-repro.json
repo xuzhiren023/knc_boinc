@@ -1,0 +1,73 @@
+{
+  "schema": "knc-twin.kernel/1",
+  "entry": "function",
+  "numerical_policy": {
+    "daz": false,
+    "ftz": false,
+    "rounding": "rn",
+    "x87_control_word": "0x27f"
+  },
+  "name": "fildl reads 64 bits instead of 32",
+  "init": {
+    "memory": [
+      {
+        "addr": "0x1000",
+        "hex": "000000000000f03f"
+      }
+    ]
+  },
+  "expected": {
+    "registers": {
+      "0": {
+        "zmm0": {
+          "u64": [
+            "0x0"
+          ]
+        }
+      }
+    }
+  },
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "load",
+          "op": "fildl",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 4096
+            }
+          ]
+        },
+        {
+          "id": "store",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "rax",
+              "disp": 8192
+            }
+          ]
+        },
+        {
+          "id": "return_value",
+          "op": "vbroadcastsd",
+          "ops": [
+            "zmm0",
+            {
+              "base": "rax",
+              "disp": 8192
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "op": "ret",
+          "ops": []
+        }
+      ]
+    }
+  ]
+}

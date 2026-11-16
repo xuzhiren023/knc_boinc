@@ -1,0 +1,218 @@
+{
+  "flags_source": "mk/sources.mk (same objects linked by application and probe)",
+  "probe_rows": 20776,
+  "files": [
+    {
+      "path": "build/card/libm_probe.mic",
+      "sha256": "f1efeeb59b97005a167a38bef42f1feea0d3d50790c82a073b7c5e82075f56ae"
+    },
+    {
+      "path": "build/x86/libm_probe.exe",
+      "sha256": "9ab01633c669dd912f30dbaeb94c0cedc1d4815b6f52a9c205c8757d6421fd86"
+    },
+    {
+      "path": "twin/capture/log-input.bin",
+      "sha256": "6c3c396ed6b5c36dcae172271f462051b1266b851e92df3deea8ac65478fd712"
+    },
+    {
+      "path": "build/card/crlibm/asincos.c.o",
+      "sha256": "f9fdc0b527e9b372efb3f397dad2eff032ebfbfb32db00916a1bc03363901a7e"
+    },
+    {
+      "path": "build/card/crlibm/atan_accurate.c.o",
+      "sha256": "e8a7cdc65cf4784f4a024f773f81bddc925b57ef1ce9a9307b182697abe23fb9"
+    },
+    {
+      "path": "build/card/crlibm/atan_fast.c.o",
+      "sha256": "fbfdaa2bee7cd1a43d1dd11587f8cd3f4fa5050c876c0f1269301720b089918a"
+    },
+    {
+      "path": "build/card/crlibm/crlibm_private.c.o",
+      "sha256": "17a94aef04c054ad6d096d528959de5162fc69a25a068360aee1588393a1419c"
+    },
+    {
+      "path": "build/card/crlibm/csh_fast.c.o",
+      "sha256": "52715e70d55ad68a7ff17f2d96f879af85109140ec38007d8108c574bc4e7341"
+    },
+    {
+      "path": "build/card/crlibm/exp-td-standalone.c.o",
+      "sha256": "09200a0a239a9954e4f352e40c209dc7e9cb79cb5e5ef73dae7e0bc568bd544b"
+    },
+    {
+      "path": "build/card/crlibm/exp-td.c.o",
+      "sha256": "e29be43194cc70dc740029663ecb4dcdd941ac9dd1ae274018fdd86000ea6e71"
+    },
+    {
+      "path": "build/card/crlibm/expm1-standalone.c.o",
+      "sha256": "4e99aa8dfff3817e7485f2f49a36ff7976b8d769b1399d89d4646a2eceea8c6f"
+    },
+    {
+      "path": "build/card/crlibm/expm1.c.o",
+      "sha256": "e1c636c223c7f9913112277f998d6888c3bc38d9ff71d02b363beb9c4279d1c1"
+    },
+    {
+      "path": "build/card/crlibm/log.c.o",
+      "sha256": "dfa9d9aa52117ffdf87410a4eae8673bc20dec8bec62f657dbbeb9ad4489e874"
+    },
+    {
+      "path": "build/card/crlibm/log1p.c.o",
+      "sha256": "bf940e87b189c3546bee872e318e440c32a1345d5a7b7aa8a22d12582f77a6ac"
+    },
+    {
+      "path": "build/card/crlibm/pow.c.o",
+      "sha256": "7576bc937a59813a1e17d28e01a11c0230108c5425c9a1d779915bc6a8b6b86c"
+    },
+    {
+      "path": "build/card/crlibm/rem_pio2_accurate.c.o",
+      "sha256": "739be04bd2ba323e9e10b9dbaf104dcc789819763060b3bc77bec2936acbba9e"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/addition_scs.c.o",
+      "sha256": "ec10e5345f79d500439bffe86590ff6f89b858856d6fd83033fd1c270c0b627d"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/division_scs.c.o",
+      "sha256": "4acd78d1bb475e85c3f71f53fb7b10afc3f44e257cd8e8712fc0717959bebb72"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/double2scs.c.o",
+      "sha256": "2e6150dc816b47b6717da184dcbf1162c6010e338e56e5a92d25125f867baa5a"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/multiplication_scs.c.o",
+      "sha256": "3ab744e010e64eb80075e475f72fe8f9811bca4e54623665f8ab3997d8eae8e0"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/print_scs.c.o",
+      "sha256": "a0960b9d5b5cbf3b9a79909c9de03e2499fede7bfd0f7da2953cf79e0e26cc0e"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/scs2double.c.o",
+      "sha256": "ac0d05684dfa99b0d2715093486a468ad7f2aab3f1816513bb5b091cec778f7b"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/scs_private.c.o",
+      "sha256": "b1a071999ad6a3262e61994fd3f43dad8858ac292af03b259c019d91bee9e20a"
+    },
+    {
+      "path": "build/card/crlibm/scs_lib/zero_scs.c.o",
+      "sha256": "218e9e5ef03acd5f462f863c1f02756204b2ffbe47a7b429975df34ee1a58c43"
+    },
+    {
+      "path": "build/card/crlibm/trigo_accurate.c.o",
+      "sha256": "0fe9ac3440cdea6e823bf72babdad49dedaad3ddd140f944536193420ba63846"
+    },
+    {
+      "path": "build/card/crlibm/trigo_fast.c.o",
+      "sha256": "26b77a715683719aec43e1e4c84be6693fd4f751fbfabee6af877aced5423af2"
+    },
+    {
+      "path": "build/card/crlibm/trigpi.c.o",
+      "sha256": "2fc760bd759da50d4ce94ddd4623514b9067dd2ab524d65210fa7c8ef51de928"
+    },
+    {
+      "path": "build/card/crlibm/triple-double.c.o",
+      "sha256": "539abab82969563441741ee9b0d5c7f60747fb3ef3ac4775bd21582710295873"
+    },
+    {
+      "path": "build/x86/crlibm/asincos.c.o",
+      "sha256": "513d684e0dc507533d1146c21208ebd372a1d3973539e2a354a4bc97da41f831"
+    },
+    {
+      "path": "build/x86/crlibm/atan_accurate.c.o",
+      "sha256": "b786134c9eef878c4eed494c6d560cda0d1abbef2b9b232e7fbf9197aad309ba"
+    },
+    {
+      "path": "build/x86/crlibm/atan_fast.c.o",
+      "sha256": "8557ae014b6d8ec775864146b1bb964c125f51b286b59aec969b82c81d47d97a"
+    },
+    {
+      "path": "build/x86/crlibm/crlibm_private.c.o",
+      "sha256": "10facba3cf28e3146d1db87af13bb9594fdcfab92b7cdc9070125cdeb237b2b0"
+    },
+    {
+      "path": "build/x86/crlibm/csh_fast.c.o",
+      "sha256": "156e22b81b484cff418765601857dfaa30a0a6d1b246a4617a8b180629cdcb6a"
+    },
+    {
+      "path": "build/x86/crlibm/exp-td-standalone.c.o",
+      "sha256": "82de0acb14628a73f1126f89707e46b5f04856d09a68146296c6913fb6820236"
+    },
+    {
+      "path": "build/x86/crlibm/exp-td.c.o",
+      "sha256": "a06aa36f6cebba0ad36b4215ed02c66bff205cd1e958056b7757aacfc6f71caf"
+    },
+    {
+      "path": "build/x86/crlibm/expm1-standalone.c.o",
+      "sha256": "ec7217a614b749c57c23047ba104ba8c389faf2de95c5dc88c3823bb8fb34733"
+    },
+    {
+      "path": "build/x86/crlibm/expm1.c.o",
+      "sha256": "f7d637ab8e0e8b36d6d9cce45d1a77c3d2b862ab33c74ff3997b9b32bd3c4b96"
+    },
+    {
+      "path": "build/x86/crlibm/log.c.o",
+      "sha256": "db99b773080b0432deda32142a24fed5b9f620fcdd3a42ef38485805bc3e66ad"
+    },
+    {
+      "path": "build/x86/crlibm/log1p.c.o",
+      "sha256": "a3baaa627e9571d968e0f44edbc42cc6508167d82d5667af78947f406c48e1ac"
+    },
+    {
+      "path": "build/x86/crlibm/pow.c.o",
+      "sha256": "b020a2c560e4a69119d39e853309d19ed85b73725c1099327ab80034bf536a76"
+    },
+    {
+      "path": "build/x86/crlibm/rem_pio2_accurate.c.o",
+      "sha256": "02e6b1a124ff2369bbcef361c5d0ba972e9d0fb4af5df0599fe9d4cd96fde59b"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/addition_scs.c.o",
+      "sha256": "11073a8e18bec2abca93ae08b5620c9ce60fd06aa0e69996640dcd14d31a0194"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/division_scs.c.o",
+      "sha256": "87f1560f06bac43a9c6e8cb8aa0d53d29ea13bac9d3342b0fa393e43d6eab9e3"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/double2scs.c.o",
+      "sha256": "a56e5be58fb8f5b458e67c57d46ffdee205e42195c89595324bcef5b9940849b"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/multiplication_scs.c.o",
+      "sha256": "31e9657d78ef91bc6f9c9ccba03062db2493067b9098ed999fe926fdc67594ea"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/print_scs.c.o",
+      "sha256": "78751e73d2557e915e3df35fdac4937dd8d4eb0ea7495665de663417052fcfe6"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/scs2double.c.o",
+      "sha256": "1abe04aa8c782511c8fe29314bf9fc3ca2fe58d69773d4e43ea753836176b933"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/scs_private.c.o",
+      "sha256": "2c83c2409f5f98caf57dcd267f0bc328bacca17a2be90de5fe1a8423cc7429fe"
+    },
+    {
+      "path": "build/x86/crlibm/scs_lib/zero_scs.c.o",
+      "sha256": "43fa287d786dfc870f854986bc86df2f3ec71828a43d59eea102d669e6aecb45"
+    },
+    {
+      "path": "build/x86/crlibm/trigo_accurate.c.o",
+      "sha256": "9822989c4c2524e1c4989748125f83b24d790185b3539f08d53a39ac4cab6f02"
+    },
+    {
+      "path": "build/x86/crlibm/trigo_fast.c.o",
+      "sha256": "e8083225c10a8bf3058fa5161dde4c0398f44c6e728a00e6f8101bf1a68ee97b"
+    },
+    {
+      "path": "build/x86/crlibm/trigpi.c.o",
+      "sha256": "85fa3f4c9455f4a257d0424bbf82f333ee5210b145467d24d642de1786e8e89f"
+    },
+    {
+      "path": "build/x86/crlibm/triple-double.c.o",
+      "sha256": "5223af51007660021a8030298fcfbbef71c6b8698ad8daff844ca92871f3fd76"
+    }
+  ]
+}

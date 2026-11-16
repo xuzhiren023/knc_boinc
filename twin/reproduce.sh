@@ -10,7 +10,7 @@ make -C mk -j4 card > build/card-build.log 2>&1
 make -C mk -j4 x86 > build/x86-build.log 2>&1
 bash scripts/run_x86.sh 'small medium large' > build/x86-references.log 2>&1
 make -C mk -f ../twin/host.mk -j4 profile-host OUT=../build/profile \
- COMMON_CFLAGS='-O2 -g -pg -fopenmp -fno-strict-aliasing -ffp-contract=off' \
+ COMMON_CFLAGS='-O2 -g -pg -fopenmp -fno-strict-aliasing -ffp-contract=off -fno-math-errno' \
  COMMON_LDFLAGS='-pg -fopenmp' > build/profile-build.log 2>&1
 export OMP_NUM_THREADS=1 OMP_DYNAMIC=FALSE
 args=(-f workunits/small/params.lua -h workunits/small/input.hist --seed 670828913 \
