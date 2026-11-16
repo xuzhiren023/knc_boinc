@@ -1,0 +1,52 @@
+{
+  "slice_bodies": 128,
+  "bodies_per_context_executed": 1,
+  "requested_experiment_complete": false,
+  "reason": "nbGravity region computes one body; no captured body-loop driver in this region. Loop sampling supports exactly one context. compare rejects different scales/profile hashes/work counts.",
+  "capture_layout": {
+    "bodies": 20000,
+    "body_bytes": 128,
+    "vector_bytes": 32,
+    "chunk_bodies": 128,
+    "tree_bytes": 4097760
+  },
+  "streams": {
+    "core": 4,
+    "unit": 32,
+    "ring": 32
+  },
+  "body_indices": [
+    0,
+    128,
+    256,
+    384,
+    512,
+    640,
+    768,
+    896,
+    1024,
+    1152,
+    1280,
+    1408,
+    1536,
+    1664,
+    1792,
+    1920,
+    2048,
+    2176,
+    2304,
+    2432,
+    2560,
+    2688,
+    2816,
+    2944,
+    3072,
+    3200,
+    3328,
+    3456,
+    3584,
+    3712,
+    3840,
+    3968
+  ]
+}

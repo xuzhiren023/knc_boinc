@@ -1,0 +1,4 @@
+timing_prediction: unsupported
+loop sampling currently needs exactly one context; interleaved sampled contexts are not modeled
+result: twin/multicore/sample-blocker\result.json
+summary: twin/multicore/sample-blocker\summary.md

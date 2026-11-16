@@ -1,7 +1,7 @@
 # Invoked with Cygwin make -C mk -f ../twin/host.mk.
 include Makefile
 CAPTURE_OBJECT := ../build/capture_grav.o
-$(CAPTURE_OBJECT): ../build/capture_grav.c ../twin/capture_helper.h
+$(CAPTURE_OBJECT): ../build/capture_grav.c ../twin/capture_helper.h ../twin/capture_multicore.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) -I../twin -c $< -o $@
 .PHONY: capture-host profile-host
 capture-host: $(OBJECTS) $(CAPTURE_OBJECT) ../build/capture_log.o

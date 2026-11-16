@@ -1,0 +1,53 @@
+{
+  "artifacts": {
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\compare-ring",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\compare-ring\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\compare-ring\\summary.md"
+  },
+  "assumptions": [
+    "candidate functional check: mismatch (its timing stands without a verified result)"
+  ],
+  "calibration_status": null,
+  "engine_version": "0.4.0",
+  "functional_check": {
+    "status": "not_run"
+  },
+  "incompatibilities": [
+    "scale differs: 'core' vs 'ring'",
+    "profile hash differs (2058f0ec2d80 vs c6fec8a100f7): the model changed between baseline and candidate",
+    "unit of work differs: {'count': 4, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'} vs {'count': 32, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'}",
+    "candidate status is functional_mismatch, not ok"
+  ],
+  "input": {
+    "baseline": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\core\\result.json",
+    "baseline_hash": "a5ffc7cbc7975fe50712fa7bf15de959a723be2a99fcf25405a466aceaa4fff8",
+    "candidate": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\ring\\result.json",
+    "candidate_hash": "e8c44f04e43815dc701b409e45fe4d0981148d7da2a0537561fd911ca7f7ba1b"
+  },
+  "invocation": {
+    "argv": [
+      "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+      "compare",
+      "twin/multicore/core/result.json",
+      "twin/multicore/ring/result.json",
+      "--out",
+      "twin/multicore/compare-ring",
+      "--force"
+    ],
+    "command": "compare",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06",
+    "python": "3.8.5"
+  },
+  "limiting_constraints": [],
+  "message": "results are not comparable: scale differs: 'core' vs 'ring'; profile hash differs (2058f0ec2d80 vs c6fec8a100f7): the model changed between baseline and candidate; unit of work differs: {'count': 4, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'} vs {'count': 32, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'}; candidate status is functional_mismatch, not ok",
+  "prediction": null,
+  "profile": null,
+  "python_execution_seconds": 0.0806,
+  "representation_evaluated": null,
+  "result_type": "comparison",
+  "scale": null,
+  "schema": "knc-twin.result/1",
+  "status": "incompatible",
+  "timestamp_utc": "2026-11-16T13:24:14Z",
+  "unsupported": []
+}
