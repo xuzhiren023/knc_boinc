@@ -23,6 +23,22 @@ TARGET = 'root@192.168.1.100'
 OPTIONS = ['-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes', '-o',
            'ConnectionAttempts=1', '-o', 'ConnectTimeout=10', '-i', KEY]
 
+CARD_CONFIG = Path('C:/Users/xuzhi/Documents/gcc_knc/config/card.local.json')
+BODIES = dict(small=64, medium=1024, large=20000)
+
+
+def transport_options(config=CARD_CONFIG):
+    try:
+        data = json.loads(config.read_text(encoding='utf-8-sig'))
+    except (OSError, ValueError) as error:
+        raise RuntimeError('Cannot read card config {}: {}'.format(config, error))
+    hosts = data.get('knownHosts') if isinstance(data, dict) else None
+    if not isinstance(hosts, str) or not hosts.strip():
+        raise RuntimeError('Card config {} needs a nonempty knownHosts path'.format(config))
+    if not Path(hosts).is_file():
+        raise RuntimeError('Card config knownHosts file missing: ' + hosts)
+    return OPTIONS + ['-o', 'UserKnownHostsFile=' + hosts]
+
 
 def cleanup_command(directory, pid):
     # Include the supervisor and descendants whose cwd is the deleted lease.
@@ -58,18 +74,22 @@ def check_ledger(path=LEDGER):
         raise RuntimeError('Cannot establish card ledger safety: ' + str(error))
 
 
-def dry_plan(case, threads):
+def dry_plan(case, threads, options):
     # Runtime leases, PIDs, repeat counts and package inventory are symbolic.
     # Include each transport operation, including conditional/repeated ones.
-    ssh = [SSH, '-T'] + OPTIONS + ['--', TARGET]
-    scp = [SCP, '-O'] + OPTIONS + ['--']
+    ssh = [SSH, '-T'] + options + ['--', TARGET]
+    scp = [SCP, '-O'] + options + ['--']
     def remote(command):
         print(shlex.join(ssh + [command]))
     def copy(local, remote_name, upload=True):
         pair = [local, TARGET + ':' + shlex.quote(remote_name)]
         print(shlex.join(scp + (pair if upload else pair[::-1])))
     print('DRY RUN: no card commands executed; ledger enforced only for live runs.')
-    print('case={} threads={}; run 60 s -> suspend 30 s -> resume -> checkpoint -> quit -> restart'.format(case, threads))
+    run_seconds, suspend_seconds = (5, 5) if case == 'large' else (60, 30)
+    print('case={} threads={} bodies={}; workunits/{}; run {} s -> suspend {} s -> resume 2 s -> checkpoint -> quit -> restart'.format(
+        case, threads, BODIES[case], case, run_seconds, suspend_seconds))
+    print('Screenshot at {} s after first live snapshot; suspend at {} s after that snapshot.'.format(
+        2 if case == 'large' else 30, run_seconds))
     print('Templates: $R is a fresh ' + BASE + '/task-<pid>-<time> per launch;')
     print('$PID is read from its pid file; polling/retries repeat the listed commands.')
     for launch in ('initial', 'restart'):
@@ -140,6 +160,7 @@ def bmp_to_png(source, destination):
 
 
 def live(args):
+    options = args.ssh_options
     if not args.in_granted_turn:
         check_ledger()
     package = ROOT / 'dist/milkyway_package'
@@ -158,7 +179,7 @@ def live(args):
     started = time.monotonic()
     child = None
     def ssh(command):
-        argv = [SSH, '-T'] + OPTIONS + ['--', TARGET, command]
+        argv = [SSH, '-T'] + options + ['--', TARGET, command]
         with (run / 'transport.log').open('a') as log:
             log.write(shlex.join(argv) + '\n')
             log.flush()
@@ -173,15 +194,16 @@ def live(args):
             shutil.copyfile(ROOT / 'workunits' / args.case / src, slot / dst)
         for logical, physical in (('params.lua', 'params.data'), ('input.hist', 'hist.data'), ('histogram.txt', 'result.data')):
             (slot / logical).write_text('<soft_link>{}</soft_link>\n'.format(physical))
-        bodies = 64 if args.case == 'small' else 1024
+        bodies = BODIES[args.case]
         (slot / 'knc_wrapper.cfg').write_text(
-            'host=192.168.1.100\nuser=root\nssh_key={}\nssh_path={}\nscp_path={}\nremote_base={}\n'
+            'host=192.168.1.100\nuser=root\nssh_key={}\nknown_hosts={}\nssh_path={}\nscp_path={}\nremote_base={}\n'
             'package_dir={}\napp=milkyway_nbody.mic\nOMP_NUM_THREADS={}\npoll_interval=1\n'
             'snapshot_interval=5\nconnect_timeout=10\nretry_limit=3\ncheckpoint_timeout=60\nbodies={}\n'.format(
-                KEY, SSH, SCP, BASE, package.as_posix(), args.threads, bodies))
+                KEY, options[-1].split('=', 1)[1], SSH, SCP, BASE, package.as_posix(), args.threads, bodies))
         task = '-f params.lua -h input.hist -z histogram.txt --seed 670828913 --nthreads {} --print-histogram {}'.format(args.threads, bodies)
         env = dict(os.environ, KNC_TASK_ARGS=task, KNC_GRAPHICS_EXE=str(package / 'knc_nbody_graphics.exe'))
         env.pop('KNC_FAKE_CARD', None)
+        env['KNC_E2E_LARGE'] = '1' if args.case == 'large' else '0'
         leases = {}
         phase_start = time.monotonic()
         with (run / 'client.log').open('w') as log:
@@ -275,15 +297,16 @@ def live(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--case', choices=('small', 'medium'), default='medium')
+    parser.add_argument('--case', choices=('small', 'medium', 'large'), default='medium')
     parser.add_argument('--threads', type=int, default=4)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--in-granted-turn', action='store_true')
     args = parser.parse_args()
     if not 1 <= args.threads <= 240:
         parser.error('--threads must be in 1..240')
+    args.ssh_options = transport_options()
     if args.dry_run:
-        dry_plan(args.case, args.threads)
+        dry_plan(args.case, args.threads, args.ssh_options)
     else:
         live(args)
 

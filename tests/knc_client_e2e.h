@@ -2,6 +2,9 @@
 #include <chrono>
 static void card_scenario(SHARED_MEM* shm, APP_CLIENT_SHM& ipc,
                           PROCESS_INFORMATION& pi, const char* command) {
+    const char* large_env=getenv("KNC_E2E_LARGE");
+    const bool large=large_env && !strcmp(large_env,"1");
+    const double screenshot_at=large?2.:30., suspend_at=large?5.:60., suspend_for=large?5.:30.;
     using Clock = std::chrono::steady_clock;
     PROCESS_INFORMATION gfx={};
     HANDLE mapping=nullptr;
@@ -55,7 +58,7 @@ static void card_scenario(SHARED_MEM* shm, APP_CLIENT_SHM& ipc,
         };
         wait(live,"no running card snapshot");record("startup");
         auto running=Clock::now();
-        hold(30);
+        hold(screenshot_at);
         require(live(),"live mapping lost before screenshot");
         const char* exe=getenv("KNC_GRAPHICS_EXE");require(exe,"graphics executable missing");
         std::string graphics=std::string("\"")+exe+"\" --screenshot live-card.bmp";
@@ -63,12 +66,12 @@ static void card_scenario(SHARED_MEM* shm, APP_CLIENT_SHM& ipc,
         require(CreateProcessA(nullptr,graphics.data(),nullptr,nullptr,FALSE,0,nullptr,nullptr,&si,&gfx),"graphics launch");
         CloseHandle(gfx.hThread);
         wait([&]{return exists("live-card.bmp");},"graphics screenshot timeout",15);
-        while(elapsed(running)<60)hold(std::min(1.,60-elapsed(running)));
+        while(elapsed(running)<suspend_at)hold(std::min(1.,suspend_at-elapsed(running)));
         record("run-before-suspend");
         control("<suspend/>");
         wait([&]{return trace("signal STOP");},"card STOP missing");record("suspend-ack");
         hook("suspended");
-        hold(30);record("suspended");
+        hold(suspend_for);record("suspended");
         control("<resume/>");
         wait([&]{return trace("signal CONT");},"card CONT missing");record("resume-ack");
         hold(2);hook("checkpoint");record("resumed-to-checkpoint");
