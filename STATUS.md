@@ -4,7 +4,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 | Sprint | State |
 |---|---|
-| 1 | S1-01..S1-04 merged; card run staged, waits for the gcc-knc lead's "go"; S1-05 (twin rerun) waits for knc-twin 0.4.0 + S14-20 |
+| 1 | S1-01..S1-05 merged; card run staged, waits for the gcc-knc lead's "go"; S1-06 (8-core twin check, large case) running |
 | 2 | S2-01..S2-04 merged |
 | 3 | S3-01, S3-02 merged |
 | 4 | S4-01 merged (end-to-end script, not yet run on the card); S4-02 guide merged as a draft, final pass after the card run |
@@ -20,8 +20,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 - knc_wrapper (S2-02) passes normal finish, suspend/resume, quit/checkpoint/restart, abort and card-unreachable flows
   through real BOINC Win32 IPC with a fake card running the x86 app; restarted output equals uninterrupted.
-- knc-twin (S1-03): gravity refused (PLT sqrt, no sourced cost); crlibm log_rn returns 0x43c628b76e3a7b61 for
-  log(1.0) in the twin (expected 0). S1-04: twin defect (fildl read 8 bytes, filds 4), confirmed by the knc-twin session; fix in engine 0.4.0 (gcc-knc S14-19), PLT cold-path support S14-20; rerun is S1-05.
+- knc-twin 0.4.0 (S1-05): fildl repro +0.0 and all 16 crlibm log_rn cases match x86 bits, so the S1-03 mismatch was
+  a twin defect, not GCC-KNC wrong code. Gravity functional ok with the region cut before the never-taken cold error
+  branch (until gcc-knc S14-20). Gravity timing is not usable: bound 43,656 > simulate 33,622 cycles/call, reported
+  to the knc-twin session.
 
 ## Not proven yet
 
