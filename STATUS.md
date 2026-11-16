@@ -52,6 +52,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 ## Lead notes
 
+- 2026-11-16: knc-twin moved to its own repo (C:/Users/xuzhi/Documents/knc-twin). Ticket renames: x87 double rounding
+  S14-37 -> T1-06; bounds above simulate S14-27 -> T1-03; multicore gaps S14-31 -> T1-05; sparse native image
+  S14-39 -> T1-07; never-executed direct call and schedule --block -> T1-04. Lane order: T1-08, T1-06, T1-03,
+  T1-04, T1-02, T1-05, T1-07, T1-01. The twin session messages us when T1-06 lands.
+
 - 2026-11-16: card window 10 (gcc-knc turn claude-turn-s14-w10) closed at 11:15Z without our jobs (gcc-knc wait-loop bug). Staged jobs and conditions carry over to the next gcc-knc card turn; start only on its "go".
 
 - Never edit tools/codex_run.sh while a session runs: bash reads scripts as it goes (S2-02 exit 127).
