@@ -31,5 +31,7 @@ Lead-maintained. Last update: 2026-11-16 EST.
 
 ## Lead notes
 
+- 2026-11-16: card window 10 (gcc-knc turn claude-turn-s14-w10) closed at 11:15Z without our jobs (gcc-knc wait-loop bug). Staged jobs and conditions carry over to the next gcc-knc card turn; start only on its "go".
+
 - Never edit tools/codex_run.sh while a session runs: bash reads scripts as it goes (S2-02 exit 127).
 - Do not remove a ticket worktree before its built artifacts (dist/, runs/) are no longer needed: they are gitignored.
