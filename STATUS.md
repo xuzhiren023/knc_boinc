@@ -78,6 +78,25 @@ Lead-maintained. Last update: 2026-11-16 EST.
   S ~ 27 s, P ~ 860 thread-s: ~88% of card time does not shrink with threads. Host fit (6 cores): S ~ 2.7 s.
   The dominant term is serial per-step or setup work on one card thread, not the force loop.
 
+- 2026-11-16 S7-02 merged. Real 117676 on the laptop (12 thr, runs overlapped, not isolated): 5,488 s total, of
+  which ~4,560 s is serial body generation (mixed dwarf, Eddington-integral rejection sampling) before step 1;
+  1,568 steps take ~920 s. On the card the serial generation would run ~10x slower: this, not the step loop, is
+  why real tasks lose on the card. S8-03 parallelizes the quadrature nodes (bit-identical by construction).
+
+- 2026-11-16 window 12, S8-01 phase timers, large case (110 steps), wall seconds:
+
+  | Phase | Card 240 thr | Laptop 12 thr | Laptop 1 thr |
+  |---|---:|---:|---:|
+  | nbMakeTree (serial) | 13.19 | 1.58 | 1.11 |
+  | nbMapForceBody | 13.00 | 24.96 | 142.1 |
+  | integrators | 0.18 (0.08 static) | 0.10 | 0.05 |
+  | final histogram/likelihood | 0.37 | 0.07 | 0.03 |
+  | setup (incl. first gravity) | 0.95 | 0.59 | 1.89 |
+  | whole run | 27.42 | 26.89 | 143.4 |
+
+  The card force walk is already ~2x the laptop; the serial tree build is half the card time. Static integrator:
+  bit-identical, saves 0.1 s. Parallel tree (S8-02) is the large-case fix; S8-03 the real-task fix.
+
 - 2026-11-16: twin T1-06 (x87 single rounding) merged and installed; the fmul repro now gives ...9f. After window
   12: rerun the 128-body chunk scaling and the six gravity bodies (light Codex ticket), report any remaining
   difference to the twin session.
