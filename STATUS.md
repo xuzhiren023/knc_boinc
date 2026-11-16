@@ -73,6 +73,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   (within ~20% is decided on the card; run twin-generated natives on the host first, T1-15). One staged run list
   per window to the GCC-KNC lead. Compiler defects go to the GCC-KNC lead with a reduced repro.
 
+- 2026-11-16 window 12 thread sweep, scalar chunk-4 card build, large case (card_run card_minutes, includes ~3 s
+  staging): 60 thr 41.6 s, 120 thr 36.1 s, 240 thr 30.9 s, all bit-identical. A fit T = S + P/t gives
+  S ~ 27 s, P ~ 860 thread-s: ~88% of card time does not shrink with threads. Host fit (6 cores): S ~ 2.7 s.
+  The dominant term is serial per-step or setup work on one card thread, not the force loop.
+
 - 2026-11-16: twin T1-06 (x87 single rounding) merged and installed; the fmul repro now gives ...9f. After window
   12: rerun the 128-body chunk scaling and the six gravity bodies (light Codex ticket), report any remaining
   difference to the twin session.
