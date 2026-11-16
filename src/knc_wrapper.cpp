@@ -60,7 +60,7 @@ static void log(const std::string& s) {
     std::ofstream("knc_wrapper.log",std::ios::app)<<s<<'\n';
 }
 struct Config {
-    std::string host,user,key,ssh="C:/Windows/System32/OpenSSH/ssh.exe",scp="C:/Windows/System32/OpenSSH/scp.exe";
+    std::string host,user,key,known_hosts,ssh="C:/Windows/System32/OpenSSH/ssh.exe",scp="C:/Windows/System32/OpenSSH/scp.exe";
     std::string base="/tmp/knc-boinc", app="milkyway_nbody.mic";
     fs::path package;
     int threads=240,retries=3,connect=10,bodies=64;
@@ -74,6 +74,7 @@ struct Config {
             auto eq=line.find('='); if (eq==line.npos) throw std::runtime_error("config needs key=value");
             auto k=trim(line.substr(0,eq)), v=trim(line.substr(eq+1));
             if (k=="host") host=v; else if (k=="user") user=v; else if (k=="ssh_key") key=v;
+            else if (k=="known_hosts") known_hosts=v;
             else if (k=="ssh_path") ssh=v; else if (k=="scp_path") scp=v;
             else if (k=="remote_base") base=v; else if (k=="app") app=v;
             else if (k=="package_dir") package=posix(v);
@@ -134,6 +135,7 @@ class Card {
         std::vector<std::string> a{posix(copy?c.scp:c.ssh).string()};
         if (copy) a.push_back("-O"); else a.push_back("-T");
         for (auto s:{"BatchMode=yes","StrictHostKeyChecking=yes","ConnectionAttempts=1"}) {a.push_back("-o"); a.push_back(s);}
+        if (!c.known_hosts.empty()) a.insert(a.end(),{"-o","UserKnownHostsFile="+c.known_hosts});
         a.insert(a.end(),{"-o","ConnectTimeout="+std::to_string(c.connect),"-i",native(posix(c.key))});
         return a;
     }
@@ -151,6 +153,8 @@ public:
     Card(const Config& config,const fs::path& fake_dir):c(config),fake(fake_dir) {
         if (!fake.empty()) {fake=fs::absolute(fake); fs::create_directories(fake);}
         else {
+            if (!c.known_hosts.empty() && !fs::is_regular_file(posix(c.known_hosts)))
+                throw std::runtime_error("known_hosts file missing: "+c.known_hosts);
             auto safe=[](const std::string& s){return !s.empty() && s[0]!='-' && s.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-")==s.npos;};
             if (!safe(c.host) || !safe(c.user) || c.key.empty()) throw std::runtime_error("host, user and ssh_key required");
         }

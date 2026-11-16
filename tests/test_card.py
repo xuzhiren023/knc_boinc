@@ -53,8 +53,16 @@ class CardTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         commands = [shlex.split(line) for line in result.stdout.splitlines() if line and not line.startswith('#')]
         self.assertEqual(len(commands), 4)
+        for script in ('multicore-card-commands.sh', 'probe-commands.sh'):
+            printed = subprocess.run(['C:/Program Files/Git/bin/bash.exe', 'scripts/' + script],
+                                     cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(printed.returncode, 0, printed.stderr)
+            for line in printed.stdout.splitlines():
+                if 'gcc_knc/tools/card_run' in line:
+                    self.assertIn('--benchmark', shlex.split(line))
         for args, case, threads in zip(commands, ['small', 'small', 'medium', 'large'], ['240', '60', '240', '240']):
             self.assertEqual(args[:2], ['python', 'C:/Users/xuzhi/Documents/gcc_knc/tools/card_run'])
+            self.assertIn('--benchmark', args)
             self.assertIn('--print-histogram', args)
             self.assertIn('OMP_NUM_THREADS=' + threads, args)
             self.assertEqual(args[args.index('--threads') + 1], threads)

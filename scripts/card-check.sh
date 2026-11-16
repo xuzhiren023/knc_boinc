@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 mkdir -p runs/card
 for spec in small:240:64 small:60:64 medium:240:1024 large:240:20000; do
     IFS=: read -r case_name threads bodies <<< "$spec"
-    command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run
+    command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run --benchmark
         --threads "$threads" --timeout 43200
         --receipt "runs/card/$case_name-$threads.json"
         --file dist/card/milkyway_nbody.mic
