@@ -1,0 +1,5 @@
+{
+  "blockers": [
+    "undeclared_callees: ['fprintf', 'sqrt']"
+  ]
+}

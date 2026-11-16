@@ -1,0 +1,2 @@
+00:32:22: Making final checkpoint
+00:32:22: Removing checkpoint file 'build/profile/checkpoint'

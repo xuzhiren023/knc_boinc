@@ -1,0 +1,54 @@
+{
+  "init": {
+    "registers": {
+      "zmm0": {
+        "u64": [
+          "0x3ff0000000000000",
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "memory": [
+      {
+        "addr": "0x60000000",
+        "file": "capture/log-input.bin"
+      }
+    ]
+  },
+  "expected": {
+    "registers": {
+      "0": {
+        "zmm0": {
+          "u64": [
+            "0x0"
+          ]
+        }
+      }
+    }
+  },
+  "unit_of_work": {
+    "description": "one log_rn call, first real small input",
+    "count": 1
+  },
+  "numerical_policy": {
+    "rounding": "rn",
+    "ftz": false,
+    "daz": false,
+    "x87_control_word": "0x27f"
+  },
+  "scenario": {
+    "memory": {
+      "type": "line_tracking",
+      "cold_level": "memory"
+    },
+    "branch": {
+      "type": "all_predicted"
+    }
+  }
+}
