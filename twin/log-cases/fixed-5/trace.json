@@ -1,0 +1,2307 @@
+{
+  "0": [
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971c0",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971c5",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "sub",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971c9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "kmov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727504,
+      "ctx": 0,
+      "id": "a4971cd",
+      "lines": [
+        139637976727488
+      ],
+      "mask_bits": 1,
+      "nbytes": 8,
+      "op": "vpackstorelpd",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727504,
+      "ctx": 0,
+      "id": "a4971d5",
+      "lines": [
+        139637976727488
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a4971d9",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstpl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r7"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a4971dc",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971e0",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971e3",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "sar",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971e7",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "cmp",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971ed",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4971ef",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "jg",
+      "taken": true,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497548",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "xor",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49754a",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "cmp",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49754f",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "jle",
+      "taken": true,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497233",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497235",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "and",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49723a",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "sar",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49723d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "lea",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497244",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "lea",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49724a",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49724c",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "or",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497251",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "sar",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497254",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "cmp",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49725a",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "jbe",
+      "taken": false,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49725c",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "sub",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497261",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "add",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497264",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "shl",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497268",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "movzbl",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a49726c",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497271",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "shl",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a497275",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a497279",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 4,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a49727d",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fildl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r6"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497281",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727448,
+      "ctx": 0,
+      "id": "a497283",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstpl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r6"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497287",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "or",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 9361600,
+      "ctx": 0,
+      "id": "a49728a",
+      "lines": [
+        9361600
+      ],
+      "mask_bits": null,
+      "nbytes": 4,
+      "op": "flds",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r6"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a497290",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "mov",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 9361608,
+      "ctx": 0,
+      "id": "a497294",
+      "lines": [
+        9361600
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r5"
+        ]
+      }
+    },
+    {
+      "addr": 9361616,
+      "ctx": 0,
+      "id": "a49729a",
+      "lines": [
+        9361600
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727464,
+      "ctx": 0,
+      "id": "a4972a0",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstpl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a4972a4",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972a7",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r7"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972a9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r6"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972ab",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r7"
+        ],
+        "writes": [
+          "x87r4",
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972ad",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmulp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r6"
+        ],
+        "writes": [
+          "x87r6"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972af",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5",
+          "x87r6"
+        ],
+        "writes": [
+          "x87r5",
+          "x87r6"
+        ]
+      }
+    },
+    {
+      "addr": 5021124,
+      "ctx": 0,
+      "id": "a4972b1",
+      "lines": [
+        5021120
+      ],
+      "mask_bits": null,
+      "nbytes": 4,
+      "op": "fsubs",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5"
+        ],
+        "writes": [
+          "x87r5"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972b7",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r7"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972b9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972bb",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972bd",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972bf",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972c1",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972c3",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsubrp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r5"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972c5",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsubrp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r7"
+        ],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972c7",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r4",
+          "x87r5"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972c9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r7"
+        ],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972cb",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972cd",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": 9365840,
+      "ctx": 0,
+      "id": "a4972cf",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972d5",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 9365848,
+      "ctx": 0,
+      "id": "a4972d7",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "faddl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972dd",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972df",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972e1",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmulp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 9365856,
+      "ctx": 0,
+      "id": "a4972e3",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972e9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 9365864,
+      "ctx": 0,
+      "id": "a4972eb",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972f1",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsubrp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972f3",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972f5",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972f7",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmulp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972f9",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a4972fb",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3",
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": 5022432,
+      "ctx": 0,
+      "id": "a4972fd",
+      "lines": [
+        5022400
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fmull",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497303",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r7"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497305",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497307",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497309",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727448,
+      "ctx": 0,
+      "id": "a49730b",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 9319528,
+      "ctx": 0,
+      "id": "a49730f",
+      "lines": [
+        9319488
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fldl",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497315",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fmul",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497317",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r1",
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 9365872,
+      "ctx": 0,
+      "id": "a497319",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fmull",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49731f",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r1",
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727456,
+      "ctx": 0,
+      "id": "a497321",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497325",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r1",
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a497327",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49732b",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49732d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49732f",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r6"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497331",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497333",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r5"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497335",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsubrp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497337",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r6"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497339",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r1"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49733b",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49733d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r1",
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49733f",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497341",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r2",
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727464,
+      "ctx": 0,
+      "id": "a497343",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "faddl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497347",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497349",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49734b",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49734d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49734f",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r0",
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497351",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r1"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497353",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497355",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497357",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsub",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r0"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497359",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r0",
+          "x87r1"
+        ],
+        "writes": [
+          "x87r1"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49735b",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r1",
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49735d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r2",
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727456,
+      "ctx": 0,
+      "id": "a49735f",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fsubl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727440,
+      "ctx": 0,
+      "id": "a497363",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fsubrl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497367",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497369",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fld",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r4"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49736b",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r2"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a49736d",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fstl",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497370",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fsubr",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497372",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r2",
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497374",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "faddp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r2",
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": 9365880,
+      "ctx": 0,
+      "id": "a497376",
+      "lines": [
+        9365824
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "fmull",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49737c",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fadd",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49737e",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fxch",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": [
+          "x87r3",
+          "x87r4"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497380",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fucompp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r3",
+          "x87r4"
+        ],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497382",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fnstsw",
+      "taken": null,
+      "x87": {
+        "reads": [],
+        "writes": []
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497384",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "and",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497387",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "cmp",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49738a",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "je",
+      "taken": true,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497560",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fstp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r5"
+        ],
+        "writes": [
+          "x87r5"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497562",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fstp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r6"
+        ],
+        "writes": [
+          "x87r6"
+        ]
+      }
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a497564",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "fstp",
+      "taken": null,
+      "x87": {
+        "reads": [
+          "x87r7"
+        ],
+        "writes": [
+          "x87r7"
+        ]
+      }
+    },
+    {
+      "addr": 139637976727432,
+      "ctx": 0,
+      "id": "a497566",
+      "lines": [
+        139637976727424
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "vbroadcastsd",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": null,
+      "ctx": 0,
+      "id": "a49756d",
+      "lines": [],
+      "mask_bits": null,
+      "nbytes": 0,
+      "op": "add",
+      "taken": null,
+      "x87": null
+    },
+    {
+      "addr": 139637976727544,
+      "ctx": 0,
+      "id": "a497571",
+      "lines": [
+        139637976727488
+      ],
+      "mask_bits": null,
+      "nbytes": 8,
+      "op": "ret",
+      "taken": true,
+      "x87": null
+    }
+  ]
+}

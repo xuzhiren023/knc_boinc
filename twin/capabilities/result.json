@@ -1,8 +1,8 @@
 {
   "artifacts": {
-    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\capabilities",
-    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\capabilities\\result.json",
-    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03\\twin\\capabilities\\summary.md"
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\capabilities\\summary.md"
   },
   "assumptions": [],
   "calibration_status": null,
@@ -2895,18 +2895,18 @@
       "--force"
     ],
     "command": "capabilities",
-    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-03",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
     "python": "3.8.5"
   },
   "limiting_constraints": [],
   "prediction": null,
   "profile": null,
-  "python_execution_seconds": 0.005,
+  "python_execution_seconds": 0.004,
   "representation_evaluated": null,
   "result_type": "capabilities",
   "scale": null,
   "schema": "knc-twin.result/1",
   "status": "ok",
-  "timestamp_utc": "2026-11-16T05:39:20Z",
+  "timestamp_utc": "2026-11-16T06:09:40Z",
   "unsupported": []
 }

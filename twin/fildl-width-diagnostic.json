@@ -1,0 +1,10 @@
+{
+  "kind": "local diagnostic only; copied per-instruction spec, no shared-engine edits; no timing claim",
+  "change": "fildl mem_size 8 -> 4",
+  "functional_check": {
+    "status": "ok",
+    "mismatches": [],
+    "checked": 1
+  },
+  "steps": 136
+}

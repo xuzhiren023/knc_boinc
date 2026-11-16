@@ -1,0 +1,90 @@
+{
+  "artifacts": {
+    "final_state": "twin/fildl-repro\\final-state.json",
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\fildl-repro",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\fildl-repro\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\fildl-repro\\summary.md"
+  },
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range"
+  ],
+  "calibration_status": null,
+  "engine_version": "0.3.1",
+  "functional_check": {
+    "checked": 1,
+    "mismatches": [
+      {
+        "got": "0x43cff80000000000",
+        "want": "0x0000000000000000",
+        "where": "ctx0.zmm0[0]"
+      }
+    ],
+    "status": "mismatch"
+  },
+  "input": {
+    "hash_sha256": "7a7dbe845ae4f40e52830e2b3e51f64f506d6ff5ca78805e2795a9c3dab38813",
+    "kernel": {
+      "contexts": [
+        0
+      ],
+      "instructions": {
+        "0": 4
+      },
+      "loop": null,
+      "name": "fildl reads 64 bits instead of 32",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "level": "l1",
+          "type": "fixed_level"
+        }
+      },
+      "unit_of_work": {
+        "count": 1,
+        "description": "whole kernel run"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04\\twin\\fildl-repro.json"
+  },
+  "invocation": {
+    "argv": [
+      "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+      "functional",
+      "twin\\fildl-repro.json",
+      "--trace",
+      "--out",
+      "twin/fildl-repro",
+      "--force"
+    ],
+    "command": "functional",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-04",
+    "python": "3.8.5"
+  },
+  "limiting_constraints": [],
+  "message": "1 mismatch(es) against expected outputs; first: {\"where\": \"ctx0.zmm0[0]\", \"got\": \"0x43cff80000000000\", \"want\": \"0x0000000000000000\"}",
+  "prediction": null,
+  "profile": null,
+  "python_execution_seconds": 0.014,
+  "representation_evaluated": "normalized-records",
+  "result_type": "functional",
+  "scale": "region",
+  "schema": "knc-twin.result/1",
+  "status": "functional_mismatch",
+  "timestamp_utc": "2026-11-16T06:15:11Z",
+  "unsupported": []
+}

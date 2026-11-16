@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Re-extract the whole built function; preserve non-ok results as evidence.
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")/.."
 TWIN_HOME=${TWIN_HOME:-C:/Users/xuzhi/.claude/skills/knc-twin}
 OBJDUMP=${KNC_OBJDUMP:-C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cross/bin/k1om-mpss-linux-objdump.exe}
@@ -12,18 +13,23 @@ python "$TWIN_HOME/scripts/knc_twin.py" capabilities --out twin/capabilities --f
 python "$TWIN_HOME/scripts/from_binary.py" "$binary" --function "$function_name" \
     --with-callee nbReportTreeIncest --disassembly twin/card.disassembly.txt --init "$capture" \
     --out twin/kernel.json --report twin/conversion.json
-# The transitive library inclusion is attempted faithfully. The adapter refuses
-# the PLT's indirect jump: keep the diagnostic; never strip the branch or invent costs.
+# Include the PLT entries that actually exist in this build. In particular,
+# -fno-math-errno removes sqrt@plt; its absence must not mask the fprintf test.
+closure_callees=()
+for symbol in sqrt@plt fprintf@plt; do
+    if grep -Fq "<$symbol>:" twin/card.disassembly.txt; then
+        closure_callees+=(--with-callee "$symbol")
+    fi
+done
 set +e
 python "$TWIN_HOME/scripts/from_binary.py" "$binary" --function "$function_name" \
-    --with-callee nbReportTreeIncest --with-callee sqrt@plt --with-callee fprintf@plt \
+    --with-callee nbReportTreeIncest "${closure_callees[@]}" \
     --disassembly twin/card.disassembly.txt --init "$capture" \
     --out twin/closure.json --report twin/closure-conversion.json > twin/closure-attempt.txt 2>&1
 closure_status=$?
 set -e
 printf 'adapter_exit=%s\n' "$closure_status" >> twin/closure-attempt.txt
-# Audit records the blockers. Commands below independently return their actual
-# unsupported status, without evaluating an approximate or truncated trace.
+# No branch deletion or invented cost for the unsupported closure.
 python twin/check_kernel.py
 failed=0
 for command in validate functional simulate bounds; do

@@ -8,3 +8,7 @@ runs/
 __pycache__/
 .codex-logs/
 .work/
+# S1-04 large re-extracted inputs and full engine memory snapshots are local.
+twin/log-cases/*.json
+twin/log-cases/*/final-memory.json
+!twin/log-cases/log-one-intermediates.json
