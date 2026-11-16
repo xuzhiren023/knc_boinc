@@ -10,6 +10,8 @@ ifeq ($(TARGET),card)
 CC := $(KNC_ROOT)/bin/k1om-mpss-linux-gcc
 CXX := $(KNC_ROOT)/bin/k1om-mpss-linux-g++
 TARGET_FLAGS := -march=knc
+# 256 chunks at 1,024 bodies; 5,000 at 20,000 bodies. See S5-02.
+FORCE_CHUNK ?= 4
 PROGRAM := milkyway_nbody.mic
 else
 CC := $(TOOLCHAIN)/gcc
@@ -21,6 +23,9 @@ include sources.mk
 OUT := $(ROOT)/build/$(TARGET)
 OBJECTS := $(addprefix $(OUT)/,$(addsuffix .o,$(SOURCES)))
 CPPFLAGS := $(COMMON_CPPFLAGS) -I$(ROOT)/config -I$(ROOT)/src $(addprefix -I$(UPSTREAM)/,$(INCLUDE_DIRS))
+ifneq ($(strip $(FORCE_CHUNK)),)
+CPPFLAGS += -DNBODY_FORCE_CHUNK=$(FORCE_CHUNK)
+endif
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
