@@ -1,0 +1,9 @@
+third_party/
+build/
+dist/
+runs/
+*.o
+*.exe
+*.mic
+__pycache__/
+.codex-logs/
