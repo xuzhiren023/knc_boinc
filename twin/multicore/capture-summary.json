@@ -1,0 +1,40 @@
+{
+  "exit": 0,
+  "tree_incest_diagnostics": 0,
+  "layout_matches": true,
+  "capture_layout": {
+    "bodies": 20000,
+    "body_bytes": 128,
+    "vector_bytes": 32,
+    "chunk_bodies": 128,
+    "tree_bytes": 4097760
+  },
+  "files": {
+    "twin\\multicore\\capture\\ctx.bin": {
+      "bytes": 656,
+      "sha256": "6800c7cc2c74f065e30161b659e30306dc0a922692c8da5b34ebf26c4f63ba30"
+    },
+    "twin\\multicore\\capture\\state.bin": {
+      "bytes": 384,
+      "sha256": "252efef36034a9edeef5390bc4de17a45d500c4fbae77b5c0a663235681b4cd0"
+    },
+    "twin\\multicore\\capture\\eps2.bin": {
+      "bytes": 32,
+      "sha256": "eff0912bacbf7b522e0341b29ebd91cfef72142722a0ac38734a38cbdadd330a"
+    },
+    "twin\\multicore\\capture\\bodies.bin": {
+      "bytes": 2560000,
+      "sha256": "088b799337a07a2c1f7ac7820002fb28f3427b071b4ae020ecfbb83011f91dfe"
+    },
+    "twin\\multicore\\capture\\nodes.bin": {
+      "bytes": 4097760,
+      "sha256": "026d07ad3a5055e0b5d74e69156c123ef593b247af2a8818bfa4df2e5473a2b5"
+    }
+  },
+  "expected_xyz_sha256": "2e98eae2837234c811ee2a563477020814fa4961dcb681c47dc46ec3d45d0415",
+  "app_card_sha256": "abc78177bfa9b8b6bde139f162361f5d238693da4b7f46b536c1cabed46dcc43",
+  "expected_xyz_bodies": 4096,
+  "force_step": 0,
+  "seed": 670828913,
+  "command": "OMP_NUM_THREADS=1 OMP_DYNAMIC=FALSE build/capture.exe -f workunits/large/params.lua -h workunits/large/input.hist --seed 670828913 --nthreads 1 --print-histogram --ignore-checkpoint --checkpoint-interval=-1 -z build/s1-06-capture.hist -c build/s1-06-capture.checkpoint 20000"
+}

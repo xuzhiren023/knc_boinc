@@ -1,0 +1,226 @@
+{
+  "artifacts": {
+    "output_dir": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\ring",
+    "result_json": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\ring\\result.json",
+    "summary_md": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\ring\\summary.md"
+  },
+  "assumptions": [
+    "x87 precision control is 53-bit: results round to that significand with the extended exponent range",
+    "ZF/SF after imul are architecturally undefined; the model leaves them unchanged"
+  ],
+  "calibration_status": {
+    "note": "Simulated/analytical outputs are model results, never native measurements. ",
+    "state": "unvalidated",
+    "statement": "Low-core scaling and independent full-card validation pending.",
+    "synthetic": false
+  },
+  "engine_version": "0.4.0",
+  "error_details": "{\"first\": {\"got\": \"69ab9aa33d856240\", \"want\": \"6aab9aa33d856240\", \"where\": \"mem[0x60008000]+8\"}}",
+  "functional_check": {
+    "checked": 32,
+    "mismatches": [
+      {
+        "got": "69ab9aa33d856240",
+        "want": "6aab9aa33d856240",
+        "where": "mem[0x60008000]+8"
+      },
+      {
+        "got": "f671a67973c008c0",
+        "want": "ee71a67973c008c0",
+        "where": "mem[0x6000b000]+16"
+      },
+      {
+        "got": "a8bcf9cb3bde4940",
+        "want": "a7bcf9cb3bde4940",
+        "where": "mem[0x6000d000]+8"
+      },
+      {
+        "got": "fb030bfe709661c0",
+        "want": "fc030bfe709661c0",
+        "where": "mem[0x60018000]+0"
+      },
+      {
+        "got": "0ea184676cd260c0",
+        "want": "0da184676cd260c0",
+        "where": "mem[0x60019000]+0"
+      },
+      {
+        "got": "b35c50a7b8ef3d40",
+        "want": "b45c50a7b8ef3d40",
+        "where": "mem[0x6001c000]+16"
+      }
+    ],
+    "status": "mismatch"
+  },
+  "input": {
+    "hash_sha256": "8f95cc8bbee98a3bab4e6d9b68a6a5e2106fabe33b374d994d32d3429352876d",
+    "kernel": {
+      "contexts": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "instructions": {
+        "0": 203,
+        "1": 203,
+        "2": 203,
+        "3": 203,
+        "4": 203,
+        "5": 203,
+        "6": 203,
+        "7": 203,
+        "8": 203,
+        "9": 203,
+        "10": 203,
+        "11": 203,
+        "12": 203,
+        "13": 203,
+        "14": 203,
+        "15": 203,
+        "16": 203,
+        "17": 203,
+        "18": 203,
+        "19": 203,
+        "20": 203,
+        "21": 203,
+        "22": 203,
+        "23": 203,
+        "24": 203,
+        "25": 203,
+        "26": 203,
+        "27": 203,
+        "28": 203,
+        "29": 203,
+        "30": 203,
+        "31": 203
+      },
+      "loop": null,
+      "name": "large-first-force-one-body-diagnostic-ring",
+      "numerical_policy": {
+        "daz": false,
+        "ftz": false,
+        "ftz_rule": "tiny",
+        "gather_completion": "one_line",
+        "nan_compare": "any_nan",
+        "rounding": "rn",
+        "x87_control_word": "0x027f"
+      },
+      "representation": "normalized-records",
+      "scenario": {
+        "branch": {
+          "type": "all_predicted"
+        },
+        "frontend": {
+          "icache": "warm"
+        },
+        "memory": {
+          "cold_level": "memory",
+          "hardware_prefetcher": "auto",
+          "memory_service": "auto",
+          "page_bytes": 4096,
+          "tlb": "auto",
+          "type": "line_tracking"
+        }
+      },
+      "unit_of_work": {
+        "count": 32,
+        "description": "one body per context, first body of distinct 128-body chunks; diagnostic only"
+      }
+    },
+    "path": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06\\twin\\multicore\\ring.json"
+  },
+  "invocation": {
+    "argv": [
+      "C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py",
+      "simulate",
+      "twin/multicore/ring.json",
+      "--scale",
+      "ring",
+      "--profile",
+      "card-7120-measured",
+      "--max-steps",
+      "2000000",
+      "--max-seconds",
+      "1740",
+      "--no-issue-log",
+      "--out",
+      "twin/multicore/ring",
+      "--force"
+    ],
+    "command": "simulate",
+    "cwd": "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S1-06",
+    "python": "3.8.5"
+  },
+  "limiting_constraints": [],
+  "message": "candidate produced wrong results (6 mismatches); its timing is not reported as a valid result",
+  "parameters_used": {},
+  "prediction": null,
+  "profile": {
+    "calibration": {
+      "state": "unvalidated",
+      "statement": "Low-core scaling and independent full-card validation pending."
+    },
+    "chain": [
+      "knc-common",
+      "core-x100-measured",
+      "card-7120-measured",
+      "multicore-assumed"
+    ],
+    "hash": "c6fec8a100f70fa2b9b027bc95457cd8b3b132987ef48568c8969d043bcc2c0c",
+    "id": "multicore-assumed",
+    "kind": "overlay",
+    "native_measurement_ids": [
+      "S6-03: card_run jobs claude-0380b2ec, claude-7191652b, claude-b1f534af (2026-11-06), .work/_shared/S6-03/knc-char.mic, median of five group medians, spread <2% unless starred",
+      "S8-01: .work/_shared/tmp/claude-s8-01/job1..job19 (2026-11-07/08), one launch each",
+      "S8-10 C11: .work/_shared/tmp/claude-s8-10-out/c11-*.out (2026-11-09), three launches",
+      "S8-12 reruns: .work/_shared/tmp/claude-s8-12/job{1..6}-*.out (2026-11-08)",
+      "S8-17 C12: .work/_shared/tmp/claude-s8-17/c12.out (2026-11-08)"
+    ],
+    "parameter_status_counts": {
+      "assumed": 29,
+      "derived": 15,
+      "documented": 43,
+      "measured": 32,
+      "unknown": 5
+    },
+    "synthetic": false,
+    "version": "1"
+  },
+  "python_execution_seconds": 129.7895,
+  "representation_evaluated": "normalized-records",
+  "result_type": "timing_prediction",
+  "scale": "ring",
+  "schema": "knc-twin.result/1",
+  "status": "functional_mismatch",
+  "timestamp_utc": "2026-11-16T13:22:03Z",
+  "unsupported": []
+}

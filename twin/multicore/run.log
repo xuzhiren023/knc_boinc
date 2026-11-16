@@ -1,0 +1,27 @@
+Repacked 29611 nodes as byte-identical file blocks
+Prepared 4/32/32 one-body diagnostics; NOT the requested 128-body/context slices
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/multicore/core.json --scale core --profile card-7120-measured --max-steps 2000000 --max-seconds 1740 --no-issue-log --out twin/multicore/core --force
+timing_prediction: ok
+predicted 572779 core cycles (143194.750 per unit) for 146712 dynamic instructions on 4 context(s); unvalidated_scenario_estimate
+result: twin/multicore/core\result.json
+summary: twin/multicore/core\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/multicore/unit.json --scale unit --profile card-7120-measured --max-steps 2000000 --max-seconds 1740 --no-issue-log --out twin/multicore/unit --force
+timing_prediction: functional_mismatch
+candidate produced wrong results (6 mismatches); its timing is not reported as a valid result
+result: twin/multicore/unit\result.json
+summary: twin/multicore/unit\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py simulate twin/multicore/ring.json --scale ring --profile card-7120-measured --max-steps 2000000 --max-seconds 1740 --no-issue-log --out twin/multicore/ring --force
+timing_prediction: functional_mismatch
+candidate produced wrong results (6 mismatches); its timing is not reported as a valid result
+result: twin/multicore/ring\result.json
+summary: twin/multicore/ring\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py compare twin/multicore/core/result.json twin/multicore/unit/result.json --out twin/multicore/compare-unit --force
+comparison: incompatible
+results are not comparable: scale differs: 'core' vs 'unit'; profile hash differs (2058f0ec2d80 vs c6fec8a100f7): the model changed between baseline and candidate; unit of work differs: {'count': 4, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'} vs {'count': 32, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'}; candidate status is functional_mismatch, not ok
+result: twin/multicore/compare-unit\result.json
+summary: twin/multicore/compare-unit\summary.md
+$ python C:/Users/xuzhi/.claude/skills/knc-twin/scripts/knc_twin.py compare twin/multicore/core/result.json twin/multicore/ring/result.json --out twin/multicore/compare-ring --force
+comparison: incompatible
+results are not comparable: scale differs: 'core' vs 'ring'; profile hash differs (2058f0ec2d80 vs c6fec8a100f7): the model changed between baseline and candidate; unit of work differs: {'count': 4, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'} vs {'count': 32, 'description': 'one body per context, first body of distinct 128-body chunks; diagnostic only'}; candidate status is functional_mismatch, not ok
+result: twin/multicore/compare-ring\result.json
+summary: twin/multicore/compare-ring\summary.md

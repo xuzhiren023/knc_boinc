@@ -12,3 +12,14 @@ log-cases/*.json
 # Full dynamic traces and schedule logs are regenerated; compact evidence is kept.
 functional/trace.json
 issue-log.json
+
+# S1-06: large-case snapshot and regenerated diagnostic kernels/logs.
+multicore/capture/
+multicore/capture.json
+multicore/core.json
+multicore/unit.json
+multicore/ring.json
+multicore/*/final-memory.json
+multicore/*/trace.json
+# Core envelope embeds one hash entry per input block; report has compact evidence.
+multicore/core/result.json
