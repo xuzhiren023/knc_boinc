@@ -204,13 +204,113 @@ static fs::path resolved(const char* logical) {
     if (rc) throw std::runtime_error(std::string("resolve failed: ")+logical);
     return fs::absolute(posix(name));
 }
+// File operands from the pinned nbody/src/main.c popt table. Keep strings
+// such as visualizer-args opaque; they are not filenames.
+struct TaskFile { fs::path local; std::string remote; bool input=false,output=false,executable=false,optional_output=false; };
+struct Task {
+    std::vector<std::string> args;
+    std::vector<TaskFile> files;
+    std::string checkpoint;
+    Task(std::vector<std::string> incoming,const Config& c,const Card& card) {
+        if (incoming.empty()) incoming={"-f","params.lua","-h","input.hist","-z","histogram.txt",
+            "--seed","670828913","--print-histogram",std::to_string(c.bodies)};
+        auto file=[&](const std::string& name,char kind) {
+            if (name.empty()) throw std::runtime_error("empty task filename");
+            auto local=resolved(name.c_str()).lexically_normal();
+            auto it=std::find_if(files.begin(),files.end(),[&](const TaskFile& f){return f.local==local;});
+            if (it==files.end()) {
+                files.push_back({local,card.dir+"/files/"+std::to_string(files.size())});
+                it=files.end()-1;
+            }
+            if (kind=='i' || kind=='v') it->input=true;
+            if (kind=='o' || kind=='a') it->output=true;
+            if (kind=='v') it->executable=true;
+            if (kind=='c') {checkpoint=it->remote; it->optional_output=true;}
+            return it->remote;
+        };
+        const std::map<std::string,char> rules={
+            {"input-file",'i'},{"histogram-file",'i'},{"match-histogram",'i'},
+            {"histoout-file",'o'},{"output-file",'o'},{"checkpoint",'c'},{"visualizer-bin",'v'}};
+        const std::map<char,std::string> shorts={{'f',"input-file"},{'h',"histogram-file"},
+            {'s',"match-histogram"},{'z',"histoout-file"},{'o',"output-file"},{'c',"checkpoint"},
+            {'w',"checkpoint-interval"},{'n',"nthreads"},{'e',"seed"},{'d',"device"},{'p',"p"}};
+        auto takes_value=[&](const std::string& key) {
+            return rules.count(key) || key=="checkpoint-interval" || key=="nthreads" ||
+                key=="seed" || key=="device" || key=="platform" || key=="np" || key=="visualizer-args";
+        };
+        bool threads=false,interval=false,options=true;
+        for (size_t i=0;i<incoming.size();++i) {
+            std::string arg=incoming[i];
+            if (options && arg=="--") { options=false; args.push_back(arg); continue; }
+            if (options && arg.size()>1 && arg[0]=='-') {
+                std::string key; size_t value_at=std::string::npos;
+                if (arg.rfind("--",0)==0 || arg=="-np" || arg.rfind("-np=",0)==0) {
+                    size_t start=arg[1]=='-'?2:1, eq=arg.find('=');
+                    key=arg.substr(start,eq==arg.npos?arg.npos:eq-start);
+                    if (eq!=arg.npos) value_at=eq+1;
+                } else {
+                    // popt short clusters: stop at the first option taking an operand.
+                    for (size_t j=1;j<arg.size();++j) {
+                        auto it=shorts.find(arg[j]);
+                        if (it!=shorts.end() && takes_value(it->second)) {
+                            key=it->second;
+                            if (j+1<arg.size()) value_at=j+1;
+                            break;
+                        }
+                    }
+                }
+                threads |= key=="nthreads"; interval |= key=="checkpoint-interval";
+                if (takes_value(key)) {
+                    auto rule=rules.find(key);
+                    if (value_at!=arg.npos) {
+                        if (rule!=rules.end()) arg=arg.substr(0,value_at)+file(arg.substr(value_at),rule->second);
+                        args.push_back(arg);
+                    } else {
+                        args.push_back(arg);
+                        if (++i==incoming.size()) throw std::runtime_error("missing operand: "+arg);
+                        args.push_back(rule==rules.end()?incoming[i]:file(incoming[i],rule->second));
+                    }
+                    continue;
+                }
+                args.push_back(arg); continue;
+            }
+            // popt's POSIXMEHARDER ends option parsing at the first positional value.
+            options=false;
+            auto local=resolved(arg.c_str());
+            args.push_back(fs::is_regular_file(local)?file(arg,'a'):arg);
+        }
+        // Prepend defaults so POSIX parsing cannot mistake them for Lua parameters.
+        std::vector<std::string> defaults;
+        if (checkpoint.empty()) {checkpoint=card.dir+"/checkpoint"; defaults={"--checkpoint",checkpoint};}
+        if (!interval) defaults.push_back("--checkpoint-interval=1");
+        if (!threads) defaults.insert(defaults.end(),{"--nthreads",std::to_string(c.threads)});
+        args.insert(args.begin(),defaults.begin(),defaults.end());
+    }
+    void stage(const Card& card) const {
+        card.at("mkdir -p files");
+        for (const auto& f:files) {
+            if (f.input || fs::is_regular_file(f.local)) card.copy(f.local,f.remote,true);
+            if (f.executable) card.at("chmod u+x "+quote(f.remote));
+        }
+    }
+    void collect(const Card& card) const {
+        for (const auto& f:files) {
+            if (f.output || (f.optional_output && !card.at("if test -f "+quote(f.remote)+"; then echo yes; fi").empty()))
+                card.copy(f.local,f.remote,false);
+        }
+    }
+};
 int main(int argc,char** argv) {
     BOINC_OPTIONS opt; boinc_options_defaults(opt); opt.direct_process_action=0; opt.normal_thread_priority=1;
     if (boinc_init_options(&opt)) return 2;
     try {
         fs::path fake;
-        if (argc==3 && std::string(argv[1])=="--fake-card") fake=posix(argv[2]);
-        else if (argc!=1) throw std::runtime_error("usage: knc_wrapper.exe [--fake-card DIR]");
+        int first=1;
+        if (argc>1 && std::string(argv[1])=="--fake-card") {
+            if (argc<3) throw std::runtime_error("--fake-card needs DIR");
+            fake=posix(argv[2]); first=3;
+        }
+        std::vector<std::string> incoming(argv+first,argv+argc);
         char executable[4096];
         ssize_t length=readlink("/proc/self/exe",executable,sizeof(executable)-1);
         if (length<0 || size_t(length)>=sizeof(executable)-1)
@@ -219,6 +319,7 @@ int main(int argc,char** argv) {
         fs::path exe=fs::path(executable).parent_path();
         fs::path cfg=fs::exists("knc_wrapper.cfg")?fs::absolute("knc_wrapper.cfg"):exe/"knc_wrapper.cfg";
         Config c(cfg,exe); Card card(c,fake);
+        Task task(incoming,c,card);
         bool leased=fs::exists("knc_remote");
         if (!leased) {
             card.exec("test -d "+quote(card.dir)+" || mkdir "+(fake.empty()?"-p -- ":"-- ")+quote(card.dir));
@@ -231,15 +332,15 @@ int main(int argc,char** argv) {
                 if (entry.is_regular_file() && (name==c.app || name.find(".so")!=name.npos)) card.copy(entry.path(),card.dir+"/"+name,true);
             }
             if (!fs::is_regular_file(c.package/c.app)) throw std::runtime_error("card package missing app");
-            card.copy(resolved("params.lua"),card.dir+"/params.lua",true);
-            card.copy(resolved("input.hist"),card.dir+"/input.hist",true);
+            task.stage(card);
             if (fs::exists("knc_checkpoint")) {
-                card.copy("knc_checkpoint",card.dir+"/checkpoint",true); log("checkpoint uploaded for restart");
+                card.copy("knc_checkpoint",task.checkpoint,true); log("checkpoint uploaded for restart");
             }
             std::string run="#!/bin/sh\ncd "+quote(card.dir)+" || exit 125\n";
             run+="export OMP_NUM_THREADS="+std::to_string(c.threads)+" OMP_DYNAMIC=FALSE KNC_WRAPPER_FILES=1 LD_LIBRARY_PATH="+quote(card.dir)+"\n";
-            run+="./"+quote(c.app)+" -f params.lua -h input.hist -z histogram.txt -c checkpoint --seed 670828913 --nthreads "+
-                std::to_string(c.threads)+" --print-histogram --checkpoint-interval=1 "+std::to_string(c.bodies)+" &\n";
+            run+="./"+quote(c.app);
+            for (const auto& arg:task.args) run+=" "+quote(arg);
+            run+=" &\n";
             run+="p=$!\nprintf '%s\n' \"$p\" > pid.tmp\nmv pid.tmp pid\nwait \"$p\"\nr=$?\nprintf '%s\n' \"$r\" > exit.tmp\nmv exit.tmp exit\n";
             write("knc_run.sh",run); card.copy("knc_run.sh",card.dir+"/run.sh",true);
             card.at("chmod u+x "+quote(c.app)+" && if mkdir started 2>/dev/null; then nohup sh ./run.sh >stdout.txt 2>stderr.txt </dev/null & fi");
@@ -266,7 +367,7 @@ int main(int argc,char** argv) {
                 }
                 if (s.exit>=0) {log("completion won race with quit"); break;}
                 if (s.live) card.signal("STOP"); // freeze the acknowledged checkpoint during transfer
-                card.copy("knc_checkpoint.tmp",card.dir+"/checkpoint",false);
+                card.copy("knc_checkpoint.tmp",task.checkpoint,false);
                 fs::rename("knc_checkpoint.tmp","knc_checkpoint"); boinc_checkpoint_completed(); log("checkpoint saved");
                 if (s.live) card.signal("KILL"); card.clean(); log("quit acknowledged"); return 0;
             }
@@ -287,7 +388,7 @@ int main(int argc,char** argv) {
         }
         card.copy(resolved("nbody_stdout.txt"),card.dir+"/stdout.txt",false);
         card.copy(resolved("nbody_stderr.txt"),card.dir+"/stderr.txt",false);
-        if (!s.exit) card.copy(resolved("histogram.txt"),card.dir+"/histogram.txt",false);
+        if (!s.exit) task.collect(card);
         card.clean();
         if (s.exit) {log("card app exit "+std::to_string(s.exit)); return boinc_finish(s.exit);}
         fs::remove("knc_checkpoint"); boinc_fraction_done(1); log("finished"); return boinc_finish(0);

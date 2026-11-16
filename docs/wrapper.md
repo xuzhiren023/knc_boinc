@@ -36,7 +36,7 @@ Unknown keys and invalid ranges fail the task with a diagnostic.
 | `connect_timeout` | 10 seconds; SSH connect limit, 1–600 |
 | `retry_limit` | 3 retries after the first attempt, 0–100 |
 | `checkpoint_timeout` | 60 seconds to acknowledge a checkpoint request |
-| `bodies` | 64; upstream model's final argument |
+| `bodies` | 64; legacy zero-argument sample's final argument |
 
 SSH uses batch mode, one connection attempt and strict host-key checking.
 Provision the key and known_hosts for the account running BOINC beforehand.
@@ -49,11 +49,52 @@ operation already in progress must complete or time out first.
 ## Task flow and files
 
 The real BOINC API uses the S2-01 Win32 IPC variant with
-`direct_process_action=0`. It resolves logical `params.lua` and `input.hist`
-and the outputs `histogram.txt`, `nbody_stdout.txt`, `nbody_stderr.txt`. The model and seed
-are the existing standalone N-body invocation; seed is 670828913. Declare all
-five logical names in the task definition. Separate N-body log names preserve
-the BOINC wrapper's own `stderr.txt` diagnostics.
+`direct_process_action=0`. Task arguments retain their order and values, except
+for file operands, which resolve through `boinc_resolve_filename` and become
+absolute paths in a private remote `files/` directory. Physical basenames never
+determine remote names. Spaces, shell punctuation and aliases are quoted safely.
+Inputs are uploaded, outputs are downloaded to the resolved host names on
+success, and logical BOINC soft-link files remain intact.
+
+The file rules come from the pinned `nbody/src/main.c` option table:
+
+| Options | Direction |
+| --- | --- |
+| `-f`, `--input-file` | Input Lua |
+| `-h`, `--histogram-file` | Input histogram |
+| `-s`, `--match-histogram` | Input comparison histogram |
+| `-z`, `--histoout-file` | Output histogram |
+| `-o`, `--output-file` | Output bodies |
+| `-c`, `--checkpoint` | Checkpoint input/output, also used by wrapper quit/restart |
+| `--visualizer-bin` | Input visualizer executable |
+
+Separated and attached short operands and long `--option=value` operands are
+handled. Missing required inputs fail visibly. Other standalone arguments that
+resolve to existing slot files are staged and returned after success, supporting
+additional Lua file parameters. Other values (including numeric parameters)
+pass through. `--visualizer-args` is an opaque command string, not a file option.
+File names used only inside Lua, absent output names without a recognized file
+option, and files referenced inside a visualizer command string cannot be
+inferred from argv.
+
+Wrapper defaults for checkpoint, checkpoint interval and thread count are added
+before the task arguments only when the corresponding task option is absent.
+No task seed, Lua parameters, output option or thread setting is replaced.
+The environment still sets the configured `OMP_NUM_THREADS`; upstream's explicit
+`--nthreads` takes precedence. The checkpoint side-file protocol uses the task's
+selected checkpoint path; a checkpoint retained by upstream at successful exit
+is also returned to its resolved name. Existing zero-argument development slots
+retain the
+legacy sample invocation (`params.lua`, `input.hist`, `histogram.txt`, seed
+670828913 and config `bodies`); this fallback is not used for server arguments.
+`--fake-card DIR` is consumed only as the leading wrapper transport selector.
+
+The wrapper captures logs to resolved `nbody_stdout.txt` and `nbody_stderr.txt`.
+Separate N-body log names preserve the BOINC wrapper's own `stderr.txt`
+diagnostics. Current standard server output/log declarations remain unknown;
+these log names must be reconciled with a current task definition before a live
+trial. The 2024 Orbit Fitting example is historical evidence, not a verified
+current standard workunit contract; see [packaging.md](packaging.md).
 
 Each task stages the executable and package `.so*` files and inputs in a unique
 `task-PID-TIMESTAMP` directory under `remote_base`. The slot's `knc_remote`
@@ -67,7 +108,7 @@ stdout and stderr, waits for the app and atomically publishes its `exit` code.
 The app receives `OMP_NUM_THREADS`, `OMP_DYNAMIC=FALSE` and `LD_LIBRARY_PATH`
 pointing at its staged runtime libraries. Polls read `progress`, `pid` and
 `exit`, forwarding a clamped finite fraction to `boinc_fraction_done`.
-Completion copies logs and, on success, the histogram to resolved local names,
+Completion copies logs and, on success, task outputs to resolved local names,
 removes only the task's directory and calls `boinc_finish` with app status.
 Failures returning outputs retain the lease for a later transfer retry.
 
@@ -76,7 +117,7 @@ Failures returning outputs retain the lease for a later transfer retry.
 | Suspend | `kill -STOP` on the card app PID (all its OpenMP threads) |
 | Resume | `kill -CONT` on that PID |
 | Quit / lost heartbeat | Request a fresh checkpoint; resume a stopped app to let it write; freeze the acknowledged checkpoint, copy to slot `knc_checkpoint` via temporary file and rename, notify BOINC, kill app, remove task dir and return without `boinc_finish` |
-| Restart after quit | Upload slot checkpoint as remote `checkpoint`; omit `--ignore-checkpoint` so upstream restores it |
+| Restart after quit | Upload slot checkpoint to the task-selected checkpoint path (default remote `checkpoint`); preserve the task's restore/ignore options |
 | Abort | `kill -KILL`, remove task directory, finish with abort status 202 |
 | Unreachable card | Retry finitely, then `boinc_temporary_exit(60, diagnostic)`; preserve lease and any remote work |
 
@@ -122,7 +163,15 @@ A `.unreachable` marker in DIR deterministically fails transport attempts.
 The test uses the medium model with 1024 bodies and shortens evolution and
 reverse-orbit time to 0.1 Gyr to bound runtime while allowing control signals.
 
-The five scenarios check resolved outputs and likelihood; progress frozen
+Two further scenarios send explicit sample and historical-forum-shaped argv,
+with differing logical/physical names, body and histogram outputs, both option
+operand forms, a task checkpoint, a nondefault seed, trailing numeric parameters,
+and an extra Lua file parameter containing a space. The forum case also quits
+and restores its task-selected checkpoint; the sample retains a checkpoint
+under its resolved name on completion. They verify the actual
+supervisor argv and resolved outputs using real x86 N-body.
+
+The five original scenarios check resolved outputs and likelihood; progress frozen
 under STOP then advancing under CONT; quit saving a checkpoint without finish
 and restart uploading/restoring it; abort killing and cleaning; and bounded
 unreachable retries producing BOINC's temporary-exit marker. Task directories
@@ -142,6 +191,9 @@ The lead can run a prepared standalone slot (config and logical files in it):
 bash scripts/run_wrapper.sh /path/to/slot
 # Or the same code with the x86 package configured in knc_wrapper.cfg:
 bash scripts/run_wrapper.sh /path/to/slot --fake-card C:/path/to/fake-card
+# Pass the prepared task's actual arguments after the transport selector:
+bash scripts/run_wrapper.sh /path/to/slot --fake-card C:/path/to/fake-card \
+  -f nbody_parameters.lua -h histogram.txt --seed 123456 -np 1 -p 1024
 ```
 
 This launcher sets the host DLL search path and local scratch variables, then
