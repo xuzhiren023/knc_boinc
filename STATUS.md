@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 GCC-KNC S14-44 is their next ticket: phase 0 = best existing flag set for x87-heavy scalar double
+  under our contract (53-bit, no contraction, no fast-math), ranked with knc-twin, plus a staged A/B list (core-small,
+  large) for us to run; lane-0 IMCI codegen is a later go/no-go. Waits on the owner freeing the laptop and disk > 30 GB.
 - 2026-11-17 window 14 (04:49-05:09Z), 16 jobs, all bit-identical. Large case card seconds (whole / tree / force):
   reference 27.45/13.33/12.98; vector 27.05/13.13/12.79; S8-07 pool 23.72/9.91/12.69 (best); cofm 27.37 (no gain);
   S8-08 walk layout+prefetch 34.62/12.96/20.51 (force +58%: copy/remap/scatter + prefetch, negative); S8-09
