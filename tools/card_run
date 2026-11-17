@@ -31,9 +31,10 @@ import time
 import uuid
 import tempfile
 
-# Retain upstream config, helper, lock and state paths across both projects.
-ROOT = Path("C:/Users/xuzhi/Documents/gcc_knc")
-sys.path.insert(0, str(ROOT / "tools"))
+# Per-tool state belongs to knc-boinc; card-wide locks/latch remain shared.
+ROOT = Path(__file__).resolve().parents[1]
+UPSTREAM_ROOT = Path("C:/Users/xuzhi/Documents/gcc_knc")
+sys.path.insert(0, str(UPSTREAM_ROOT / "tools"))
 # The shared helper is read-only, including its bytecode cache.
 _saved_dont_write_bytecode = sys.dont_write_bytecode
 sys.dont_write_bytecode = True
@@ -41,7 +42,7 @@ try:
     import card_dma
 finally:
     sys.dont_write_bytecode = _saved_dont_write_bytecode
-RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
+RUN_DIR = re.compile(r"/tmp/knc-boinc/claude-[0-9a-f]{32}\Z")
 REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
 MEMORY_BUDGET_MIB = 10240  # Owner, 2026-11-04: the other project rarely uses more than 7 GB.
 # Owner, 2026-11-10: in our exclusive turns the budget is MemFree less this margin; the 10 GiB
@@ -195,8 +196,12 @@ def staging_name(name):
     return name
 
 
+def remote_helpers():
+    return (Path(__file__).resolve().parent / "card_run_remote.sh").read_text(encoding="utf8")
+
+
 def watchdog_bytes():
-    return ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+    return (remote_helpers() +
             '\nrun_dir=$1\nboot_id=$2\n'
             'printf claude-watchdog > /proc/self/comm\nguard_boot || exit 92\n'
             'sleep "$3" || exit 95\ncleanup\n').encode("utf8")
@@ -371,13 +376,14 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     result["transfers"] = getattr(transport, "transfers", [])
     session, acquired, execution_started, execution_finished = None, False, False, False
     job_id = "claude-" + uuid.uuid4().hex
-    run_dir = "/tmp/claude/" + job_id
+    run_dir = "/tmp/knc-boinc/" + job_id
     result.update(job_id=job_id, run_dir=run_dir, memory_mb=memory_mb, profile=profile)
     if profile is not None:
         result.update(profile_memory_limit_mib=PROFILE_MEMORY_MIB.get(profile),
                       peak_resident_kib=None, peak_memory_kib=None, monitor_cpu_ticks=None)
     recorded, card_fault, ledger_offset = False, False, 0
     admission_lock = None
+    shared_lock = None
     overlaps = set()
     cpuinfo = None
     queued = False
@@ -455,6 +461,8 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
         lock_path = Path(lock_path).absolute()
         if lock_path.resolve() != default_lock(ROOT):
             lock_path.parent.resolve().relative_to(ROOT.resolve())
+        else:
+            lock_path.parent.mkdir(parents=True, exist_ok=True)
         # O_EXCL is intentional: stale locks require an owner's intervention.
         try:
             fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
@@ -462,6 +470,21 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
             raise Refused("own lock present: %s" % lock_path)
         acquired = True
         os.close(fd)
+        # GCC-KNC holds this card-wide execution lock for the whole job. Take
+        # the same lock in addition to our per-tool lock, including SSH jobs.
+        card_lock = getattr(transport, "card_lock", None)
+        if card_lock is not None and Path(card_lock).resolve() != lock_path.resolve():
+            card_lock = Path(card_lock)
+            try:
+                fd = os.open(str(card_lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            except FileExistsError:
+                raise Refused("card-wide lock present: %s" % card_lock)
+            shared_lock = card_lock
+            os.close(fd)
+        # Recheck after acquiring coordination locks: another tool may have
+        # left a stop marker between our initial check and lock acquisition.
+        if dma_latch is not None and dma_latch.exists():
+            raise Refused("DMA cleanup unresolved; lead must inspect " + str(dma_latch))
         # Mandatory for all our invocations sharing this ledger, even if callers
         # override their local --lock. Other agents never need to take this lock.
         candidate = Path(ledger_path).resolve().parent / "claude-admission.lock"
@@ -683,6 +706,11 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
                 admission_lock.unlink()
             except OSError as error:
                 failure("infrastructure", INFRA_EXIT, "admission lock release failed: %s" % error)
+        if shared_lock is not None:
+            try:
+                shared_lock.unlink()
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "card-wide lock release failed: %s" % error)
         if acquired:
             try:
                 lock_path.unlink()
@@ -704,26 +732,48 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
     return result
 
 
+def transfer_file(source, destination, *, size, direction, method, threshold_bytes, backends):
+    selected = ('dma' if size >= threshold_bytes else 'ssh') if method == 'auto' else method
+    fallback = None
+    try:
+        row = card_dma.transfer_file(source, destination, size=size, direction=direction,
+                                     method=selected, threshold_bytes=threshold_bytes, backends=backends)
+    except card_dma.TransferFailure as error:
+        if not (method == 'auto' and selected == 'dma' and error.kind == 'unavailable'
+                and not error.data_started):
+            raise
+        fallback = dict(method='dma', reason=str(error))
+        try:
+            row = card_dma.transfer_file(source, destination, size=size, direction=direction,
+                                         method='ssh', threshold_bytes=threshold_bytes, backends=backends)
+        except card_dma.TransferFailure as fallback_error:
+            fallback_error.fallback = fallback
+            raise
+    row['fallback'] = fallback
+    return row
+
+
 class SSHTransport:
     """Bounded OpenSSH shell; run() permits one state/cleanup reconnect."""
 
     def __init__(self, config, transport_timeout, stage_timeout=STAGE_TIMEOUT,
-                 transfer="auto", threshold_bytes=1048576, collect=(), collect_dir=None):
+                 transfer="auto", threshold_bytes=67108864, collect=(), collect_dir=None):
         self.config = config
         self.transport_timeout = transport_timeout
         self.stage_timeout = stage_timeout
         self.transfer, self.threshold_bytes = transfer, threshold_bytes
         self.transfers = []
         self.collect_names, self.collect_dir = collect, collect_dir
-        self.dma_latch = main_root(ROOT) / ".work/_state/card-dma-active.lock"
-        self.helper_free = transfer == "ssh" or not all(
+        self.dma_latch = main_root(UPSTREAM_ROOT) / ".work/_state/card-dma-active.lock"
+        self.card_lock = main_root(UPSTREAM_ROOT) / ".work/_state/card.lock"
+        self.helper_free = (transfer == "ssh" and not collect) or not all(
             self.helper(key, name).is_file() for key, name in
             (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe")))
         if self.helper_free and (transfer == "dma" or collect):
-            raise Refused("DMA/--collect requires both transfer helpers and --transfer auto or dma")
+            raise Refused("DMA/--collect requires both transfer helpers")
 
     def helper(self, key, name):
-        return Path(self.config.get(key, str(main_root(ROOT) / ".work/_shared" / name)))
+        return Path(self.config.get(key, str(main_root(UPSTREAM_ROOT) / ".work/_shared" / name)))
 
     def stage_overhead(self, packed=False):
         unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
@@ -765,7 +815,7 @@ class SSHTransport:
             session.transfer_stop = False
             if not session.pin_helper.is_file():
                 raise OSError("static donor helper missing: %s; see docs/card-run.md" % session.pin_helper)
-            session.rpc((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8"), timeout,
+            session.rpc(remote_helpers(), timeout,
                         step="load-helpers")
             return session
         except BaseException:
@@ -905,7 +955,7 @@ class SSHSession:
         # S5-04: all of staging shares one limit; each step gets what is left of it.
         limit = time.monotonic() + self.stage_timeout
         step_limit = lambda: min(timeout, self.remaining(limit))
-        self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
+        self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/knc-boinc && "
                  "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
                  shlex.quote(self.boot_id), step_limit(), step="stage-create")
         if not self.helper_free:
@@ -961,7 +1011,9 @@ class SSHSession:
                                    private=private, mode=self.file_mode(name, data[:4]))
         # Generated controls and the suite pack share the file transport.
         # Temporary host bytes are bounded by the existing maxStageMiB check.
-        with tempfile.NamedTemporaryFile(prefix="claude-input-", dir=self.host_helper.parent,
+        scratch = main_root(ROOT) / ".work/_state/card-scratch"
+        scratch.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(prefix="claude-input-", dir=scratch,
                                          delete=False) as output:
             output.write(data)
             path = Path(output.name)
@@ -1003,7 +1055,7 @@ class SSHSession:
 
     def transfer_file(self, source, destination, size, direction, timeout, *, mode="600"):
         try:
-            row = card_dma.transfer_file(source, destination, size=size, direction=direction,
+            row = transfer_file(source, destination, size=size, direction=direction,
                                         method=self.transfer_method, threshold_bytes=self.threshold_bytes,
                                         backends={method: card_dma.Endpoint(self, method, timeout, mode)
                                                   for method in ("ssh", "dma")})
@@ -1044,14 +1096,19 @@ class SSHSession:
                                    timing_scope="bootstrap wall time"))
 
     def file_command(self, command):
-        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+        script = (remote_helpers() +
                   "\numask 077\nrun_dir=%s\nboot_id=%s\n"
                   "cd -- \"$run_dir\" && guard_boot && exec %s\n" %
                   (shlex.quote(self.run_dir), shlex.quote(self.boot_id), command))
         return self.command[:-1] + ["sh -c " + shlex.quote(script)]
 
     def file_helpers(self, source, private, size, direction, method, timeout):
-        return card_dma.HelperPair(self, timeout).run(source, private, size, direction, method)
+        saved = sys.dont_write_bytecode
+        sys.dont_write_bytecode = True
+        try:
+            return card_dma.HelperPair(self, timeout).run(source, private, size, direction, method)
+        finally:
+            sys.dont_write_bytecode = saved
 
     def collect(self, names, directory, *, timeout):
         directory = Path(directory).resolve()
@@ -1070,7 +1127,7 @@ class SSHSession:
 
     def upload(self, step, command, data, timeout):
         # A separate, finite SSH stdin carries raw bytes, never shell syntax.
-        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+        script = (remote_helpers() +
                   "\numask 077\nrun_dir=%s\nboot_id=%s\n"
                   "printf claude-upload > /proc/self/comm\n"
                   "cd -- \"$run_dir\" && guard_boot && %s\n" %
@@ -1095,7 +1152,7 @@ class SSHSession:
         block, prefix = divmod(offset, 65536)
         # BusyBox 1.19.4 lacks head -c and od -A. Use a finite raw SSH stream
         # with the same boot/directory checks as uploads, preserving every byte.
-        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+        script = (remote_helpers() +
                   "\nrun_dir=%s\nboot_id=%s\n"
                   "printf claude-download > /proc/self/comm\n"
                   "cd -- \"$run_dir\" && guard_boot && dd if=%s bs=65536 skip=%d count=%d\n" %
@@ -1241,7 +1298,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project", default=PROJECT,
                         help="ledger project (CARD_PROJECT; default: knc-boinc)")
-    parser.add_argument("--config", type=Path, default=main_root(ROOT) / "config/card.local.json")
+    parser.add_argument("--config", type=Path, default=main_root(UPSTREAM_ROOT) / "config/card.local.json")
     parser.add_argument("--lock", type=Path)
     parser.add_argument("--external-lock", action="append", type=Path, default=[])
     parser.add_argument("--baseline-name", action="append", default=[])
@@ -1253,12 +1310,12 @@ def main():
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
                         help="seconds allowed for staging; a slower upload is an infrastructure failure")
-    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="auto")
-    parser.add_argument("--dma-threshold", type=int, default=1048576, metavar="BYTES")
+    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="ssh")  # owner 2026-11-17: ssh by default; dma or auto only when asked
+    parser.add_argument("--dma-threshold", type=int, default=67108864, metavar="BYTES")
     parser.add_argument("--collect", action="append", default=[], metavar="CLAUDE_FILE",
                         help="collect an owned regular file after the program completes")
-    parser.add_argument("--collect-dir", type=Path, default=ROOT / "tests/out/collected")
-    parser.add_argument("--receipt", type=Path, default=ROOT / "tests/out/card-result.json")
+    parser.add_argument("--collect-dir", type=Path, default=main_root(ROOT) / ".work/_state/collected")
+    parser.add_argument("--receipt", type=Path, default=main_root(ROOT) / ".work/_state/card-result.json")
     parser.add_argument("--file", action="append", type=Path, default=[])
     parser.add_argument("--file-list", type=Path,
                         help="one repo-relative path per line; stages everything in one pack upload")
@@ -1277,7 +1334,7 @@ def main():
                 raise ValueError("missing connection setting: " + key)
         timeout = args.timeout if args.timeout is not None else config.get("timeout", 60.0)
         transport_timeout = (args.transport_timeout if args.transport_timeout is not None
-                             else config.get("transportTimeout", 10.0))
+                             else max(120.0, config.get("transportTimeout", 10.0)))
         result = run(args.program, args.args,
                      lock_path=args.lock or Path(config.get("ownLock", str(default_lock(ROOT)))),
                      external_locks=[Path(p) for p in config.get("externalLocks", [])] + args.external_lock,

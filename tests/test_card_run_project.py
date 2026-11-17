@@ -181,9 +181,10 @@ class CardProjectTest(unittest.TestCase):
 
     def test_paths_and_local_call_sites(self):
         upstream = Path('C:/Users/xuzhi/Documents/gcc_knc')
-        self.assertEqual(self.runner.ROOT, upstream)
-        self.assertEqual(self.runner.default_lock(self.runner.ROOT), upstream / '.work/_state/card.lock')
-        self.assertEqual(self.runner.RECEIPT_DIR, upstream / '.work/_state/card')
+        self.assertEqual(self.runner.ROOT, ROOT)
+        self.assertEqual(self.runner.UPSTREAM_ROOT, upstream)
+        self.assertEqual(self.runner.default_lock(self.runner.ROOT), self.runner.main_root(ROOT) / '.work/_state/card.lock')
+        self.assertEqual(self.runner.RECEIPT_DIR, self.runner.main_root(ROOT) / '.work/_state/card')
         self.assertTrue((ROOT / 'scripts/card-run-path.sh').is_file())
         for directory in ('scripts', 'packaging'):
             for path in (ROOT / directory).rglob('*'):
