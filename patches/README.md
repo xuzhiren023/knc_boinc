@@ -34,6 +34,8 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `zz-nbody-tree-instrumentation.patch` | Instrumentation | Tree subphase timers; NBODY_TREE_IDENTITY=0 |
 | `zzzzz-nbody-walk-performance.patch` | Performance | WALK_PREFETCH=0, WALK_HOT=0, WALK_SCHEDULE=0; in-place hints, tree-time hot fields, force scheduling |
 | `zzzzzz-nbody-walk-profile.patch` | Instrumentation | WALK_PROFILE=0, WALK_PROOF=0; per-thread counters/timers and force byte proof |
+| `zzzzzzzz-nbody-walk-memory-proof.patch` | Instrumentation | WALK_MEMORY_PROOF=0; live body/tree mapping backing in a separate diagnostic build |
+| `zzzzzzz-nbody-walk-memory.patch` | Performance | WALK_ORDER=0, WALK_HUGEPAGES=0; exact target permutation and native tree/body backing |
 | `zzzz-nbody-walk-counters.patch` | Instrumentation | Host-only NBODY_WALK_COUNTERS=0 |
 
 Performance patches contain no numerical correctness fix. S8-09 separated the
@@ -190,3 +192,14 @@ options default off.
   cores; the installed double atan is expressed as atan2(x,1). The incomplete
   gamma implementation and its crlibm calls stay scalar and unchanged.
   No certified bound or replay. See `docs/research/s10-df-special.md`.
+S10-07 performance helpers are `src/nbody_walk_order.h` and `src/nbody_walk_pages.h`.
+`WALK_ORDER=1` uses threaded-tree DFS indices and static four-body chunks; pin
+OpenMP threads in groups of four actual siblings. Per-target arithmetic, nodes,
+body storage order and force slots stay unchanged. Custom Lua potentials and
+incomplete permutations (including massless targets) use generation order.
+`WALK_HUGEPAGES=1` uses paired native allocation/free for the pool and all live
+body-array ownership paths, including clone/checkpoint restore. It uses Linux
+2 MiB-aligned allocations, sizes rounded to 2 MiB, and THP advice with ordinary
+free, following the lead's current MPSS state note. It never changes kernel policy; no mapping success is promised.
+The separate `src/nbody_walk_memory_proof.h` is Instrumentation and is compiled
+only into the card diagnostic binary. Both performance options default off.
