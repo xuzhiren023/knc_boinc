@@ -110,6 +110,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 knc-boinc window 8 (16:02-16:15Z, card clean): S10-02 force candidates no gain (prefetch 12.82, hot 12.70,
+  both 12.84 vs 12.71 s; twin predicted no winner). Walk profile: per-thread nbGravity 3.05 s of 12.43 s active force
+  loop time, balanced (max 12.64 s): ~75% of the large case's force phase is OUTSIDE the tree walk, in the external
+  potential. The large case uses Disk.freeman (Bessel functions); all three real Lua files use Disk.miyamotoNagai.
+  The large case is not representative of real tasks for the step phase. Real 117676: setup is 79% of 27.9 min.
 - 2026-11-17 FULL REAL WORKUNIT 117676 on the card (15:32-16:00Z, release build, 240 threads, ssh, card clean):
   whole_run 1,673 s (27.9 min): setup (generation + first force map) 1,319 s; 1,568 steps: force 292 s, tree 40.7 s,
   per-step likelihood 17.7 s, integrators 1.9 s. All 8 likelihood tags identical to the stock 1.96 app
