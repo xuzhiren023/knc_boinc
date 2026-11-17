@@ -105,6 +105,17 @@ Lead-maintained. Last update: 2026-11-16 EST.
   S8-03 (parallel quad): x86 core-small (4,000 bodies, real 117676 args) generation 140.2 s -> 36.9 s at 12 threads,
   bodies byte-identical, likelihood -2357.216400957532642 identical. Card check pending.
 
+- 2026-11-17 00:12Z owner: no BOINC launch tonight; next 4 h: card must dominate x86 by a large margin, results
+  still accepted. Packaged build (S8-03 parallel quad, chunk 4, result-contract) passed on the card: core-small
+  68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
+  integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
+
+- Window 12 closed early (~00:25Z, owner let PhiWeather start): "boinc done" sent; card clean (no processes,
+  /tmp/claude empty). Next: one staged run list (S8-05, S8-07, S8-08, S8-09) for the GCC-KNC window after PhiWeather.
+- Window 12: extension denied; hard stop 02:59:39Z (earlier if PhiWeather is ready: finish the current batch and
+  hand over). End: cleanup, ps check, "boinc done" to the GCC-KNC lead; stage remaining checks (S8-05, S8-07,
+  S8-08, S8-09) as one run list for the next GCC-KNC window after PhiWeather's ~3 h job.
+
 - Twin use (owner 2026-11-16): knc-twin 0.4 simulates 1 core or up to 8 detailed cores on the ring
   (`simulate --scale ring`, `streams[].core`, 4 contexts per core; multicore results are
   unvalidated_scenario_estimate). Use 1 core with 4 contexts for per-thread speed at 4 threads/core (the 82x
