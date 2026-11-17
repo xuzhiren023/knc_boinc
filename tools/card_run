@@ -1,0 +1,1303 @@
+#!/usr/bin/env python3
+# Copied from gcc_knc/tools/card_run; last upstream file commit:
+# 5feedc3f23aff1c2807598d0bb7e2bf3d087631c
+# Upstream Git blob: 7bf94b0d8e6f8435f8ba5e57a331491677519455
+# Local differences are enumerated in tools/CARD_RUN.md.
+"""Shared-card runner; see docs/card-run.md. Fake transport never uses SSH.
+
+Turn-row protocol: before a multi-job benchmark window, append a ledger row with
+event=queued, project=<selected project>, a unique jobId beginning claude-turn-, cores=[],
+timingValid=true, and queuedTime as an ISO-8601 timestamp with timezone. While
+live (age under three hours), that row keeps our benchmark turn ahead of foreign
+queues with later queuedTime values. Running jobs must still drain. Close the
+window by appending event=finish with the same jobId and project; ordinary
+round-robin yielding then resumes. A later turn row cannot jump an older queue.
+"""
+import argparse
+from collections import deque
+from datetime import datetime, timedelta, timezone
+import getpass
+import json
+import math
+import os
+from pathlib import Path
+import queue
+import re
+import shlex
+import subprocess
+import sys
+import threading
+import time
+import uuid
+import tempfile
+
+# Retain upstream config, helper, lock and state paths across both projects.
+ROOT = Path("C:/Users/xuzhi/Documents/gcc_knc")
+sys.path.insert(0, str(ROOT / "tools"))
+# The shared helper is read-only, including its bytecode cache.
+_saved_dont_write_bytecode = sys.dont_write_bytecode
+sys.dont_write_bytecode = True
+try:
+    import card_dma
+finally:
+    sys.dont_write_bytecode = _saved_dont_write_bytecode
+RUN_DIR = re.compile(r"/tmp/claude/claude-[0-9a-f]{32}\Z")
+REFUSED_EXIT, TIMEOUT_EXIT, INFRA_EXIT = 125, 124, 126
+MEMORY_BUDGET_MIB = 10240  # Owner, 2026-11-04: the other project rarely uses more than 7 GB.
+# Owner, 2026-11-10: in our exclusive turns the budget is MemFree less this margin; the 10 GiB
+# budget and the other project's cores apply only while one of its jobs runs.
+MEMORY_MARGIN_MIB = 1536
+CARD_MEMORY_MIB = 16384  # 7120P: 16 GB GDDR5, the most any one job can declare.
+# S9-14 (owner 2026-11-10, ADR-0012): run as a smaller card on our 7120P. Compute cores are the
+# card's cores less its OS core (3120: 57, 5110P: 60, 7120: 61, Intel product specifications),
+# so cores 0-55, 0-58 or 0-59 here. Memory is the card's usable memory (the 6 and 8 GB cards
+# less 0.5 GiB for the card OS); None means MemFree less MEMORY_MARGIN_MIB, as for any
+# exclusive job.
+PROFILE_CORES = {"3100": 56, "5100": 59, "7100": 60, "full": 60}
+PROFILE_MEMORY_MIB = {"3100": 5632, "5100": 7680, "7100": None, "full": None}
+PROFILE_HELP = ("run as that card would: its compute cores, and sampled resident plus swap memory. "
+                "A profile cannot stand in for the clock (1.1, 1.053, 1.238 GHz) or the memory "
+                "bandwidth per core (about 4.2, 5.3, 5.8 GB/s): fewer active cores each get more "
+                "bandwidth, so it is a fair test of correctness, memory size and core count, and "
+                "only a rough test of memory-bound speed")
+PROJECT = os.environ.get("CARD_PROJECT", "knc-boinc")
+OWN_JOB = re.compile(r"claude-[0-9a-f]{32}\Z")
+STAGE_TIMEOUT = 120.0  # S5-04: no start row of ours stays open through a slow upload.
+PACK_MAGIC = b"claude-pack 1\n"
+STAGING_RESERVED = {"claude-program", "claude-pin", "claude-watchdog.sh",
+                    "claude-pinned", "stdout", "stderr", "status", "claude-transfer",
+                    "claude-dma-active", "claude-pack", "memory-ready", "memory-report",
+                    "memory-error", "memory-monitor"}
+
+
+# MPSS has no enabled memory controller (lead answer, S11-29). One persistent
+# awk reader samples the entire tree, retaining identities across reparenting.
+# Shell globbing lists PIDs without ls; only candidate descendants need stat.
+PROFILE_START = r'''
+start_job() {
+    guard_boot && [ -f claude-watchdog.sh ] && [ -x claude-pin ] || return 92
+    job_limit=$1; job_cpus=$2; shift 3
+    mkdir memory-monitor || return 92
+    : > stdout; : > stderr
+    (trap '' HUP; exec sh ./claude-watchdog.sh "$run_dir" "$boot_id" "$job_limit") \
+        > /dev/null 2>&1 < /dev/null &
+    (trap '' HUP
+     (while [ ! -f memory-ready ]; do usleep 10000 2>/dev/null || sleep 1; done
+      exec ./claude-pin "$job_cpus" 0 ./claude-program "$@") &
+     root=$!
+     # Isolate claude-pin's marker from the program's exec-success marker.
+     (cd memory-monitor && exec ../claude-pin 0 0 /bin/sh -c \
+         'cd .. && exec awk "$@"' memory-monitor \
+         -v root="$root" -v limit="$profile_memory_kib" -v boot="$boot_id" '
+     function identity(pid,    f,line,n,a) {
+         f="/proc/" pid "/stat"
+         n=(getline line < f); close(f)
+         if (n<=0) return ""
+         sub(/^.*\) /,"",line); split(line,a," ")
+         parent[pid]=a[2]; state[pid]=a[1]
+         return a[20]
+     }
+     function report(    line,a,f) {
+         f="/proc/self/stat"; getline line < f; close(f)
+         sub(/^.*\) /,"",line); split(line,a," ")
+         # Include reaped listing-shell/sleep CPU, in kernel clock ticks.
+         printf "%d %d %d %d\n", peakrss, peakmem, a[12]+a[13]+a[14]+a[15], exceeded > "memory-report"
+         close("memory-report")
+     }
+     BEGIN {
+         known[root]=identity(root)
+         while (1) {
+             f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
+             if (current!=boot) exit 92
+             fullscan=(!sampled || iteration%10==0 || child_change)
+             if (fullscan) {
+             for (p in ids) delete ids[p]
+             cmd="printf \047%s\\n\047 /proc/[0-9]*"
+             while ((cmd | getline path)>0) {
+                 sub(/^.*\//,"",path); ids[path]=""
+                 # PIDs normally grow. A new low PID means wraparound:
+                 # from then on inspect every PID, preserving ancestry checks.
+                 if (path+0<root+0) {
+                     if (sampled && !(path in initial_low)) wrapped=1
+                     if (!sampled) initial_low[path]=1
+                 }
+             }
+             close(cmd)
+             for (p in ids)
+                 if (wrapped || p+0>=root+0) ids[p]=identity(p)
+             sampled=1
+             } else {
+                 for (p in known) ids[p]=identity(p)
+             }
+             # Discover grandchildren regardless of PID/directory ordering.
+             do {
+                 changed=0
+                 for (p in ids)
+                     if (ids[p]!="" && !(p in known) && parent[p] in known &&
+                         ids[parent[p]]==known[parent[p]]) {
+                         known[p]=ids[p]; changed=1
+                     }
+             } while (changed)
+             rss=0; swap=0; live=0; children=0
+             for (p in known) {
+                 if (ids[p]!=known[p] || ids[p]=="" || state[p]=="Z") {
+                     delete known[p]; continue
+                 }
+                 live++
+                 children++
+                 f="/proc/" p "/status"
+                 while ((getline line < f)>0) {
+                     split(line,a,/[ \t]+/)
+                     if (a[1]=="VmRSS:") rss+=a[2]
+                     if (a[1]=="VmSwap:") swap+=a[2]
+                 }
+                 close(f)
+             }
+             if (rss>peakrss) peakrss=rss
+             if (rss+swap>peakmem) peakmem=rss+swap
+             if (limit>0 && rss+swap>limit) exceeded=1
+             report()
+             child_change=(children!=previous_children)
+             previous_children=children
+             iteration++
+             if (exceeded) {
+                 f="/proc/sys/kernel/random/boot_id"; getline current < f; close(f)
+                 if (current!=boot) exit 92
+                 # Recheck start time immediately before signalling, including
+                 # descendants that changed cwd/executable or were reparented.
+                 for (p in known)
+                     if (identity(p)==known[p]) system("kill -KILL " p " 2>/dev/null")
+             }
+             if (!live) exit
+             print "ready" > "memory-ready"; close("memory-ready")
+             system("usleep 100000 2>/dev/null || sleep 1")
+         }
+     }') &
+     reader=$!
+     wait "$root"; code=$?
+     wait "$reader" || { code=126; echo failed > memory-error; }
+     printf '%s\n' "$code" > status) > stdout 2> stderr < /dev/null &
+}
+'''
+
+
+class Refused(OSError):
+    pass
+
+
+class TransportError(ConnectionError):
+    """Connection ended or exceeded its deadline, rather than a remote exit."""
+
+
+def staging_name(name):
+    if not name or name in (".", "..") or any(c in name for c in ("/", "\\", "\0")):
+        raise Refused("unsafe staging filename: %r" % name)
+    return name
+
+
+def watchdog_bytes():
+    return ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+            '\nrun_dir=$1\nboot_id=$2\n'
+            'printf claude-watchdog > /proc/self/comm\nguard_boot || exit 92\n'
+            'sleep "$3" || exit 95\ncleanup\n').encode("utf8")
+
+
+def check_staging(program, files, max_stage_mib, overhead, packed=False):
+    if not isinstance(max_stage_mib, int) or isinstance(max_stage_mib, bool) or max_stage_mib <= 0:
+        raise Refused("maxStageMiB must be a positive integer")
+    names = set(STAGING_RESERVED) | ({"claude-unpack"} if packed else set())
+    for path in files:
+        name = staging_name(path.name)
+        if packed and "\n" in name:
+            raise Refused("pack entry names cannot contain a newline: %r" % name)
+        if name in names:
+            raise Refused("duplicate or reserved staging filename: " + name)
+        names.add(name)
+    total = overhead
+    for path in [Path(program)] + files:
+        if not path.is_file():
+            raise Refused("staged input is not a regular file: %s" % path)
+        total += path.stat().st_size
+    if total > max_stage_mib * 1024 * 1024:
+        raise Refused("total staged size exceeds maxStageMiB (%s)" % max_stage_mib)
+
+
+def pack_stream(entries):
+    """One stream for tools/claude-unpack.c: per file "<600|700> <size> <name>\\n", then its bytes."""
+    parts = [PACK_MAGIC]
+    for name, data in entries:
+        mode = b"700" if data.startswith(b"\x7fELF") else b"600"
+        parts += [mode, b" %d " % len(data), staging_name(name).encode("utf8"), b"\n", data]
+    parts.append(b"end %d\n" % len(entries))
+    return b"".join(parts)
+
+
+def inside(path, directory):
+    return isinstance(path, str) and (path == directory or path.startswith(directory + "/"))
+
+
+def main_root(root):
+    # Project worktrees live at <main>/.work/<ticket>, like storage.main_root's
+    # fallback. Both main and every ticket must contend on this one state file.
+    root = Path(root).resolve()
+    return root.parent.parent if root.parent.name == ".work" else root
+
+
+RECEIPT_DIR = main_root(ROOT) / ".work/_state/card"
+
+
+def retain_receipt(result):
+    RECEIPT_DIR.mkdir(parents=True, exist_ok=True)
+    path = RECEIPT_DIR / (result["job_id"] + ".json")
+    path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+    receipts = []
+    for candidate in RECEIPT_DIR.glob("claude-*.json"):
+        try:
+            receipts.append((candidate.stat().st_mtime_ns, candidate.name, candidate))
+        except FileNotFoundError:
+            continue  # Another runner may have pruned it already.
+    for _, _, candidate in sorted(receipts, reverse=True)[200:]:
+        candidate.unlink(missing_ok=True)
+
+
+def default_lock(root):
+    return main_root(root) / ".work/_state/card.lock"
+
+
+def foreign_processes(snapshot, run_dir, baseline_names):
+    baseline_names = set(baseline_names) | {
+        "init", "sshd", "udevd", "getty", "klogd", "syslogd", "portmap", "coi_daemon"
+    }
+    directories = [run_dir]
+    if snapshot.get("physical_run_dir"):
+        directories.append(snapshot["physical_run_dir"])
+    processes = snapshot["processes"]
+    # Ours: the control shell's children (never listed themselves), processes in the run
+    # directory, and every descendant of either, whatever exe and cwd it shows.
+    ours = {str(pid) for pid in snapshot.get("own_pids", ())} | {
+        str(p.get("pid")) for p in processes
+        if any(inside(p.get(field), directory) for directory in directories for field in ("exe", "cwd"))}
+    while True:
+        children = {str(p.get("pid")) for p in processes if str(p.get("ppid")) in ours} - ours
+        if not children:
+            break
+        ours |= children
+    return [p for p in processes
+               if str(p.get("pid")) not in ours
+               and str(p.get("pid")) != "2" and str(p.get("ppid")) != "2"
+               and (not p.get("name") or p["name"] not in baseline_names)]
+
+
+def read_ledger(path):
+    # Never repair/truncate another agent's ledger, including malformed lines.
+    return [json.loads(line) for line in Path(path).read_text(encoding="utf8").splitlines()]
+
+
+def append_ledger(path, record):
+    # One append syscall per complete JSON line, on the shared local filesystem.
+    data = (json.dumps(record, sort_keys=True) + "\n").encode("utf8")
+    fd = os.open(str(path), os.O_WRONLY | os.O_APPEND)
+    try:
+        if os.write(fd, data) != len(data):
+            raise OSError("short ledger append")
+    finally:
+        os.close(fd)
+
+
+def active_jobs(lines):
+    active = {}
+    for line in lines:
+        if line.get("event") in ("start", "queued"):
+            active[ledger_job_id(line)] = line
+        elif line.get("event") in ("finish", "end", "superseded"):
+            active.pop(ledger_job_id(line), None)
+    now = datetime.now(timezone.utc)
+    return {key: row for key, row in active.items()
+            if row.get("event") != "queued" or live_queue(row, now)}
+
+
+def live_queue(row, now):
+    if row.get("timingValid") is not True:
+        return False
+    try:
+        age = now - datetime.fromisoformat(row["queuedTime"].replace("Z", "+00:00"))
+        return timedelta(0) <= age < timedelta(hours=3)
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def ledger_job_id(line):
+    # Read old runner history without rewriting it; all new lines use jobId.
+    return line["jobId"] if "jobId" in line else line["job_id"]
+
+
+def is_ours(job):
+    """Tagged rows, or legacy rows (no project) with one of our job IDs; PhiWeather rows are not ours."""
+    if "project" in job:
+        return job["project"] == PROJECT
+    return bool(OWN_JOB.fullmatch(str(job.get("jobId", job.get("job_id", "")))))
+
+
+def refuse_if_timed_job_open(active):
+    """S5-04: a timed whole-card job of another project or agent is spoiled by any job of ours."""
+    for job in active.values():
+        if job.get("event") != "queued" and not is_ours(job) and job.get("timingValid") is True:
+            raise Refused("timed job %s is open until %s; not staging"
+                          % (ledger_job_id(job), job.get("expectedEnd")))
+
+
+def cpu_binding(cpuinfo):
+    mapping = {}
+    for block in cpuinfo.strip().split("\n\n"):
+        fields = dict(line.split(":", 1) for line in block.splitlines() if ":" in line)
+        fields = {key.strip(): value.strip() for key, value in fields.items()}
+        if "processor" in fields and "core id" in fields:
+            core = int(fields["core id"])
+            if 0 <= core <= 59:
+                mapping[int(fields["processor"])] = core
+    if not mapping:
+        raise Refused("no CPUs mapped to physical cores 0-59")
+    return mapping
+
+
+def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
+        transport_timeout, receipt_path, transport, ledger_path, memory_mb=None,
+        monotonic=time.monotonic, files=(), max_stage_mib=64, packed=False, stage_timeout=STAGE_TIMEOUT,
+        threads=1, cores=None, benchmark=False, profile=None):
+    result = dict(result_class="infrastructure", exit_code=INFRA_EXIT,
+                  program_exit_code=None, boot_id_before=None, boot_id_after=None,
+                  card_minutes=0.0, detail="", foreign_processes=[], overlapping_jobs=[],
+                  reaped=[], stale_kept=[], skipped_processes=[])
+    result["transfers"] = getattr(transport, "transfers", [])
+    session, acquired, execution_started, execution_finished = None, False, False, False
+    job_id = "claude-" + uuid.uuid4().hex
+    run_dir = "/tmp/claude/" + job_id
+    result.update(job_id=job_id, run_dir=run_dir, memory_mb=memory_mb, profile=profile)
+    if profile is not None:
+        result.update(profile_memory_limit_mib=PROFILE_MEMORY_MIB.get(profile),
+                      peak_resident_kib=None, peak_memory_kib=None, monitor_cpu_ticks=None)
+    recorded, card_fault, ledger_offset = False, False, 0
+    admission_lock = None
+    overlaps = set()
+    cpuinfo = None
+    queued = False
+    refused_sandbox = False
+
+    def failure(kind, code, detail):
+        result.update(result_class=kind, exit_code=code, detail=str(detail))
+
+    def snapshot():
+        nonlocal card_fault, cpuinfo
+        snap = session.snapshot(timeout=transport_timeout, include_cpuinfo=cpuinfo is None)
+        boot = snap.get("boot_id")
+        if not isinstance(boot, str) or not boot.strip():
+            raise OSError("unknown boot ID; cannot establish card state")
+        result["boot_id_after"] = boot
+        if result["boot_id_before"] is None:
+            result["boot_id_before"] = boot
+        elif result["boot_id_before"] != boot:
+            card_fault = True
+            raise OSError("card boot ID changed; no signalling or cleanup permitted")
+        # CPU topology belongs to the established boot. Preserve it through
+        # admission waits and the one cleanup reconnect; memory stays fresh.
+        if cpuinfo is None:
+            cpuinfo = snap["cpuinfo"]
+        else:
+            snap["cpuinfo"] = cpuinfo
+        for process in foreign_processes(snap, run_dir, baseline_names):
+            if process not in result["foreign_processes"]:
+                result["foreign_processes"].append(process)
+        for skipped in snap.get("skipped_processes", []):
+            if skipped not in result["skipped_processes"]:
+                result["skipped_processes"].append(skipped)
+        return snap
+
+    def refuse_foreign_workload(snap):
+        if benchmark:
+            names = sorted({str(process.get("name") or "unknown")
+                            for process in foreign_processes(snap, run_dir, baseline_names)})
+            if names:
+                raise Refused("foreign workload running: " + ", ".join(names))
+
+    try:
+        username = os.environ.get("USERNAME") or getpass.getuser()
+        # Engineer sessions, Codex or Claude (owner, 2026-11-07), never start card jobs.
+        if username.startswith("CodexSandbox") or os.environ.get("PM_ROLE") == "engineer":
+            refused_sandbox = True
+            raise Refused("card jobs are lead-only; leave the binaries for the lead")
+        dma_latch = getattr(transport, "dma_latch", None)
+        if dma_latch is not None and dma_latch.exists():
+            raise Refused("DMA cleanup unresolved; lead must inspect " + str(dma_latch))
+        if any(not math.isfinite(n) or n <= 0 for n in (timeout, transport_timeout)):
+            raise ValueError("limits must be finite and positive")
+        if profile is not None:
+            if profile not in PROFILE_CORES:
+                raise Refused("profile must be one of " + ", ".join(PROFILE_CORES))
+            if cores is not None:
+                raise Refused("a profile sets its own cores; cannot combine with explicit cores")
+            memory_mb = PROFILE_MEMORY_MIB[profile]
+        if memory_mb is not None and (not isinstance(memory_mb, int) or isinstance(memory_mb, bool)
+                                      or not 0 < memory_mb <= CARD_MEMORY_MIB):
+            raise Refused("memory limit must be 1..%d MB (the card's memory)" % CARD_MEMORY_MIB)
+        if not isinstance(threads, int) or isinstance(threads, bool) or not 1 <= threads <= 240:
+            raise Refused("threads must be an integer from 1 through 240")
+        if cores is not None:
+            if (not cores or any(not isinstance(c, int) or isinstance(c, bool) or not 0 <= c < 60
+                                 for c in cores) or len(set(cores)) != len(cores)):
+                raise Refused("cores must be a nonempty list of distinct physical cores 0-59")
+            if benchmark:
+                raise Refused("benchmark takes all cores; cannot combine with explicit cores")
+        files = [Path(path) for path in files]
+        overhead = getattr(transport, "stage_overhead", lambda **kwargs: 0)
+        check_staging(program, files, max_stage_mib,
+                      overhead(packed=True) if packed else overhead(), packed)
+        read_ledger(ledger_path)  # Required before any connection/job.
+        lock_path = Path(lock_path).absolute()
+        if lock_path.resolve() != default_lock(ROOT):
+            lock_path.parent.resolve().relative_to(ROOT.resolve())
+        # O_EXCL is intentional: stale locks require an owner's intervention.
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            raise Refused("own lock present: %s" % lock_path)
+        acquired = True
+        os.close(fd)
+        # Mandatory for all our invocations sharing this ledger, even if callers
+        # override their local --lock. Other agents never need to take this lock.
+        candidate = Path(ledger_path).resolve().parent / "claude-admission.lock"
+        try:
+            fd = os.open(str(candidate), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            raise Refused("our ledger admission lock present: %s" % candidate)
+        admission_lock = candidate
+        os.close(fd)
+        if not benchmark:
+            refuse_if_timed_job_open(active_jobs(read_ledger(ledger_path)))
+        session = transport.connect(run_dir, timeout=transport_timeout)
+        deadline = monotonic() + timeout
+        declared_mb = memory_mb
+        while True:
+            snap = snapshot()
+            refuse_foreign_workload(snap)
+            # Transports may report known unavailability. SSH establishes actual
+            # affinity at execution, via claude-pin and its completion marker.
+            if snap.get("pinning") is False:
+                raise Refused("CPU pinning unavailable; refusing unpinned job")
+            topology = cpu_binding(snap["cpuinfo"])
+            lines = read_ledger(ledger_path)
+            active = active_jobs(lines)
+            active.pop(job_id, None)  # Our queue is replaced by our start, never a reservation.
+            if not benchmark:
+                refuse_if_timed_job_open(active)  # Their chain may start while we wait for memory.
+            foreign_queues = [j for j in active.values()
+                              if j.get("event") == "queued" and not is_ours(j)]
+            foreign_queue = bool(foreign_queues)
+            first_foreign_queue = min((datetime.fromisoformat(j["queuedTime"].replace("Z", "+00:00"))
+                                       for j in foreign_queues), default=None)
+            # active_jobs has already removed closed and non-live queues.
+            own_turn = first_foreign_queue is not None and any(
+                j.get("event") == "queued" and j.get("project") == PROJECT
+                and str(j.get("jobId", "")).startswith("claude-turn-") and j.get("cores") == []
+                and datetime.fromisoformat(j["queuedTime"].replace("Z", "+00:00")) < first_foreign_queue
+                for j in active.values())
+            last_timed = next((j for j in reversed(lines) if j.get("event") in ("finish", "end")
+                               and j.get("timingValid") is True), None)
+            their_turn = (benchmark and foreign_queue and not own_turn
+                          and last_timed is not None and is_ours(last_timed))
+            # Job queues do not reserve cores: running jobs must drain even
+            # when an open turn row keeps our multi-job window.
+            running = [j for j in active.values() if j.get("event") == "start"]
+            shared = any(not is_ours(j) for j in running)
+            occupied = {c for j in (running if benchmark else active.values())
+                        for c in j.get("cores", [])}
+            available = [c for c in range(59, -1, -1) if c not in occupied
+                         and sum(value == c for value in topology.values()) == 4]
+            fixed = (list(range(PROFILE_CORES[profile])) if profile is not None
+                     else None if benchmark else cores)
+            selected = (list(fixed) if fixed is not None else list(range(60)) if benchmark
+                        else available[:math.ceil(threads / 4)])
+            core_ready = (not running and all(c in available for c in selected) if benchmark else
+                          not foreign_queue and (fixed is not None or len(selected) >= math.ceil(threads / 4))
+                          and all(c in available for c in selected))
+            reserved = sum(int(j.get("memoryLimitMiB", j.get("memory_mb", 7 * 1024)) or 0)
+                           for j in active.values() if is_ours(j) and j.get("event") != "queued")
+            free = dict(line.split(":", 1) for line in snap["meminfo"].splitlines() if ":" in line)
+            free_kb = int(free["MemFree"].split()[0])
+            budget = MEMORY_BUDGET_MIB if shared else free_kb // 1024 - MEMORY_MARGIN_MIB
+            unlimited = declared_mb is None and not shared
+            job_memory = (declared_mb if declared_mb is not None else
+                          128 if shared else 0)
+            memory_ready = (budget > 0 if unlimited else
+                            job_memory > 0 and reserved + job_memory <= budget
+                            and free_kb - job_memory * 1024 >= MEMORY_MARGIN_MIB * 1024)
+            if core_ready and memory_ready and not their_turn:
+                mapping = {cpu: core for cpu, core in topology.items() if core in selected}
+                # S9-23 (owner 2026-11-10): an exclusive job with no declared limit gets no
+                # RLIMIT_AS; the admission check above still ran on MemFree and the margin.
+                memory_mb = result["memory_mb"] = (None if unlimited else job_memory)
+                break
+            if benchmark and not queued:
+                append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
+                              event="queued", timingValid=True, cores=list(range(60)),
+                              queuedTime=datetime.now(timezone.utc).isoformat()))
+                queued = True
+            if monotonic() >= deadline:
+                reason = ("their turn" if their_turn else "memory admission" if not memory_ready
+                          else "core admission")
+                raise Refused(reason + " wait expired; job was not staged")
+            time.sleep(min(1.0, deadline - monotonic()))
+        result.update(session.reap_stale(result["boot_id_before"], timeout=transport_timeout))
+        now = datetime.now(timezone.utc)
+        ledger_offset = len(lines)
+        # Overlap means another job running: not a queue row, nor our own turn reservation.
+        overlaps.update(key for key, job in active.items() if job.get("event") == "start")
+        # A timed job keeps the whole card to itself even when its profile uses fewer cores.
+        ledger_job = dict(agent="claude", project=PROJECT, jobId=job_id,
+                          cores=list(range(60)) if benchmark else sorted(set(mapping.values())),
+                          logicalCpus=sorted(mapping), memoryLimitMiB=memory_mb, profile=profile,
+                          startTime=now.isoformat(),
+                          expectedEnd=(now + timedelta(seconds=timeout)).isoformat(), timingValid=benchmark)
+        append_ledger(ledger_path, dict(ledger_job, event="start"))
+        recorded = True
+        queued = False  # The start event closes the queued event with the same jobId.
+        result["cpus"] = sorted(mapping)
+        staging_started = monotonic()
+        session.stage(run_dir, program, timeout=transport_timeout,
+                      **({"files": files} if files else {}), **({"packed": True} if packed else {}))
+        if monotonic() - staging_started > stage_timeout:
+            raise OSError("staging took longer than %g s; stopped" % stage_timeout)
+        snap = snapshot()
+        refuse_foreign_workload(snap)
+        started = monotonic()
+        execution_started = True
+        session.profile = profile
+        try:
+            status = session.execute(run_dir, argv, timeout=timeout,
+                                     card_timeout=math.ceil(timeout + max(5.0, 2 * transport_timeout)),
+                                     cpus=sorted(mapping), memory_mb=memory_mb)
+            result.update(result_class="program", exit_code=status, program_exit_code=status)
+            if getattr(transport, "collect_names", ()):
+                # No SCIF endpoint may overlap the execution watchdog. Uploads
+                # precede start_job; collection follows guarded termination of
+                # the completed job's watchdog and any remaining children.
+                session.signal_owned(run_dir, result["boot_id_before"], timeout=transport_timeout)
+                session.collect(transport.collect_names, transport.collect_dir,
+                                timeout=stage_timeout)
+        except TimeoutError as error:
+            failure("timeout", TIMEOUT_EXIT, error)
+        finally:
+            result["card_minutes"] = (monotonic() - started) / 60.0
+            if profile is not None:
+                report = getattr(session, "memory_report", {})
+                result.update(report)
+                peak = report.get("peak_memory_kib")
+                limit = PROFILE_MEMORY_MIB[profile]
+                if limit is not None and peak is not None and peak > limit * 1024:
+                    failure("resource", 137, "peak resident plus swap %d KiB exceeds limit %d KiB" %
+                            (peak, limit * 1024))
+        execution_finished = True
+    except Refused as error:
+        failure("refused", REFUSED_EXIT, error)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        failure("infrastructure", INFRA_EXIT, error)
+    except KeyboardInterrupt:
+        failure("infrastructure", INFRA_EXIT, "host interrupted")
+    finally:
+        result["transfer_stop"] = bool(getattr(session, "transfer_stop", False) or
+                                      (getattr(transport, "dma_latch", None) is not None and
+                                       transport.dma_latch.exists()))
+        if session is not None:
+            try:
+                # This check runs after success, refusal, timeout, or partial staging.
+                if result["boot_id_before"] is None:
+                    raise OSError("initial boot ID unknown; no cleanup permitted")
+
+                def finish_remote():
+                    snapshot()
+                    if execution_started and (not execution_finished or result["result_class"] == "timeout"):
+                        session.signal_owned(run_dir, result["boot_id_before"], timeout=transport_timeout)
+                    session.cleanup(run_dir, result["boot_id_before"], timeout=transport_timeout)
+
+                try:
+                    finish_remote()
+                except OSError as error:
+                    if card_fault:  # Confirmed reboot: never clean another boot.
+                        raise
+                    failure("infrastructure", INFRA_EXIT,
+                            "%s; finalization failed: %s" % (result["detail"], error))
+                    # Exactly one reconnect, for state/cleanup only. No replay of
+                    # admission, staging, start_job or program execution.
+                    session.close()
+                    session = None
+                    try:
+                        session = transport.connect(run_dir, timeout=transport_timeout)
+                    except ConnectionError:
+                        card_fault = True
+                        raise
+                    # Only a failed connect establishes unreachability. A later
+                    # deadline on this session is infrastructure; snapshot()
+                    # independently records a confirmed boot-ID change.
+                    finish_remote()
+            except (OSError, ValueError) as error:
+                failure("infrastructure", INFRA_EXIT, "%s; cleanup incomplete: %s" % (result["detail"], error))
+            finally:
+                try:
+                    if session is not None:
+                        session.close()
+                except OSError as error:
+                    failure("infrastructure", INFRA_EXIT, "session close failed: %s" % error)
+        if card_fault:
+            try:
+                append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id, event="card-fault",
+                              detail=result["detail"], boot_id_before=result["boot_id_before"],
+                              boot_id_after=result["boot_id_after"], timingValid=False))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "fault ledger write failed: %s" % error)
+        if recorded:
+            try:
+                lines = read_ledger(ledger_path)
+                overlaps.update(ledger_job_id(line) for line in lines[ledger_offset:]
+                                if line.get("event") == "start")
+                overlaps.discard(job_id)
+                result["overlapping_jobs"] = sorted(overlaps)
+            except (OSError, ValueError, KeyError) as error:
+                failure("infrastructure", INFRA_EXIT, "ledger completion failed: %s" % error)
+            try:
+                append_ledger(ledger_path, dict(ledger_job, event="finish",
+                              endTime=datetime.now(timezone.utc).isoformat(),
+                              outcome=("success" if result["result_class"] == "program" and
+                                       result["exit_code"] == 0 else result["result_class"] + "-failure"),
+                              result_class=result["result_class"], exit_code=result["exit_code"],
+                              detail=result["detail"][:300]))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "ledger finish failed: %s" % error)
+        if queued:
+            try:
+                append_ledger(ledger_path, dict(agent="claude", project=PROJECT, jobId=job_id,
+                              event="superseded", timingValid=True,
+                              endTime=datetime.now(timezone.utc).isoformat(), outcome="cancelled"))
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "queue close failed: %s" % error)
+        if admission_lock is not None:
+            try:
+                admission_lock.unlink()
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "admission lock release failed: %s" % error)
+        if acquired:
+            try:
+                lock_path.unlink()
+            except OSError as error:
+                failure("infrastructure", INFRA_EXIT, "own lock release failed: %s" % error)
+    # An optional caller copy must not prevent retaining the job diagnostic.
+    if receipt_path is not None and not refused_sandbox:
+        try:
+            receipt_path = Path(receipt_path)
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            receipt_path.write_text(json.dumps(result, sort_keys=True) + "\n", encoding="utf8")
+        except OSError as error:
+            failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
+    if not refused_sandbox:
+        try:
+            retain_receipt(result)
+        except OSError as error:
+            failure("infrastructure", INFRA_EXIT, "cannot write result: %s" % error)
+    return result
+
+
+class SSHTransport:
+    """Bounded OpenSSH shell; run() permits one state/cleanup reconnect."""
+
+    def __init__(self, config, transport_timeout, stage_timeout=STAGE_TIMEOUT,
+                 transfer="auto", threshold_bytes=1048576, collect=(), collect_dir=None):
+        self.config = config
+        self.transport_timeout = transport_timeout
+        self.stage_timeout = stage_timeout
+        self.transfer, self.threshold_bytes = transfer, threshold_bytes
+        self.transfers = []
+        self.collect_names, self.collect_dir = collect, collect_dir
+        self.dma_latch = main_root(ROOT) / ".work/_state/card-dma-active.lock"
+        self.helper_free = transfer == "ssh" or not all(
+            self.helper(key, name).is_file() for key, name in
+            (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe")))
+        if self.helper_free and (transfer == "dma" or collect):
+            raise Refused("DMA/--collect requires both transfer helpers and --transfer auto or dma")
+
+    def helper(self, key, name):
+        return Path(self.config.get(key, str(main_root(ROOT) / ".work/_shared" / name)))
+
+    def stage_overhead(self, packed=False):
+        unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
+        return (self.helper("pinHelper", "claude-pin.mic").stat().st_size + len(watchdog_bytes()) + unpack
+                + (0 if self.helper_free else self.helper("transferHelper", "claude-transfer.mic").stat().st_size))
+
+    def connect(self, run_dir, *, timeout):
+        if not RUN_DIR.fullmatch(run_dir):
+            raise OSError("invalid private directory")
+        c = self.config
+        host = c["host"]
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.:-]*", host):
+            raise OSError("invalid card hostname/address")
+        command = ["C:/Windows/System32/OpenSSH/ssh.exe", "-F", "NUL", "-i", c["identity"],
+                   "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes",
+                   "-o", "StrictHostKeyChecking=yes", "-o", "GlobalKnownHostsFile=NUL",
+                   "-o", "UserKnownHostsFile=" + c["knownHosts"],
+                   "-o", "HostKeyAlgorithms=ssh-ed25519", "-o", "ConnectTimeout=5",
+                   "root@" + host, "exec sh"]
+        session = SSHSession(command, run_dir, self.transport_timeout)
+        try:
+            session.rpc("check_tools() { for tool in readlink ls id cat dd chmod sleep mkdir rm rmdir awk mv wc; "
+                        "do command -v \"$tool\" >/dev/null || { echo \"missing required card tool: $tool\"; missing=1; }; done; "
+                        "if [ \"${missing:-0}\" = 1 ]; then "
+                        "return 94; fi; }; check_tools", timeout, step="check-tools")
+            session.rpc("umask 077\nrun_dir=%s\n"
+                        "printf claude-control > /proc/self/comm" %
+                        shlex.quote(run_dir), timeout, step="initialize-control")
+            session.stage_timeout = self.stage_timeout
+            session.pin_helper = self.helper("pinHelper", "claude-pin.mic")
+            session.unpack_helper = self.helper("unpackHelper", "claude-unpack.mic")
+            session.card_helper = self.helper("transferHelper", "claude-transfer.mic")
+            session.host_helper = self.helper("transferHost", "claude-transfer.exe")
+            session.cygwin_bin = self.helper("cygwinBin", "toolchain/cygwin/bin")
+            session.dma_enabled = c.get("dmaEnabled", True)
+            session.transfer_method, session.threshold_bytes = self.transfer, self.threshold_bytes
+            session.helper_free = self.helper_free
+            session.transfers, session.dma_latch = self.transfers, self.dma_latch
+            session.transfer_stop = False
+            if not session.pin_helper.is_file():
+                raise OSError("static donor helper missing: %s; see docs/card-run.md" % session.pin_helper)
+            session.rpc((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8"), timeout,
+                        step="load-helpers")
+            return session
+        except BaseException:
+            session.close()
+            raise
+
+
+class SSHSession:
+    stage_timeout = STAGE_TIMEOUT
+    helper_free = True
+    transfer_method = "ssh"
+
+    def __init__(self, command, run_dir, transport_timeout):
+        self.transfers = []
+        self.run_dir, self.transport_timeout = run_dir, transport_timeout
+        self.command = command
+        self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+        self.lines = queue.Queue()
+        self.token = uuid.uuid4().hex.encode("ascii")
+        self.boot_id = None
+        self.broken = False
+        self.ssh_errors = deque(maxlen=8)
+        threading.Thread(target=self.read_stdout, daemon=True).start()
+        threading.Thread(target=self.read_stderr, daemon=True).start()
+
+    def read_stdout(self):
+        try:
+            for line in iter(self.process.stdout.readline, b""):
+                self.lines.put(line)
+        finally:
+            self.lines.put(None)
+
+    def read_stderr(self):
+        for data in iter(self.process.stderr.readline, b""):
+            self.ssh_errors.append(data[-1000:])
+            sys.stderr.buffer.write(data)
+            sys.stderr.buffer.flush()
+
+    def rpc(self, script, timeout, *, step="remote-command"):
+        if self.broken:
+            raise TransportError("%s: SSH session unavailable" % step)
+        # Use a writer thread so a full SSH input pipe is bounded too.
+        # Merge command stderr before the completion marker, so diagnostics are
+        # ordered and included even when stderr would otherwise stay buffered.
+        payload = ("{\n" + script + "\n} 2>&1\ncard_rc=$?\nprintf '\\n%s:%%s\\n' \"$card_rc\"\n" %
+                   self.token.decode()).encode("utf8")
+        deadline = time.monotonic() + timeout
+        written = queue.Queue()
+
+        def write():
+            try:
+                self.process.stdin.write(payload)
+                self.process.stdin.flush()
+                written.put(None)
+            except OSError as error:
+                written.put(error)
+
+        threading.Thread(target=write, daemon=True).start()
+        output = []
+        try:
+            error = written.get(timeout=max(0.001, deadline - time.monotonic()))
+            if error:
+                raise error
+            while True:
+                line = self.lines.get(timeout=max(0.001, deadline - time.monotonic()))
+                if line is None:
+                    raise OSError("card unreachable: SSH session ended")
+                if line.startswith(self.token + b":"):
+                    status = int(line.split(b":", 1)[1])
+                    if status:
+                        break
+                    return b"".join(output).rstrip(b"\n")
+                output.append(line)
+        except (queue.Empty, OSError, ValueError) as error:
+            self.broken = True
+            reason = "operation deadline" if isinstance(error, queue.Empty) else str(error)
+            detail = b"".join(output)[-500:] + b"".join(self.ssh_errors)[-500:]
+            raise TransportError("%s: SSH transport failure: %s; %s" %
+                                 (step, reason, detail.decode("utf8", "replace"))) from error
+        # A nonzero remote command keeps the SSH protocol synchronized and usable.
+        raise OSError("%s: remote operation failed (status %s): %s" %
+                      (step, status, b"".join(output).decode("utf8", "replace")[-1000:]))
+
+    def snapshot(self, *, timeout, include_cpuinfo=True):
+        command = "snapshot" if include_cpuinfo else "snapshot skip-cpu"
+        records = []
+        for raw in self.rpc(command, timeout, step="snapshot").rstrip(b"\n").split(b"\n"):
+            try:
+                records.append(raw.decode("utf8", "strict"))
+            except UnicodeError as error:
+                raise OSError("unknown process identity in snapshot: %r" % raw[:200]) from error
+        if not records or not records[0].startswith("BOOT\t"):
+            raise OSError("malformed process/boot snapshot")
+        boot = records[0][5:]
+        processes, skipped, own = [], [], []
+        cpuinfo, meminfo = [], []
+        physical_run_dir = None
+        for line in records[1:]:
+            fields = line.split("\t")
+            if len(fields) == 2 and fields[0] == "RUNDIR":
+                physical_run_dir = fields[1]
+                continue
+            if fields[0] == "CPU":
+                cpuinfo.append(line[4:])
+                continue
+            if fields[0] == "MEM":
+                meminfo.append(line[4:])
+                continue
+            if len(fields) == 2 and fields[0] == "OWN" and fields[1].isdigit():
+                own.append(fields[1])
+                continue
+            diagnostic = "unknown process identity in snapshot: %r" % line.encode("utf8")[:200]
+            # A partial record may still identify one of our own processes.
+            owned = any(inside(value, directory)
+                        for value in fields[3:]
+                        for directory in (getattr(self, "run_dir", None), physical_run_dir) if directory)
+            complete = (len(fields) == 6 and fields[0] == "PROC"
+                        and fields[1].isdigit() and fields[2].isdigit())
+            if owned and (not complete or not all(fields[3:])):
+                raise Refused(diagnostic)
+            if fields[0] == "SKIP" or (fields[0] == "PROC" and len(fields) < 6):
+                skipped.append(repr(line.encode("utf8")[:200]))
+                continue
+            if not complete:
+                raise OSError(diagnostic)
+            processes.append(dict(zip(("pid", "ppid", "name", "exe", "cwd"), fields[1:])))
+        if self.boot_id is None:
+            self.boot_id = boot
+        return dict(boot_id=boot, processes=processes, skipped_processes=skipped, own_pids=own,
+                    physical_run_dir=physical_run_dir,
+                    cpuinfo="\n".join(cpuinfo),
+                    meminfo="\n".join(meminfo))
+
+    def stage(self, run_dir, program, *, timeout, files=(), packed=False):
+        self.validate(run_dir)
+        # S5-04: all of staging shares one limit; each step gets what is left of it.
+        limit = time.monotonic() + self.stage_timeout
+        step_limit = lambda: min(timeout, self.remaining(limit))
+        self.rpc("boot_id=%s\ncheck_boot && mkdir -p /tmp/claude && "
+                 "mkdir -- \"$run_dir\" && cd -- \"$run_dir\" && guard_dir" %
+                 shlex.quote(self.boot_id), step_limit(), step="stage-create")
+        if not self.helper_free:
+            self.bootstrap_helper(step_limit())
+        if packed:
+            # S4-12: the helper's own upload, then every other file in one
+            # stream, instead of one connection and one chmod per file.
+            self.send_file("claude-unpack", self.unpack_helper.read_bytes(), step_limit())
+            self.rpc("guard_boot && chmod 700 claude-unpack", step_limit(), step="stage-chmod")
+            entries = ([("claude-program", Path(program).read_bytes()),
+                                  ("claude-pin", self.pin_helper.read_bytes()),
+                                  ("claude-watchdog.sh", watchdog_bytes())] +
+                                 [(Path(path).name, Path(path).read_bytes()) for path in files])
+            stream = pack_stream(entries)
+            if self.helper_free:
+                started = time.monotonic()
+                self.upload("upload-pack", "./claude-unpack %d" % len(stream), stream, step_limit())
+                for name, data in entries:
+                    self.finish_ssh(name, len(data), started, step_limit(), "shared pack wall time")
+            else:
+                self.send_file("claude-pack", stream, step_limit())
+                self.rpc("guard_boot && ./claude-unpack %d < claude-pack && rm -- claude-pack" % len(stream),
+                         step_limit(), step="unpack-verified-pack")
+            self.rpc("guard_boot && chmod 700 claude-program claude-pin", step_limit(),
+                     step="stage-chmod")
+            return
+        self.send_path("claude-program", Path(program), step_limit())
+        self.send_file("claude-pin", self.pin_helper.read_bytes(), step_limit())
+        # A separate shell has its own $$, so stop_owned spares the watchdog
+        # itself. Ignore HUP before exec; losing SSH must not disarm the timer.
+        self.send_file("claude-watchdog.sh", watchdog_bytes(), step_limit())
+        for path in files:
+            # Bound each upload and chmod together, independent of batch size.
+            deadline = time.monotonic() + step_limit()
+            path = Path(path)
+            name = staging_name(path.name)
+            with path.open("rb") as source:
+                elf = source.read(4) == b"\x7fELF"
+            self.send_path(name, path, self.remaining(deadline))
+            mode = "700" if elf else "600"
+            self.rpc("guard_boot && chmod %s -- %s" % (mode, shlex.quote(name)),
+                     self.remaining(deadline), step="stage-chmod")
+        self.rpc("guard_boot && chmod 700 claude-program claude-pin", step_limit(),
+                 step="stage-chmod")
+
+    def send_file(self, name, data, timeout):
+        if self.helper_free:
+            started = time.monotonic()
+            staging_name(name)
+            private = "claude-part-" + uuid.uuid4().hex
+            self.upload("upload-" + name, "cat > " + private, data, timeout)
+            return self.finish_ssh(name, len(data), started, self.remaining(started + timeout),
+                                   private=private, mode=self.file_mode(name, data[:4]))
+        # Generated controls and the suite pack share the file transport.
+        # Temporary host bytes are bounded by the existing maxStageMiB check.
+        with tempfile.NamedTemporaryFile(prefix="claude-input-", dir=self.host_helper.parent,
+                                         delete=False) as output:
+            output.write(data)
+            path = Path(output.name)
+        try:
+            self.send_path(name, path, timeout)
+        finally:
+            path.unlink()
+
+    def send_path(self, name, source, timeout):
+        if self.helper_free:
+            return self.send_file(name, source.read_bytes(), timeout)
+        destination = staging_name(name)
+        with source.open("rb") as stream:
+            mode = self.file_mode(name, stream.read(4))
+        self.transfer_file(source, destination, source.stat().st_size, "up", timeout, mode=mode)
+
+    @staticmethod
+    def file_mode(name, prefix):
+        return "700" if name in ("claude-program", "claude-pin", "claude-unpack") or prefix == b"\x7fELF" else "600"
+
+    def finish_ssh(self, name, size, started, timeout, scope="file wall time", *, private=None, mode="600"):
+        deadline = time.monotonic() + timeout
+        count = self.rpc("guard_boot && wc -c < " + shlex.quote(private or staging_name(name)),
+                         timeout, step="upload-length")
+        if int(count) != size:
+            self.transfer_stop = True
+            raise OSError("SSH upload length mismatch: " + name)
+        if private:
+            self.rpc("guard_boot && chmod %s -- %s && mv -- %s %s" %
+                     (mode, private, private, shlex.quote(staging_name(name))),
+                     self.remaining(deadline), step="upload-publish")
+        seconds = time.monotonic() - started
+        self.transfers.append(dict(method="ssh", bytes=size, seconds=seconds,
+                                   mib_per_second=size / 1048576 / seconds if seconds else 0,
+                                   file_complete=True, wall_seconds=seconds,
+                                   fallback=(dict(method="dma", reason="dma unavailable: helper missing")
+                                             if self.transfer_method == "auto" else None),
+                                   direction="up", destination=name, timing_scope=scope))
+
+    def transfer_file(self, source, destination, size, direction, timeout, *, mode="600"):
+        try:
+            row = card_dma.transfer_file(source, destination, size=size, direction=direction,
+                                        method=self.transfer_method, threshold_bytes=self.threshold_bytes,
+                                        backends={method: card_dma.Endpoint(self, method, timeout, mode)
+                                                  for method in ("ssh", "dma")})
+        except card_dma.TransferFailure as error:
+            # The suite must not retry integrity or uncertain-cleanup failures
+            # as a fresh job (including failures on the SSH fallback).
+            self.transfer_stop = (error.kind in ("integrity", "bugcheck", "uncertain_cleanup")
+                                  or (error.data_started and not error.cleanup_confirmed))
+            self.transfers.append(dict(source=str(source), destination=str(destination),
+                                       direction=direction, failure=str(error), kind=error.kind,
+                                       fallback=getattr(error, "fallback", None),
+                                       data_started=error.data_started,
+                                       cleanup_confirmed=error.cleanup_confirmed))
+            raise
+        row.update(source=str(source), destination=str(destination), direction=direction)
+        self.transfers.append(row)
+
+    def bootstrap_helper(self, timeout):
+        # Publish the authenticated bootstrap stream after its exact length check.
+        data = self.card_helper.read_bytes()
+        private = "claude-part-" + uuid.uuid4().hex
+        deadline = time.monotonic() + timeout
+        started = time.monotonic()
+        self.upload("transfer-bootstrap", "cat > " + private, data, self.remaining(deadline))
+        count = self.rpc("guard_boot && wc -c < " + private,
+                         self.remaining(deadline), step="bootstrap-length")
+        if int(count) != len(data):
+            self.transfer_stop = True
+            raise card_dma.TransferFailure("helper bootstrap length mismatch", kind="integrity",
+                                            data_started=True, cleanup_confirmed=True)
+        self.rpc("guard_boot && chmod 700 -- %s && mv -- %s claude-transfer" % (private, private),
+                 self.remaining(deadline), step="bootstrap-publish")
+        seconds = time.monotonic() - started
+        self.transfers.append(dict(method="ssh", bytes=len(data), seconds=seconds,
+                                   mib_per_second=len(data) / 1048576 / seconds,
+                                   file_complete=True, wall_seconds=seconds,
+                                   fallback=None, direction="up", destination="claude-transfer",
+                                   timing_scope="bootstrap wall time"))
+
+    def file_command(self, command):
+        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                  "\numask 077\nrun_dir=%s\nboot_id=%s\n"
+                  "cd -- \"$run_dir\" && guard_boot && exec %s\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), command))
+        return self.command[:-1] + ["sh -c " + shlex.quote(script)]
+
+    def file_helpers(self, source, private, size, direction, method, timeout):
+        return card_dma.HelperPair(self, timeout).run(source, private, size, direction, method)
+
+    def collect(self, names, directory, *, timeout):
+        directory = Path(directory).resolve()
+        directory.mkdir(parents=True, exist_ok=True)
+        deadline = time.monotonic() + timeout
+        for name in names:
+            staging_name(name)
+            if not name.startswith("claude-") or name in STAGING_RESERVED:
+                raise Refused("collection requires an owned, non-control claude- filename")
+            # wc is metadata here, not evidence: the helper checks exact length
+            # again on its opened regular file and refuses symlinks.
+            size = int(self.rpc("guard_boot && test -f %s && test ! -L %s && wc -c < %s" %
+                                (shlex.quote(name), shlex.quote(name), shlex.quote(name)),
+                                self.remaining(deadline), step="collect-size"))
+            self.transfer_file(name, directory / name, size, "down", self.remaining(deadline))
+
+    def upload(self, step, command, data, timeout):
+        # A separate, finite SSH stdin carries raw bytes, never shell syntax.
+        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                  "\numask 077\nrun_dir=%s\nboot_id=%s\n"
+                  "printf claude-upload > /proc/self/comm\n"
+                  "cd -- \"$run_dir\" && guard_boot && %s\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), command))
+        child = subprocess.Popen(self.command[:-1] + ["sh -c " + shlex.quote(script)],
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            _, errors = child.communicate(input=data, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            _, errors = child.communicate()
+            raise TransportError("%s: SSH upload deadline; %s" %
+                                 (step, errors.decode("utf8", "replace")[-1000:]))
+        if child.returncode:
+            error_type = TransportError if child.returncode == 255 else OSError
+            raise error_type("%s: SSH upload failed (status %s): %s" %
+                             (step, child.returncode, errors.decode("utf8", "replace")[-1000:]))
+
+    def read_output(self, name, offset, timeout):
+        if name not in ("stdout", "stderr") or not isinstance(offset, int) or offset < 0:
+            raise OSError("invalid output stream or offset")
+        block, prefix = divmod(offset, 65536)
+        # BusyBox 1.19.4 lacks head -c and od -A. Use a finite raw SSH stream
+        # with the same boot/directory checks as uploads, preserving every byte.
+        script = ((ROOT / "tools/card_run_remote.sh").read_text(encoding="utf8") +
+                  "\nrun_dir=%s\nboot_id=%s\n"
+                  "printf claude-download > /proc/self/comm\n"
+                  "cd -- \"$run_dir\" && guard_boot && dd if=%s bs=65536 skip=%d count=%d\n" %
+                  (shlex.quote(self.run_dir), shlex.quote(self.boot_id), name, block, 1 + bool(prefix)))
+        child = subprocess.Popen(self.command[:-1] + ["sh -c " + shlex.quote(script)],
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            data, errors = child.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            _, errors = child.communicate()
+            raise TransportError("read-%s: SSH download deadline; %s" %
+                                 (name, errors.decode("utf8", "replace")[-1000:]))
+        if child.returncode:
+            error_type = TransportError if child.returncode == 255 else OSError
+            raise error_type("read-%s: SSH download failed (status %s): %s" %
+                             (name, child.returncode, errors.decode("utf8", "replace")[-1000:]))
+        # An unaligned byte offset needs at most two blocks. Trim the prefix
+        # locally rather than asking the card for slow one-byte reads/skips.
+        return data[prefix:prefix + 65536]
+
+    @staticmethod
+    def remaining(deadline):
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise OSError("SSH operation deadline")
+        return left
+
+    def validate(self, run_dir):
+        if run_dir != self.run_dir or not RUN_DIR.fullmatch(run_dir):
+            raise OSError("operation outside this exact run directory")
+
+    def execute(self, run_dir, argv, *, timeout, card_timeout, cpus, memory_mb):
+        self.validate(run_dir)
+        deadline = time.monotonic() + timeout
+        def operation(script, step):
+            return self.rpc(script, self.transport_timeout, step=step)
+        command = " ".join(shlex.quote(str(arg)) for arg in argv)
+        profile = getattr(self, "profile", None)
+        prefix = (PROFILE_START + "\nprofile_memory_kib=%d\n" %
+                  ((PROFILE_MEMORY_MIB[profile] or 0) * 1024) if profile is not None else "")
+        operation(prefix + "boot_id=%s\nstart_job %s %s %s %s" %
+                  (shlex.quote(self.boot_id), shlex.quote(str(card_timeout)),
+                   shlex.quote(",".join(str(cpu) for cpu in cpus)),
+                   0 if profile is not None else memory_mb or 0, command), "start-job")
+        offsets = [0, 0]
+        status = None
+        poll_delay = 0.5
+        next_output = time.monotonic() + 10.0
+        def read_memory():
+            values = operation("guard_boot && cat memory-report", "read-memory").split()
+            if len(values) != 4 or any(not value.isdigit() for value in values):
+                raise OSError("missing or malformed memory monitor report")
+            self.memory_report = dict(zip(
+                ("peak_resident_kib", "peak_memory_kib", "monitor_cpu_ticks"),
+                map(int, values[:3])))
+        while True:
+            if time.monotonic() >= deadline:
+                if profile is not None:
+                    try:
+                        read_memory()
+                    except OSError as error:
+                        self.memory_report = dict(getattr(self, "memory_report", {}),
+                                                  memory_report_error=str(error))
+                raise TimeoutError("card program deadline exceeded")
+            if status is None:
+                answer = operation("guard_boot && if [ -f memory-error ]; then echo memory-monitor-failed; "
+                                   "elif [ -f status ]; then "
+                                   "if [ -f claude-pinned ]; then cat status; "
+                                   "else echo claude-pinned-missing; fi; "
+                                   "else echo running; fi", "read-status")
+                # A helper failure leaves SSH usable for guarded cleanup.
+                if answer == b"claude-pinned-missing":
+                    raise OSError("claude-pinned missing: helper did not exec program")
+                if answer == b"memory-monitor-failed":
+                    raise OSError("profile memory monitor failed")
+                if answer != b"running":
+                    try:
+                        status = int(answer)
+                    except ValueError:
+                        raise OSError("missing program exit status")
+                    if profile is not None:
+                        read_memory()
+            # Status uses the existing control session. Only these binary reads
+            # open connections: at most one pair per ten seconds while running.
+            if status is not None or time.monotonic() >= next_output:
+                read_any = False
+                for index, (name, stream) in enumerate((("stdout", sys.stdout.buffer),
+                                                       ("stderr", sys.stderr.buffer))):
+                    data = self.read_output(name, offsets[index], self.transport_timeout)
+                    stream.write(data)
+                    stream.flush()
+                    offsets[index] += len(data)
+                    read_any = read_any or bool(data)
+                if status is not None:
+                    if not read_any:
+                        return status
+                    continue  # Drain completed output without another poll delay.
+                next_output = time.monotonic() + 10.0
+            time.sleep(min(poll_delay, max(0, deadline - time.monotonic())))
+            poll_delay = min(5.0, 2 * poll_delay)
+
+    def guarded(self, operation, run_dir, boot_id, timeout):
+        self.validate(run_dir)
+        if not boot_id or boot_id != self.boot_id:
+            raise OSError("boot guard mismatch")
+        # A reconnected control shell has not cd'd into the existing run dir.
+        self.rpc("boot_id=%s\ncheck_boot && if [ -e \"$run_dir\" ]; then "
+                 "cd -- \"$run_dir\" && %s; fi" % (shlex.quote(boot_id), operation),
+                 timeout, step=operation)
+
+    def reap_stale(self, boot_id, *, timeout):
+        if not boot_id or boot_id != self.boot_id:
+            raise OSError("stale cleanup boot guard mismatch")
+        output = self.rpc("boot_id=%s\nreap_stale" % shlex.quote(boot_id), timeout, step="reap-stale")
+        report = dict(reaped=[], stale_kept=[])
+        fields = {"REAPED": "reaped", "STALE_KEPT": "stale_kept"}
+        for line in output.decode("utf8", "replace").splitlines():
+            tag, separator, path = line.partition("\t")
+            if separator and tag in fields:
+                report[fields[tag]].append(path)
+        return report
+
+    def signal_owned(self, run_dir, boot_id, *, timeout):
+        self.guarded("stop_owned", run_dir, boot_id, timeout)
+
+    def cleanup(self, run_dir, boot_id, *, timeout):
+        self.guarded("cleanup", run_dir, boot_id, timeout)
+
+    def close(self):
+        # Closing local SSH cannot authorize any remote signal/removal.
+        if self.process.poll() is None:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait(timeout=1)
+
+
+def main():
+    global PROJECT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--project", default=PROJECT,
+                        help="ledger project (CARD_PROJECT; default: knc-boinc)")
+    parser.add_argument("--config", type=Path, default=main_root(ROOT) / "config/card.local.json")
+    parser.add_argument("--lock", type=Path)
+    parser.add_argument("--external-lock", action="append", type=Path, default=[])
+    parser.add_argument("--baseline-name", action="append", default=[])
+    parser.add_argument("--timeout", type=float)
+    parser.add_argument("--threads", type=int, default=1, help="worker threads; reserve four logical CPUs per core")
+    parser.add_argument("--cores", help="explicit comma-separated physical core IDs (0-59)")
+    parser.add_argument("--benchmark", action="store_true", help="exclusive whole-card timed or atomic job")
+    parser.add_argument("--profile", choices=sorted(PROFILE_CORES), help=PROFILE_HELP)
+    parser.add_argument("--transport-timeout", type=float)
+    parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
+                        help="seconds allowed for staging; a slower upload is an infrastructure failure")
+    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="auto")
+    parser.add_argument("--dma-threshold", type=int, default=1048576, metavar="BYTES")
+    parser.add_argument("--collect", action="append", default=[], metavar="CLAUDE_FILE",
+                        help="collect an owned regular file after the program completes")
+    parser.add_argument("--collect-dir", type=Path, default=ROOT / "tests/out/collected")
+    parser.add_argument("--receipt", type=Path, default=ROOT / "tests/out/card-result.json")
+    parser.add_argument("--file", action="append", type=Path, default=[])
+    parser.add_argument("--file-list", type=Path,
+                        help="one repo-relative path per line; stages everything in one pack upload")
+    parser.add_argument("program", type=Path)
+    parser.add_argument("args", nargs=argparse.REMAINDER)
+    args = parser.parse_args()
+    PROJECT = args.project
+    try:
+        files = list(args.file)
+        if args.file_list is not None:
+            lines = args.file_list.read_text(encoding="utf8").split("\n")
+            files += [ROOT / line.rstrip("\r") for line in lines if line.rstrip("\r")]
+        config = json.loads(args.config.read_text(encoding="utf8"))
+        for key in ("host", "identity", "knownHosts", "ledger"):
+            if not isinstance(config[key], str) or not config[key]:
+                raise ValueError("missing connection setting: " + key)
+        timeout = args.timeout if args.timeout is not None else config.get("timeout", 60.0)
+        transport_timeout = (args.transport_timeout if args.transport_timeout is not None
+                             else config.get("transportTimeout", 10.0))
+        result = run(args.program, args.args,
+                     lock_path=args.lock or Path(config.get("ownLock", str(default_lock(ROOT)))),
+                     external_locks=[Path(p) for p in config.get("externalLocks", [])] + args.external_lock,
+                     baseline_names=set(config.get("baselineNames", [])) | set(args.baseline_name),
+                     timeout=timeout, transport_timeout=transport_timeout, receipt_path=args.receipt,
+                     ledger_path=Path(config["ledger"]), memory_mb=config.get("memoryMB"),
+                     files=files, max_stage_mib=config.get("maxStageMiB", 64),
+                     packed=args.file_list is not None, stage_timeout=args.stage_timeout,
+                     threads=args.threads, cores=([int(c) for c in args.cores.split(",")]
+                                                 if args.cores is not None else None),
+                     benchmark=args.benchmark, profile=args.profile,
+                     transport=SSHTransport(config, transport_timeout, args.stage_timeout,
+                                            args.transfer, args.dma_threshold,
+                                            args.collect, args.collect_dir))
+        print(json.dumps(result, sort_keys=True))
+        return result["exit_code"]
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("card runner infrastructure: %s" % error, file=sys.stderr)
+        return INFRA_EXIT
+
+
+if __name__ == "__main__":
+    sys.exit(main())

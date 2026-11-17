@@ -8,7 +8,7 @@ for variant in off on; do
     for case_name in medium large; do
         bodies=1024
         [[ $case_name != large ]] || bodies=20000
-        command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run --benchmark
+        command=(python tools/card_run --benchmark
             --threads 240 --timeout 43200 --receipt "runs/card/vector/$variant-$case_name.json"
             --file "build/vector/card-$variant/milkyway_nbody.mic"
             --file "workunits/$case_name/params.lua" --file "workunits/$case_name/input.hist")

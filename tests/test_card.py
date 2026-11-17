@@ -61,10 +61,10 @@ class CardTest(unittest.TestCase):
                                      cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(printed.returncode, 0, printed.stderr)
             for line in printed.stdout.splitlines():
-                if 'gcc_knc/tools/card_run' in line:
+                if 'tools/card_run' in line:
                     self.assertIn('--benchmark', shlex.split(line))
         for args, case, threads in zip(commands, ['small', 'small', 'medium', 'large'], ['240', '60', '240', '240']):
-            self.assertEqual(args[:2], ['python', 'C:/Users/xuzhi/Documents/gcc_knc/tools/card_run'])
+            self.assertEqual(args[:2], ['python', 'tools/card_run'])
             self.assertIn('--benchmark', args)
             self.assertIn('--print-histogram', args)
             self.assertIn('OMP_NUM_THREADS=' + threads, args)

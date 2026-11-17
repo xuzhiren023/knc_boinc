@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 printf 'mkdir -p runs/card/s8\n'
 for variant in card-timers card-timers-static; do
-    command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run --benchmark
+    command=(python tools/card_run --benchmark
         --threads 240 --timeout 43200 --receipt "runs/card/s8/$variant.json"
         --file "build/s8/$variant/milkyway_nbody.mic"
         --file workunits/large/params.lua --file workunits/large/input.hist
