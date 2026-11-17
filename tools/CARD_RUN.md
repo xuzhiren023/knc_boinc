@@ -22,8 +22,8 @@ Runner source: `C:/Users/xuzhi/Documents/gcc_knc/tools/card_run`, upstream commi
    Hold upstream's card-wide `card.lock` in addition to our local execution
    lock for the whole job, even with custom `--lock`. Check the shared stop
    latch before connecting and again after taking the card lock.
-5. Default transfer is `ssh` (owner 2026-11-17); `auto` stays available with a **64 MiB** DMA threshold.
-   Default (owner 2026-11-17): `--transfer ssh`. With `--transfer auto`:    Below it use SSH; at or above it try DMA. Explicit `--transfer ssh` and
+5. Default transfer is `auto` with a **1 MiB** DMA threshold (owner 2026-11-17, after ssh measured ~20 KB/s to the card: a 48 MB job upload took ~40 min). Files below 1 MiB go by ssh, larger ones (program, runtimes) by DMA, under the shared card-wide DMA latch and lock. `--transfer ssh` remains available.
+   Below it use SSH; at or above it try DMA. Explicit `--transfer ssh` and
    `--transfer dma` remain available. Fallback is limited to DMA unavailable
    before endpoints open (`kind=unavailable`, `data_started=false`); never
    replay a started DMA transfer. Integrity and uncertain-cleanup stops remain.

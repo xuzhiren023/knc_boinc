@@ -757,7 +757,7 @@ class SSHTransport:
     """Bounded OpenSSH shell; run() permits one state/cleanup reconnect."""
 
     def __init__(self, config, transport_timeout, stage_timeout=STAGE_TIMEOUT,
-                 transfer="auto", threshold_bytes=67108864, collect=(), collect_dir=None):
+                 transfer="auto", threshold_bytes=1048576, collect=(), collect_dir=None):
         self.config = config
         self.transport_timeout = transport_timeout
         self.stage_timeout = stage_timeout
@@ -1310,8 +1310,8 @@ def main():
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
                         help="seconds allowed for staging; a slower upload is an infrastructure failure")
-    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="ssh")  # owner 2026-11-17: ssh by default; dma or auto only when asked
-    parser.add_argument("--dma-threshold", type=int, default=67108864, metavar="BYTES")
+    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="auto")  # owner 2026-11-17: auto (ssh below the threshold, DMA at or above)
+    parser.add_argument("--dma-threshold", type=int, default=1048576, metavar="BYTES")
     parser.add_argument("--collect", action="append", default=[], metavar="CLAUDE_FILE",
                         help="collect an owned regular file after the program completes")
     parser.add_argument("--collect-dir", type=Path, default=main_root(ROOT) / ".work/_state/collected")

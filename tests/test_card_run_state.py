@@ -60,7 +60,7 @@ class CardStateTest(unittest.TestCase):
         self.assertEqual(run.call_args.kwargs['receipt_path'], state / 'card-result.json')
         self.assertEqual(transport.call_args.args[6], state / 'collected')
         self.assertEqual(transport.call_args.args[1], 120)
-        self.assertEqual(transport.call_args.args[3:5], ('ssh', 64 * 1024 * 1024))
+        self.assertEqual(transport.call_args.args[3:5], ('auto', 1024 * 1024))
 
     def test_shared_latch_write_and_card_lock(self):
         runner = self.runner
@@ -132,7 +132,7 @@ class CardStateTest(unittest.TestCase):
         runner = self.runner
         transport = runner.SSHTransport({}, 1)
         self.assertEqual(transport.transfer, 'auto')
-        self.assertEqual(transport.threshold_bytes, 64 * 1024 * 1024)
+        self.assertEqual(transport.threshold_bytes, 1024 * 1024)
         selected = []
         class Backend:
             def __init__(self, method):
@@ -143,8 +143,8 @@ class CardStateTest(unittest.TestCase):
             def publish(self, private, destination):
                 pass
         backends = {name: Backend(name) for name in ('ssh', 'dma')}
-        for size, expected in [(4096, 'ssh'), (64 * 1024 * 1024 - 1, 'ssh'),
-                               (64 * 1024 * 1024, 'dma')]:
+        for size, expected in [(4096, 'ssh'), (1024 * 1024 - 1, 'ssh'),
+                               (1024 * 1024, 'dma')]:
             row = runner.transfer_file('source', 'destination', size=size, direction='up',
                                                backends=backends, method=transport.transfer,
                                                threshold_bytes=transport.threshold_bytes)
