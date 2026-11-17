@@ -133,7 +133,8 @@ class Card {
     fs::path fake;
     std::vector<std::string> options(bool copy) const {
         std::vector<std::string> a{posix(copy?c.scp:c.ssh).string()};
-        if (copy) a.push_back("-O"); else a.push_back("-T");
+        // -O: legacy protocol; -T: OpenSSH 9.x rejects quoted remote names in legacy downloads ("filename does not match request").
+        if (copy) {a.push_back("-O"); a.push_back("-T");} else a.push_back("-T");
         for (auto s:{"BatchMode=yes","StrictHostKeyChecking=yes","ConnectionAttempts=1"}) {a.push_back("-o"); a.push_back(s);}
         if (!c.known_hosts.empty()) a.insert(a.end(),{"-o","UserKnownHostsFile="+c.known_hosts});
         a.insert(a.end(),{"-o","ConnectTimeout="+std::to_string(c.connect),"-i",native(posix(c.key))});
