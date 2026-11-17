@@ -1,0 +1,45 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -74,6 +74,13 @@
+ #endif
+ #if NBODY_PARALLEL_QUAD && defined(_OPENMP)
+ #include <omp.h>
++#endif
++
++#ifndef NBODY_DF_STATS
++#define NBODY_DF_STATS 0
++#endif
++#if NBODY_DF_STATS && NBODY_DF_VECTOR
++static unsigned long df_bodies, df_fallbacks;
+ #endif
+ 
+ /*Note: minusfivehalves(x) raises to x^-5/2 power and minushalf(x) is x^-1/2*/
+@@ -1229,12 +1236,16 @@
+         !omp_in_parallel())
+     {
+         dsfmt_t saved = *dsfmtState;
+-        /* DF_STATS_BODY */
++#if NBODY_DF_STATS
++        ++df_bodies;
++#endif
+         df_uncertain = 0; df_active = 1;
+         real result = vel_mag_fast(r, comp1, comp2, isDark, dsfmtState);
+         df_active = 0;
+         if (!df_uncertain) return result;
+-        /* DF_STATS_FALLBACK */
++#if NBODY_DF_STATS
++        ++df_fallbacks;
++#endif
+         *dsfmtState = saved;
+     }
+ #endif
+@@ -1819,6 +1830,9 @@
+         cm_correction_by_comp(x, y, z, vx, vy, vz, masses, rShift, vShift, mass_d, nbody_baryon, nbody); //corrects dark component
+         //cm_correction(x, y, z, vx, vy, vz, masses, rShift, vShift, dwarf_mass, nbody);
+ 
++#if NBODY_DF_STATS && NBODY_DF_VECTOR
++        fprintf(stderr, "DF_VECTOR bodies=%lu fallbacks=%lu\n", df_bodies, df_fallbacks);
++#endif
+         /* pushing the bodies */
+         for (i = 0; i < nbody; i++)
+         {

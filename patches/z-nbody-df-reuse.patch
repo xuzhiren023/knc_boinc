@@ -1,0 +1,103 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -37,6 +37,10 @@
+ #include "nbody_io.h"
+ #include "nbody_king_model.h"
+ 
++#ifndef NBODY_DF_REUSE
++#define NBODY_DF_REUSE 0
++#endif
++
+ #ifndef NBODY_PARALLEL_QUAD
+ #define NBODY_PARALLEL_QUAD 0
+ #endif
+@@ -97,6 +101,40 @@
+     real deriv = (p1 + p2 + p3 + p4 + p5) * denom;
+     return deriv;
+ }
++
++#if NBODY_DF_REUSE
++/* Restrict reuse to initialized, read-only dispatches. Other profiles retain
++ * their original calls (including warnings and lazy initialization). */
++static int df_reuse_ready(const Dwarf* m)
++{
++    return m->type == Plummer || m->type == General_Hernquist ||
++           ((m->type == Cored || m->type == NFW) && m->p0 != 0.0);
++}
++
++typedef struct { real first, second, center; } DfDerivatives;
++static DfDerivatives df_derivatives(real (*func)(const Dwarf*, real),
++                                    real x, const Dwarf* model)
++{
++    const real h = 0.001;
++    real mm = (*func)(model, x - 2.0 * h);
++    real m  = (*func)(model, x - h);
++    real pp = (*func)(model, x + 2.0 * h);
++    real p  = (*func)(model, x + h);
++    real c  = (*func)(model, x);
++    DfDerivatives d;
++    /* Keep upstream's coefficient, addition and reciprocal order verbatim. */
++    real p1 = 1.0 * mm, p2 = -8.0 * m, p3 = -1.0 * pp, p4 = 8.0 * p;
++    real denom = inv(12.0 * h);
++    d.first = (p1 + p2 + p3 + p4) * denom;
++    p1 = -1.0 * pp; p2 = 16.0 * p; p3 = -30.0 * c;
++    p4 = 16.0 * m;
++    real p5 = -1.0 * mm;
++    denom = inv(12.0 * h * h);
++    d.second = (p1 + p2 + p3 + p4 + p5) * denom;
++    d.center = c;
++    return d;
++}
++#endif
+ 
+ static real gauss_quad_serial(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
+ {
+@@ -540,10 +578,26 @@
+     real second_deriv_density = 0.0;
+     real denominator = 0.0; /*the demoninator of the distribution function: 1/sqrt(E-Psi)*/
+ 
++    real first_deriv_psi, second_deriv_psi, center_potential;
++#if NBODY_DF_REUSE
++    if (df_reuse_ready(comp1) && df_reuse_ready(comp2))
++    {
++        DfDerivatives p1 = df_derivatives(get_potential, ri, comp1);
++        DfDerivatives p2 = df_derivatives(get_potential, ri, comp2);
++        DfDerivatives d = df_derivatives(get_density, ri, isDark ? comp2 : comp1);
++        first_deriv_psi = p1.first + p2.first;
++        second_deriv_psi = p1.second + p2.second;
++        first_deriv_density = d.first;
++        second_deriv_density = d.second;
++        center_potential = p1.center + p2.center;
++    }
++    else
++#endif
++    {
+     // Potential derivatives must be calculated with both components combined since the velocity is dependent on the total potential of the dwarf
+-    real first_deriv_psi  = first_derivative(get_potential, ri, comp1) + first_derivative(get_potential, ri, comp2);
+-
+-    real second_deriv_psi = second_derivative(get_potential, ri, comp1) + second_derivative(get_potential, ri, comp2);
++    first_deriv_psi  = first_derivative(get_potential, ri, comp1) + first_derivative(get_potential, ri, comp2);
++
++    second_deriv_psi = second_derivative(get_potential, ri, comp1) + second_derivative(get_potential, ri, comp2);
+ 
+     // Density derivatives must be calculated for each component so that baryons are not assigned dark matter velocities and vice versa
+     if (!isDark) {
+@@ -554,6 +608,9 @@
+         second_deriv_density = second_derivative(get_density,   ri, comp2);
+     }
+ 
++        center_potential = potential(ri, comp1, comp2);
++    }
++
+     /*
+     * Instead of calculating the second derivative of density with respect to -pot directly,
+     * did product rule since both density and pot are functions of radius.
+@@ -578,7 +635,7 @@
+ 
+     /*second derivative of density with respect to -potential (psi) */
+     real dsqden_dpsisq = second_deriv_density * inv(first_deriv_psi) - first_deriv_density * second_deriv_psi * inv(sqr(first_deriv_psi));
+-    real diff = mw_fabs(energy - potential(ri, comp1, comp2));
++    real diff = mw_fabs(energy - center_potential);
+ 
+     /*we don't want to have a 0 in the demon*/
+ #pragma GCC diagnostic push

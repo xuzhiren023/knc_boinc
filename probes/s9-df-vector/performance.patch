@@ -1,0 +1,606 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -39,6 +39,34 @@
+ 
+ #ifndef NBODY_DF_REUSE
+ #define NBODY_DF_REUSE 0
++#endif
++
++#ifndef NBODY_DF_VECTOR
++#define NBODY_DF_VECTOR 0
++#endif
++#if NBODY_DF_VECTOR
++#include <omp.h>
++#include <float.h>
++#include <fenv.h>
++/* Only vel_mag enables this context; model setup/King and replay stay scalar. */
++static int df_active, df_uncertain;
++static real df_error;
++#pragma omp threadprivate(df_active, df_uncertain, df_error)
++
++/* Outward inflation; never compile this TU with unsafe math/reassociation. */
++static real df_up(real x) { return nextafter(x, INFINITY); }
++static int df_less(real a, real ea, real b, real eb)
++{
++    real margin = df_up(ea + eb);
++    if (!isfinite(a) || !isfinite(b) || !isfinite(margin) ||
++        !(mw_fabs(a - b) > df_up(margin + 8 * DBL_EPSILON * (mw_fabs(a) + mw_fabs(b)))))
++        df_uncertain = 1;
++    return a < b;
++}
++#endif
++
++#if NBODY_DF_VECTOR && !NBODY_DF_REUSE
++#error DF_VECTOR requires DF_REUSE
+ #endif
+ 
+ #ifndef NBODY_PARALLEL_QUAD
+@@ -254,7 +282,7 @@
+     }
+ }
+ 
+-static real gauss_quad(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
++static real gauss_quad_base(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
+ {
+     /*This is a guassian quadrature routine. It will test to always integrate from the lower to higher of the two limits.
+      * If switching the order of the limits was needed to do this then the negative of the integral is returned.
+@@ -396,8 +424,186 @@
+     return intv;
+ }
+ #else
+-#define gauss_quad gauss_quad_serial
++#define gauss_quad_base gauss_quad_serial
+ #endif
++
++#if NBODY_DF_VECTOR
++#include "nbody_df_vector.h"
++static real gauss_quad_fast(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
++{
++    /*This is a guassian quadrature routine. It will test to always integrate from the lower to higher of the two limits.
++     * If switching the order of the limits was needed to do this then the negative of the integral is returned.
++     */
++    /* Nodes use the original recurrence, including its unusual terminal panel. */
++    size_t capacity = 384;
++    real *x = malloc(5 * capacity * sizeof(real));
++    if (!x) { df_uncertain = 1; return 0; }
++    real *weights = x + capacity, *values = weights + capacity;
++    real *factors = values + capacity, *errors = factors + capacity;
++    size_t n = 0;
++    real intv = 0.0;//initial value of integral
++    real a = 0.0, b = 0.0;
++
++    if(lower > upper)
++    {
++        a = upper;
++        b = lower;
++    }
++    else
++    {
++        a = lower; 
++        b = upper;
++    }
++
++    real benchmark = 1.5 * a;
++    real Ng = 100.0;//integral resolution
++    real hg = (benchmark - a) / (Ng);
++    real lowerg = a;
++    real upperg = lowerg + hg;
++
++
++    real coef2 = (lowerg + upperg) / 2.0;//initializes the first coeff to change the function limits
++    real coef1 = (upperg - lowerg) / 2.0;//initializes the second coeff to change the function limits
++    const real c1 = 0.55555555555; //5.0 / 9.0;
++    const real c2 = 0.88888888888; //8.0 / 9.0;
++    const real c3 = 0.55555555555; //5.0 / 9.0;
++    const real x1 = -0.77459666924;//-sqrt(3.0 / 5.0);
++    const real x2 __attribute__((unused)) = 0.00000000000;
++    const real x3 = 0.77459666924; //sqrt(3.0 / 5.0);
++    real x1n = (coef1 * x1 + coef2);
++    /*should be: x2n = (coef1 * x2 + coef2);*/
++    real x2n = (coef2);
++    real x3n = (coef1 * x3 + coef2);
++    int counter = 0;
++    while (1)
++    {
++                //gauss quad
++        if (n + 3 > capacity)
++        {
++            size_t next = capacity * 2;
++            real *p = malloc(5 * next * sizeof(real));
++            if (!p) { free(x); df_uncertain = 1; return 0; }
++            memcpy(p, x, n * sizeof(real));
++            memcpy(p + next, weights, n * sizeof(real));
++            memcpy(p + 3 * next, factors, n * sizeof(real));
++            free(x); x = p; capacity = next;
++            weights = x + capacity; values = weights + capacity;
++            factors = values + capacity; errors = factors + capacity;
++        }
++        x[n] = x1n; x[n+1] = x2n; x[n+2] = x3n;
++        /* Preserve multiplication order c * f * coef1. */
++        weights[n] = weights[n+1] = weights[n+2] = coef1;
++        factors[n] = c1; factors[n+1] = c2; factors[n+2] = c3;
++        n += 3;
++
++        lowerg = upperg;
++        upperg = upperg + hg;
++        coef2 = (lowerg + upperg) / 2.0;//initializes the first coeff to change the function limits
++        coef1 = (upperg - lowerg) / 2.0;
++
++        x1n = ((coef1) * x1 + coef2);
++        /*should be: x2n = (coef1 * x2 + coef2);*/
++        x2n = (coef2);
++        x3n = ((coef1) * x3 + coef2);
++
++        if(lowerg > benchmark)
++        {
++            Ng = 10.0;//integral resolution
++            hg = (b - benchmark) / (Ng);
++        }
++
++        if(upper > lower)
++        {
++            if(lowerg >= upper)//loop termination clause
++            {
++                break;
++            }
++        }
++        else if(lower > upper)
++        {
++            if(lowerg >= lower)//loop termination clause
++            {
++                break;
++            }
++        }
++
++        if(counter > 100000)
++        {
++            break;
++        }
++        else
++        {
++            counter++;
++        }
++
++
++    }
++
++    fenv_t parent;
++    fegetenv(&parent);
++    long block;
++    /* 8 double nodes per block, matching one IMCI vector. Calls in the first
++     * loop currently block SIMD; the separate weighting loop is vectorizable. */
++    #pragma omp parallel if(!omp_in_parallel())
++    {
++        fenv_t saved;
++        fegetenv(&saved);
++        fesetenv(&parent);
++        #pragma omp for schedule(static)
++        for (block = 0; block < (long)((n + 7) / 8); ++block)
++        {
++            size_t begin = (size_t)block * 8;
++            size_t lanes = n - begin < 8 ? n - begin : 8;
++            df_nodes8(x + begin, lanes, comp1, comp2, energy, isDark,
++                      values + begin, errors + begin);
++        }
++        fesetenv(&saved);
++    }
++    size_t j;
++    for (j = 0; j < n; ++j)
++        if (!isfinite(values[j]) || mw_fabs(values[j]) < DBL_MIN ||
++            !isfinite(weights[j]) || mw_fabs(weights[j]) < DBL_MIN ||
++            mw_fabs(factors[j] * values[j]) < DBL_MIN)
++            df_uncertain = 1;
++    #pragma omp simd
++    for (j = 0; j < n; ++j)
++        values[j] = (factors[j] * values[j]) * weights[j];
++    real node_error = 0;
++    for (j = 0; j < n; ++j)
++        node_error = df_up(node_error + df_up(mw_fabs(factors[j] * weights[j]) * errors[j]));
++    real absolute = 0;
++    for (j = 0; j < n; ++j)
++    {
++        intv += values[j];
++        absolute += mw_fabs(values[j]);
++        if (!isfinite(values[j]) || (values[j] != 0 && mw_fabs(values[j]) < DBL_MIN))
++            df_uncertain = 1;
++    }
++    /* Per-node balls enclose the exact scalar graph. Weighted absolute
++     * errors plus both sum/product graphs; 1000 is an extra safety factor. */
++    real t = 8.0 * (real)n * DBL_EPSILON;
++    df_error = df_up(1000.0 * (node_error + t / (1.0 - t) * (absolute + node_error) + (real)n * DBL_MIN));
++    if (!isfinite(absolute) || !isfinite(df_error)) df_uncertain = 1;
++    free(x);
++
++    if(lower > upper)
++    {
++        intv *= -1.0;
++    }
++
++    return intv;
++}
++
++#endif
++static real gauss_quad(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
++{
++#if NBODY_DF_VECTOR
++    df_error = 0;
++    if (df_active) return gauss_quad_fast(func, lower, upper, comp1, comp2, energy, isDark);
++#endif
++    return gauss_quad_base(func, lower, upper, comp1, comp2, energy, isDark);
++}
++
+ 
+ static inline real max_finder(real (*profile)(real , real , const Dwarf*, const Dwarf*, mwbool), real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, real a, real b, real c, int limit, real tolerance)
+ {
+@@ -462,6 +668,83 @@
+     }
+ }
+ 
++
++#if NBODY_DF_VECTOR
++static inline real max_finder_guarded(real (*profile)(real , real , const Dwarf*, const Dwarf*, mwbool), real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, real a, real b, real c, int limit, real tolerance)
++{
++    /*this is a maxfinding routine to find the maximum of the density.
++     * It uses Golden Section Search as outlined in Numerical Recipes 3rd edition
++     */
++    const real RATIO = 0.61803399;
++    const real RATIO_COMPLEMENT = 1.0 - RATIO;
++    int counter = 0;
++
++    real x1 = 0.0, x2 = 0.0;
++    real x0 = a;
++    real x3 = c;
++
++    if (mw_fabs(b - c) > mw_fabs(b - a))
++    {
++        x1 = b;
++        x2 = b + (RATIO_COMPLEMENT * (c - b)); 
++    }
++    else
++    {
++        x2 = b;
++        x1 = b - (RATIO_COMPLEMENT * (b - a));
++    }
++
++    real profile_x1 = -(*profile)(x1, r, comp1, comp2, isDark);
++    real error_x1 = df_error;
++    real profile_x2 = -(*profile)(x2, r, comp1, comp2, isDark);
++
++    real error_x2 = df_error;
++
++    while (mw_fabs(x3 - x0) > (tolerance * (mw_fabs(x1) + mw_fabs(x2)) ) )
++    {
++        counter++;
++        if (df_less(profile_x2, error_x2, profile_x1, error_x1))
++        {
++            x0 = x1;
++            x1 = x2;
++            x2 = RATIO * x2 + RATIO_COMPLEMENT * x3;
++            profile_x1 = (real)profile_x2;
++            error_x1 = error_x2;
++            profile_x2 = -(*profile)(x2, r, comp1, comp2, isDark);
++            error_x2 = df_error;
++        }
++        else
++        {
++            x3 = x2;
++            x2 = x1;
++            x1 = RATIO * x1 + RATIO_COMPLEMENT * x0;
++            profile_x2 = (real)profile_x1;
++            error_x2 = error_x1;
++            profile_x1 = -(*profile)(x1, r, comp1, comp2, isDark);
++            error_x1 = df_error;
++        }
++
++        if (df_uncertain) return 0;
++        if(counter > limit)
++        {
++            break;
++        }
++    }
++
++    if (df_less(profile_x1, error_x1, profile_x2, error_x2))
++    {
++        df_error = error_x1;
++        return (-profile_x1);
++    }
++    else
++    {
++        df_error = error_x2;
++        return (-profile_x2);
++    }
++}
++
++
++#endif
+ 
+ static inline real root_finder(real (*func)(real, const Dwarf*, const Dwarf*), const Dwarf* comp1, const Dwarf* comp2, real function_value, real lower_bound, real upper_bound)
+ {
+@@ -694,6 +977,9 @@
+ 
+ static real dist_fun(real v, real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark)
+ {
++#if NBODY_DF_VECTOR
++    df_error = 0;
++#endif
+     /*This returns the value of the distribution function*/
+ 
+     //-------------------------------
+@@ -757,6 +1043,11 @@
+ 
+         /*This calls guassian quad to integrate the function for a given energy*/
+         distribution_function = v * v * cons * gauss_quad(fun, lowerlimit_r, upperlimit_r, comp1, comp2, energy, isDark);
++#if NBODY_DF_VECTOR
++        if (df_active)
++            df_error = df_up(mw_fabs(v * v * cons) * df_error +
++                            1000 * 16 * DBL_EPSILON * mw_fabs(distribution_function) + DBL_MIN);
++#endif
+     } else {
+         real king_energy, rho1, sig;
+         if (comp1->type == King && comp1->mass > 0.0) {
+@@ -814,7 +1105,7 @@
+     return r;
+ }
+ 
+-static inline real vel_mag(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark ,dsfmt_t* dsfmtState)
++static inline real vel_mag_exact(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark ,dsfmt_t* dsfmtState)
+ {
+ 
+     /*
+@@ -864,6 +1155,90 @@
+ 
+     return v; //kpc/Gyr
+ }
++
++#if NBODY_DF_VECTOR
++static inline real vel_mag_fast(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark ,dsfmt_t* dsfmtState)
++{
++
++    /*
++     * WE TOOK IN MASS IN SIMULATION UNITS, WHICH HAVE THE UNITS OF KPC^3/GY^2
++     * LENGTH IN KPC AND TIME IN GY THEREFORE, THE velocities ARE OUTPUTING IN KPC/GY
++     * THIS IS EQUAL TO 0.977813107 KM/S
++     */
++
++
++    int counter = 0;
++    real v = 0.0, u = 0.0, d = 0.0;
++
++    /* having the upper limit as exactly v_esc is bad since the dist fun seems to blow up there for small r. */
++    real v_esc = 0.0;
++    real potential_offset = 0.0; // phi_0 in the definition for relative energy
++    
++    // This logic is okay since King model is 1 component for now (only 1 comp mass is nonzero)
++    if (comp1->type == King && comp1->mass > 0.0) {
++        potential_offset = -(comp1->mass)/(comp1->r_t);
++    } else if (comp2->type == King && comp2->mass > 0.0) {
++        potential_offset = -(comp2->mass)/(comp2->r_t);
++    }
++    v_esc = 0.99 * mw_sqrt( mw_fabs(2.0 * (potential( r, comp1, comp2) + potential_offset)) );
++
++    real dist_max = max_finder_guarded(dist_fun, r, comp1, comp2, isDark, 0.0, 0.5 * v_esc, v_esc, 10, 1.0e-2);
++    real max_error = df_error;
++    if (df_uncertain) return 0;
++    while(1)
++    {
++        v = (real)mwXrandom(dsfmtState, 0.0, 1.0) * v_esc;
++        u = (real)mwXrandom(dsfmtState, 0.0, 1.0);
++        d = dist_fun(v, r, comp1, comp2, isDark);
++
++        /* Compare |d| to u*|max| with bounds, including the upstream
++         * division's rounding error. A zero-containing denominator replays. */
++        real rhs = u * mw_fabs(dist_max);
++        real rhs_error = df_up(u * max_error + 1000 * 8 * DBL_EPSILON *
++                              (mw_fabs(d) + rhs) + DBL_MIN);
++        if (!(mw_fabs(dist_max) > max_error)) df_uncertain = 1;
++        int accept = df_less(rhs, rhs_error, mw_fabs(d), df_error);
++        if (df_uncertain) return 0;
++        if(accept)
++        {
++            break;
++        }
++
++        if(counter > 1000)
++        {
++            v = 0;
++            break;
++        }
++        else
++        {
++            counter++;
++        }
++    }
++
++    return v; //kpc/Gyr
++}
++
++#endif
++
++static inline real vel_mag(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, dsfmt_t* dsfmtState)
++{
++#if NBODY_DF_VECTOR
++    /* Only initialized, pure dispatchers may run on quadrature workers. */
++    if ((comp1->type == Plummer || (comp1->type == Cored && comp1->p0 != 0)) &&
++        (comp2->type == Plummer || (comp2->type == Cored && comp2->p0 != 0)) &&
++        !omp_in_parallel())
++    {
++        dsfmt_t saved = *dsfmtState;
++        /* DF_STATS_BODY */
++        df_uncertain = 0; df_active = 1;
++        real result = vel_mag_fast(r, comp1, comp2, isDark, dsfmtState);
++        df_active = 0;
++        if (!df_uncertain) return result;
++        /* DF_STATS_FALLBACK */
++        *dsfmtState = saved;
++    }
++#endif
++    return vel_mag_exact(r, comp1, comp2, isDark, dsfmtState);}
+ 
+ static inline mwvector get_components(dsfmt_t* dsfmtState, real rad)
+ {
+--- /dev/null
++++ b/nbody/include/nbody_df_vector.h
+@@ -0,0 +1,163 @@
++/* Performance experiment: eight-node ball arithmetic. See s9-df-bound.md.
++ * This header is private to the mixed-dwarf generator. */
++typedef double DfV __attribute__((vector_size(64)));
++typedef long long DfI __attribute__((vector_size(64)));
++typedef struct { DfV v, e; } DfBall;
++static inline DfV df_v(real a) { return (DfV){a,a,a,a,a,a,a,a}; }
++static inline DfV df_abs(DfV a)
++{
++    union { DfV d; DfI i; } u;
++    u.d = a; u.i &= (DfI){0x7fffffffffffffffLL,0x7fffffffffffffffLL,
++        0x7fffffffffffffffLL,0x7fffffffffffffffLL,0x7fffffffffffffffLL,
++        0x7fffffffffffffffLL,0x7fffffffffffffffLL,0x7fffffffffffffffLL};
++    return u.d;
++}
++static inline DfV df_inflate(DfV a)
++{ return a * df_v(1 + 32 * DBL_EPSILON) + df_v(32 * DBL_MIN); }
++static inline DfBall df_ball(DfV v, DfV e)
++{
++    for(int i=0;i<8;++i)
++        if(!isfinite(v[i]) || !isfinite(e[i]) || e[i]<0 ||
++           !isfinite(fabs(v[i])+e[i])) e[i]=INFINITY;
++    return (DfBall){v,e};
++}
++static inline DfBall df_const(real x) { return (DfBall){df_v(x),df_v(0)}; }
++static inline DfBall df_add(DfBall a, DfBall b)
++{
++    DfV v = a.v + b.v, t = a.e + b.e;
++    return df_ball(v, df_inflate(t + df_v(4*DBL_EPSILON)*(df_abs(v)+t)));
++}
++static inline DfBall df_neg(DfBall a) { a.v = -a.v; return a; }
++static inline DfBall df_sub(DfBall a, DfBall b) { return df_add(a,df_neg(b)); }
++static inline DfBall df_mul(DfBall a, DfBall b)
++{
++    DfV v = a.v*b.v, t = df_abs(a.v)*b.e + df_abs(b.v)*a.e + a.e*b.e;
++    return df_ball(v, df_inflate(t + df_v(4*DBL_EPSILON)*(df_abs(v)+t)));
++}
++static inline DfBall df_div(DfBall a, DfBall b)
++{
++    DfV v = a.v/b.v;
++    DfV lower = (df_abs(b.v)-b.e)*df_v(1-4*DBL_EPSILON)-df_v(32*DBL_MIN);
++    DfV t = (a.e+df_abs(v)*b.e)/lower;
++    DfV e = df_inflate(t + df_v(4*DBL_EPSILON)*(df_abs(v)+t));
++    for (int i=0;i<8;++i) if (!(lower[i]>0)) e[i]=INFINITY;
++    return df_ball(v,e);
++}
++static inline DfBall df_sqr(DfBall a) { return df_mul(a,a); }
++static inline DfBall df_cube(DfBall a) { return df_mul(df_mul(a,a),a); }
++static inline DfBall df_inv(DfBall a) { return df_div(df_const(1),a); }
++#ifdef __k1om__
++extern DfV __knc_vmath_log_8(DfV);
++extern DfV __knc_vmath_atan_8(DfV);
++#endif
++static inline DfBall df_log(DfBall a)
++{
++    DfV v;
++#ifdef __k1om__
++    v = __knc_vmath_log_8(a.v);
++#else
++    for (int i=0;i<8;++i) v[i] = log_rn(a.v[i]);
++#endif
++    DfV lower=(a.v-a.e)*df_v(1-4*DBL_EPSILON)-df_v(32*DBL_MIN);
++    DfV t=a.e/lower;
++    DfV e=df_inflate(t+df_v(8*DBL_EPSILON)*(df_abs(v)+t));
++    for (int i=0;i<8;++i) if (!(lower[i]>0)) e[i]=INFINITY;
++    return df_ball(v,e);
++}
++static inline DfBall df_atan(DfBall a)
++{
++    DfV v;
++#ifdef __k1om__
++    v=__knc_vmath_atan_8(a.v);
++#else
++    for (int i=0;i<8;++i) v[i]=atan_rn(a.v[i]);
++#endif
++    return df_ball(v,df_inflate(a.e+df_v(8*DBL_EPSILON)*df_abs(v)));
++}
++static inline DfBall df_sqrt(DfBall a)
++{
++    DfV v;
++    #pragma omp simd
++    for (int i=0;i<8;++i) v[i]=sqrt(a.v[i]);
++    DfV lower=(a.v-a.e)*df_v(1-4*DBL_EPSILON)-df_v(32*DBL_MIN);
++    /* |sqrt(x+dx)-sqrt(x)| <= sqrt(x)*|dx|/(x-|dx|). */
++    DfV t=df_abs(v)*a.e/lower;
++    DfV e=df_inflate(t+df_v(4*DBL_EPSILON)*(df_abs(v)+t));
++    for (int i=0;i<8;++i) if (!(lower[i]>0)) e[i]=INFINITY;
++    return df_ball(v,e);
++}
++static inline DfBall df_fabs(DfBall a) { a.v=df_abs(a.v); return a; }
++/* Preserve the reference graph, including constant arithmetic and offsets. */
++static void df_samples(const Dwarf* m, DfV radii, DfBall* pot, DfBall* den)
++{
++    DfBall r={radii,df_v(0)}, mass=df_const(m->mass), rs=df_const(m->scaleLength);
++    DfBall one=df_const(1), fourpi=df_mul(df_const(4),df_const(M_PI));
++    if (m->type==Plummer)
++    {
++        *pot=df_div(mass,df_sqrt(df_add(df_sqr(r),df_sqr(rs))));
++        DfBall x=df_add(one,df_sqr(df_div(r,rs)));
++        DfBall fifth=df_mul(df_mul(df_mul(df_mul(x,x),x),x),x);
++        *den=df_mul(df_mul(df_div(df_const(3),fourpi),df_div(mass,df_cube(rs))),df_inv(df_sqrt(fifth)));
++        return;
++    }
++    /* The cored cutoff uses incomplete gamma; those lanes are evaluated by
++     * the unmodified scalar sampler below, with zero discrepancy. */
++    DfBall rc=df_const(m->rc), p0=df_const(m->p0), ps=df_const(m->ps);
++    DfBall diff=df_sub(df_const(m->m_iso_r1),df_const(m->m_nfw_r1));
++    DfBall core=df_mul(df_mul(df_mul(df_neg(fourpi),p0),df_sqr(rc)),
++        df_add(df_mul(df_log(df_add(df_sqr(rc),df_sqr(r))),df_inv(df_const(2))),
++               df_mul(df_mul(rc,df_atan(df_div(r,rc))),df_inv(r))));
++    core=df_add(df_add(df_sub(core,df_const(m->psi_iso_r1)),df_const(m->psi_nfw_r1)),df_mul(diff,df_inv(df_const(m->r1))));
++    DfBall outer=df_add(df_mul(df_mul(df_mul(df_mul(fourpi,ps),df_cube(rs)),df_inv(r)),
++                          df_log(df_add(one,df_div(r,rs)))),df_mul(diff,df_inv(r)));
++    DfBall coreden=df_div(p0,df_add(one,df_sqr(df_div(r,rc))));
++    DfBall outerden=df_div(ps,df_mul(df_div(r,rs),df_sqr(df_add(one,df_div(r,rs)))));
++    *pot=outer; *den=outerden;
++    for(int i=0;i<8;++i) if(radii[i]<=m->r1)
++    { pot->v[i]=core.v[i]; pot->e[i]=core.e[i]; den->v[i]=coreden.v[i]; den->e[i]=coreden.e[i]; }
++    if(m->rcut!=0)
++    {
++        DfBall invcut=df_inv(df_const(m->rcut));
++        DfBall offset=df_add(df_add(df_sub(df_neg(df_const(m->psi_nfw_cut)),df_mul(diff,invcut)),
++            df_const(m->psi_cut_cut)),df_mul(df_sub(df_add(df_const(m->m_nfw_cut),df_const(m->m_iso_r1)),df_const(m->m_nfw_r1)),invcut));
++        *pot=df_add(*pot,offset);
++    }
++    for(int i=0;i<8;++i) if(radii[i]<=0 || (m->rcut!=0 && radii[i]>m->rcut))
++    {
++        pot->v[i]=get_potential(m,radii[i]); pot->e[i]=0;
++        den->v[i]=get_density(m,radii[i]); den->e[i]=0;
++    }
++}
++static void df_pair(DfBall* f, DfBall* first, DfBall* second)
++{
++    /* mm,m,pp,p,center; reciprocal constants match the upstream double graph. */
++    *first=df_mul(df_add(df_add(df_add(df_mul(df_const(1),f[0]),df_mul(df_const(-8),f[1])),
++                   df_mul(df_const(-1),f[2])),df_mul(df_const(8),f[3])),df_const(1.0/(12.0*0.001)));
++    *second=df_mul(df_add(df_add(df_add(df_add(df_mul(df_const(-1),f[2]),df_mul(df_const(16),f[3])),
++                   df_mul(df_const(-30),f[4])),df_mul(df_const(16),f[1])),df_mul(df_const(-1),f[0])),df_const(1.0/(12.0*0.001*0.001)));
++}
++static void df_nodes8(const real* x, size_t n, const Dwarf* a, const Dwarf* b,
++                       real energy, mwbool dark, real* values, real* errors)
++{
++    DfBall ap[5],ad[5],bp[5],bd[5];
++    const real shifts[5]={-2.0*0.001,-0.001,2.0*0.001,0.001,0};
++    for(int k=0;k<5;++k)
++    {
++        DfV r;
++        for(int i=0;i<8;++i) r[i]=x[i<(int)n ? i:0]+shifts[k];
++        df_samples(a,r,&ap[k],&ad[k]); df_samples(b,r,&bp[k],&bd[k]);
++    }
++    DfBall af,as,bf,bs,dr,ds;
++    df_pair(ap,&af,&as); df_pair(bp,&bf,&bs); df_pair(dark?bd:ad,&dr,&ds);
++    DfBall pf=df_add(af,bf), ps=df_add(as,bs);
++    /* A zero-containing first derivative or energy difference replays; no
++     * attempt to approximate the reference's zero-substitution branches. */
++    DfBall diff=df_fabs(df_sub(df_const(energy),df_add(ap[4],bp[4])));
++    DfBall result=df_mul(df_sub(df_mul(ds,df_inv(pf)),df_mul(df_mul(dr,ps),df_inv(df_sqr(pf)))),df_inv(df_sqrt(diff)));
++    for(size_t i=0;i<n;++i)
++    {
++        values[i]=result.v[i]; errors[i]=result.e[i];
++        if(!isfinite(values[i]) || !isfinite(errors[i]) || errors[i]<0 ||
++           !(fabs(pf.v[i])>pf.e[i]) || !(diff.v[i]>diff.e[i])) errors[i]=INFINITY;
++    }
++}
