@@ -42,6 +42,25 @@ CPPFLAGS += -DNBODY_GEN_PROFILE=$(GEN_PROFILE)
 DF_REUSE ?= 0
 DF_SPECIAL ?= 0
 DF_VMATH ?= 0
+DF_VECTOR8 ?= 0
+DF_VECTOR8_GUARD ?= 0
+DF_VECTOR8_SCALAR_LOG_ATAN ?= 0
+CPPFLAGS += -DNBODY_DF_VECTOR8=$(DF_VECTOR8) -DNBODY_DF_VECTOR8_GUARD=$(DF_VECTOR8_GUARD) -DNBODY_DF_VECTOR8_SCALAR_LOG_ATAN=$(DF_VECTOR8_SCALAR_LOG_ATAN)
+ifneq ($(strip $(DF_VECTOR8_MARGIN)),)
+CPPFLAGS += -DNBODY_DF_VECTOR8_MARGIN=$(DF_VECTOR8_MARGIN)
+endif
+ifeq ($(DF_VECTOR8),1)
+ifneq ($(DF_SPECIAL),1)
+$(error DF_VECTOR8 requires DF_SPECIAL=1)
+endif
+ifeq ($(TARGET),card)
+CFLAGS_DF8 := -mveclibabi=knc -fno-math-errno
+COMMON_LDLIBS := -lknc_vmath $(COMMON_LDLIBS)
+else
+DF8_HOST_LIB ?= /cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/S10-02/host/libknc_vmath.a
+COMMON_LDLIBS := $(DF8_HOST_LIB) $(COMMON_LDLIBS)
+endif
+endif
 ifeq ($(DF_VMATH),1)
 ifeq ($(strip $(DFS_TREE)),)
 $(error DF_VMATH is an isolated experiment: use scripts/build-s10-df-special.sh)
@@ -78,6 +97,7 @@ CPPFLAGS += -DNBODY_WALK_LAYOUT=$(WALK_LAYOUT) -DNBODY_WALK_COUNTERS=$(WALK_COUN
 # PGO is opt-in; both compilation and linking need its runtime flags.
 PGOFLAGS ?=
 CFLAGS := $(PGOFLAGS) $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
+CFLAGS += $(CFLAGS_DF8)
 CXXFLAGS := $(PGOFLAGS) $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
 export TMPDIR := $(shell $(TOOLCHAIN)/cygpath -am $(ROOT)/build/tmp)

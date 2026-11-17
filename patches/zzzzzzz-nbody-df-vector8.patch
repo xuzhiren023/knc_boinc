@@ -1,0 +1,135 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -38,6 +38,39 @@
+ #include "nbody_king_model.h"
+ #include "nbody_gen_profile.h"
+ 
++#ifndef NBODY_DF_VECTOR8
++#define NBODY_DF_VECTOR8 0
++#endif
++#ifndef NBODY_DF_VECTOR8_GUARD
++#define NBODY_DF_VECTOR8_GUARD 0
++#endif
++#ifndef NBODY_DF_VECTOR8_MARGIN
++#define NBODY_DF_VECTOR8_MARGIN 0.001
++#endif
++#if NBODY_DF_VECTOR8_GUARD && !NBODY_DF_VECTOR8
++#error DF_VECTOR8_GUARD requires DF_VECTOR8
++#endif
++#if NBODY_DF_VECTOR8
++#if !NBODY_DF_SPECIAL
++#error DF_VECTOR8 requires DF_SPECIAL
++#endif
++#include "nbody_df_vector8.h"
++/* Caller owns these flags; parallel node workers only read them. */
++static int df8_exact, df8_velocity, df8_uncertain;
++static int df8_less(real a, real b)
++{
++#if NBODY_DF_VECTOR8_GUARD
++    if (df8_velocity && !df8_exact &&
++        (!isfinite(a) || !isfinite(b) ||
++         mw_fabs(a-b) <= NBODY_DF_VECTOR8_MARGIN*(mw_fabs(a)+mw_fabs(b))))
++        df8_uncertain=1;
++#endif
++    return a < b;
++}
++#else
++#define df8_less(a,b) ((a)<(b))
++#endif
++
+ #ifndef NBODY_DF_SPECIAL
+ #define NBODY_DF_SPECIAL 0
+ #endif
+@@ -427,6 +460,24 @@
+ #endif
+     if (special)
+     {
++#if NBODY_DF_VECTOR8
++        if (!df8_exact)
++        {
++            #pragma omp parallel for schedule(static)
++            for (node=0; node<(long)((3*count+7)/8); ++node)
++            {
++                size_t begin=(size_t)node*8;
++                size_t lanes=3*count-begin < 8 ? 3*count-begin : 8;
++                real x8[8], f8[8];
++                for (size_t k=0;k<lanes;++k)
++                    x8[k]=nodes[(begin+k)/3].x[(begin+k)%3];
++                df8_nodes(x8,lanes,comp1,comp2,energy,isDark,f8);
++                for (size_t k=0;k<lanes;++k)
++                    nodes[(begin+k)/3].f[(begin+k)%3]=f8[k];
++            }
++        }
++        else
++#endif
+         if (isDark)
+         {
+             #pragma omp parallel for schedule(static)
+@@ -556,7 +607,7 @@
+     while (mw_fabs(x3 - x0) > (tolerance * (mw_fabs(x1) + mw_fabs(x2)) ) )
+     {
+         counter++;
+-        if (profile_x2 < profile_x1)
++        if (df8_less(profile_x2, profile_x1))
+         {
+             x0 = x1;
+             x1 = x2;
+@@ -590,7 +641,7 @@
+ #if NBODY_GEN_PIPELINE && NBODY_PARALLEL_QUAD && defined(_OPENMP)
+     if (pipelined) { gen_pipe.active = 0; gen_pipe.count = 0; }
+ #endif
+-    if (profile_x1 < profile_x2)
++    if (df8_less(profile_x1, profile_x2))
+     {
+         return (-profile_x1);
+     }
+@@ -1043,7 +1094,7 @@
+     return r;
+ }
+ 
+-static inline real vel_mag(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark ,dsfmt_t* dsfmtState)
++static inline real vel_mag_base(real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark ,dsfmt_t* dsfmtState)
+ {
+ 
+     /*
+@@ -1079,7 +1130,7 @@
+         u = (real)gp_random(dsfmtState, 0.0, 1.0);
+         d = dist_fun(v, r, comp1, comp2, isDark);
+ 
+-        if(mw_fabs(d / dist_max) > u)
++        if(df8_less(u, mw_fabs(d / dist_max)))
+         {
+             break;
+         }
+@@ -1098,6 +1149,31 @@
+     GP_END();
+     return v; //kpc/Gyr
+ }
++
++#if NBODY_DF_VECTOR8
++static inline real vel_mag(real r, const Dwarf* a, const Dwarf* b, mwbool dark, dsfmt_t* rng)
++{
++    if (!df_special_ready(a,b)) return vel_mag_base(r,a,b,dark,rng);
++#if NBODY_DF_VECTOR8_GUARD
++    dsfmt_t saved=*rng;
++#endif
++    df8_velocity=1; df8_uncertain=0;
++    real v=vel_mag_base(r,a,b,dark,rng);
++#if NBODY_DF_VECTOR8_GUARD
++    if (df8_uncertain)
++    {
++        *rng=saved;
++        df8_exact=1;
++        v=vel_mag_base(r,a,b,dark,rng);
++        df8_exact=0;
++    }
++#endif
++    df8_velocity=0;
++    return v;
++}
++#else
++#define vel_mag vel_mag_base
++#endif
+ 
+ static inline mwvector get_components(dsfmt_t* dsfmtState, real rad)
+ {
