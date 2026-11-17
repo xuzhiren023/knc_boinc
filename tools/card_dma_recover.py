@@ -144,8 +144,9 @@ class RecoveryTransport:
                    '-o', 'GlobalKnownHostsFile=NUL', '-o', 'UserKnownHostsFile=' + c['knownHosts'],
                    '-o', 'HostKeyAlgorithms=ssh-ed25519', '-o', 'ConnectTimeout=5',
                    'root@' + c['host'], 'exec sh']
-        return subprocess.run(command, input=script, text=True, capture_output=True,
-                              check=True, timeout=self.timeout).stdout
+        # Binary stdin preserves LF: Windows text pipes send CRLF, which BusyBox sh rejects.
+        return subprocess.run(command, input=script.encode("utf8"), capture_output=True,
+                              check=True, timeout=self.timeout).stdout.decode("utf8")
 
     def card_state(self):
         lines = self.ssh(CARD_STATE).splitlines()

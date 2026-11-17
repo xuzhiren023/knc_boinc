@@ -142,7 +142,7 @@ class CardStateTest(unittest.TestCase):
                 return dict(bytes=size, file_complete=True, seconds=1)
             def publish(self, private, destination):
                 pass
-        backends = {name: Backend(name) for name in ('ssh', 'dma')}
+        backends = {name: Backend(name) for name in ('ssh', 'dma', 'tcp')}
         for size, expected in [(4096, 'ssh'), (1024 * 1024 - 1, 'ssh'),
                                (1024 * 1024, 'dma')]:
             row = runner.transfer_file('source', 'destination', size=size, direction='up',
@@ -168,7 +168,7 @@ class CardStateTest(unittest.TestCase):
                     row = runner.transfer_file('s', 'd', size=transport.threshold_bytes, direction='up',
                                                backends=backends, method='auto',
                                                threshold_bytes=transport.threshold_bytes)
-                    self.assertEqual(row['method'], 'ssh')
+                    self.assertEqual(row['method'], 'tcp')
                     self.assertEqual(row['fallback']['method'], 'dma')
                 else:
                     before = list(selected)
