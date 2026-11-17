@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 knc-boinc window 2 (13:32-13:35Z, closed, card clean): S9-04 TREE_VARIANT=3 large whole 20.95 s (was
+  23.99), nbMakeTree 7.08 s: partition 5.93 (serial, dominant), insertion 0.10, CofM 0.15, Quad 0.21, threadTree
+  0.55; core-small 62.45 s (generation). Bit-identical. Prediction 2.13 s missed on the serial partition (1.53).
+  Card now beats stock 1.96 on large (23.1 s); best x86 18.0 s. Next: parallel exact partition (S9-06).
 - 2026-11-17 first knc-boinc window (10:46-11:14Z, turn closed, card clean). S8-07 pool build, all bit-identical.
   Thread settings (large, whole_run): defaults 24.41, DELAY512 24.24, DELAY32 24.91, passive 29.17, spin 30 ms 24.01,
   close 24.05, 180 thr 24.44, 120 thr 25.80: defaults hold (single runs, ~4% spread). PGO (trained on card, core-small
