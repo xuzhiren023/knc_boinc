@@ -25,3 +25,7 @@ You implement one ticket from `work/tickets/`. The ticket is the only channel to
   intrinsics or vector code in our patches.
 - Pilot study (owner 2026-11-16): in every Engineer report add an "Effort" line: knc-twin commands run and their
   status, twin host seconds, whether a model table was used, card jobs you staged for the lead.
+- Patch classes (GCC-KNC M5 scores N-body with correctness patches only, 2026-11-17): keep every patch in exactly one
+  class and never mix them in one file. Correctness/portability: build fixes, result contract, wrapper file
+  protocol. Performance: scheduling, parallelism, layout, vectorization, fast paths (all behind an off-by-default
+  option). Instrumentation: timers, counters. Name the class in patches/README.md for each new patch.
