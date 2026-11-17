@@ -429,7 +429,7 @@ int main(int argc,char** argv) {
             graphics.heartbeat();
             BOINC_STATUS b; boinc_get_status(&b);
             if (b.abort_request) {
-                s=state(card); if (s.live) card.signal("KILL"); card.clean(); log("abort acknowledged"); return boinc_finish(202);
+                s=state(card); if (s.live) card.signal("KILL"); card.clean(); log("abort acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return boinc_finish(202);
             }
             if (b.quit_request || b.no_heartbeat) {
                 s=state(card);
@@ -444,7 +444,7 @@ int main(int argc,char** argv) {
                 if (s.live) card.signal("STOP"); // freeze the acknowledged checkpoint during transfer
                 card.copy("knc_checkpoint.tmp",task.checkpoint,false);
                 fs::rename("knc_checkpoint.tmp","knc_checkpoint"); boinc_checkpoint_completed(); log("checkpoint saved");
-                if (s.live) card.signal("KILL"); card.clean(); log("quit acknowledged"); return 0;
+                if (s.live) card.signal("KILL"); card.clean(); log("quit acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return 0;
             }
             if (bool(b.suspended)!=suspended) {
                 s=state(card);
@@ -482,9 +482,10 @@ int main(int argc,char** argv) {
         if (s.exit) {log("card app exit "+std::to_string(s.exit)); return boinc_finish(s.exit);}
         fs::remove("knc_checkpoint"); boinc_fraction_done(1); log("finished"); return boinc_finish(0);
     } catch (const Unreachable& e) {
-        graphics.status=KNC_WAITING;graphics.publish();
+        graphics.status=KNC_FINISHED;graphics.publish();
         log(e.what()); boinc_temporary_exit(60,e.what()); return 0;
     } catch (const std::exception& e) {
+        graphics.status=KNC_FINISHED;graphics.publish();
         log(e.what()); return boinc_finish(1);
     }
 }

@@ -13,7 +13,7 @@ client=$(cygpath -am build/boinc/boinc_fake_client.exe)
 run=$(mktemp -d build/wrapper/test.XXXXXX)
 scenarios=("$@")
 if [[ ${#scenarios[@]} == 0 ]]; then
-    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable graphics)
+    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable graphics graphics-launch)
 fi
 for scenario in "${scenarios[@]}"; do
     slot="$run/$scenario"
@@ -81,6 +81,9 @@ PY
         fi
     fi
     (cd "$slot"; "$client" "$wrapper" local "$mode")
+    if [[ "$scenario" == graphics-launch ]]; then
+        python tests/capture_slot_graphics.py "$slot"
+    fi
     if [[ "$scenario" == *-contract ]]; then
         python tests/test_wrapper_contract.py "$slot" "$scenario"
     fi

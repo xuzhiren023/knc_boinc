@@ -38,6 +38,8 @@ static bool valid(const knc_snapshot& s) {
 static void update() {
     if(demo){state="demo";return;}
     auto now=Clock::now();
+    // Also bound an orphan if the producer died during an odd/invalid write.
+    if(seen && now-changed>std::chrono::seconds(30))PostMessage(window,WM_CLOSE,0,0);
     if(!shared && now>=retry){shared=(const knc_graphics*)boinc_graphics_get_shmem(KNC_GRAPHICS_NAME);retry=now+std::chrono::seconds(1);}
     state="waiting";
     if(!shared)return;
@@ -49,6 +51,9 @@ static void update() {
     if(before!=*seq || incoming.sequence!=before)return;
     if(incoming.magic!=KNC_GRAPHICS_MAGIC||incoming.version!=1||incoming.size!=sizeof(incoming)||incoming.status>KNC_WAITING||!valid(incoming.snapshot))return;
     if(!seen||before!=last_sequence){snapshot=incoming.snapshot;last_sequence=before;changed=now;seen=true;}
+    // The reader holds the mapping open even after the wrapper exits.
+    // Stop on its terminal status, or bound an orphan after producer loss.
+    if(incoming.status==KNC_FINISHED && now-changed>std::chrono::seconds(2)) PostMessage(window,WM_CLOSE,0,0);
     if(now-changed>std::chrono::seconds(5)){state="stale - waiting";return;}
     static const char* names[]={"running","suspended","finished","waiting"};state=names[incoming.status];
 }
@@ -125,7 +130,8 @@ static void render() {
     text(24,h-36,"MilkyWay@home | N-body simulation");text(24,h-62,"Gold: stars   Blue: dark matter   Grid: Galactic disc");
     char line[160];snprintf(line,sizeof(line),"Progress: %.1f%%   Status: %s",seen||demo?snapshot.fraction_done*100:0,state);text(24,32,line);
     if(active){snprintf(line,sizeof(line),"Bodies: %u   Step: %llu   Simulation time: %.4g",snapshot.body_count,(unsigned long long)snapshot.step,snapshot.sim_time);text(24,56,line);}
-    if(!screenshot.empty()) {
+    // Live evidence must contain a snapshot, not the launch-time waiting scene.
+    if(!screenshot.empty() && (demo || (seen && snapshot.body_count && !strcmp(state,"running")))) {
         if(!capture_window(w,h)){fprintf(stderr,"Window capture failed");exit(1);}
         screenshot.clear();
     }
@@ -134,6 +140,8 @@ static void render() {
 static LRESULT CALLBACK proc(HWND w,UINT message,WPARAM wp,LPARAM lp){
     switch(message){
     case WM_CLOSE:DestroyWindow(w);return 0;
+    // BOINC's Windows screensaver calls CloseWindow(), which minimizes.
+    case WM_SIZE:if(fullscreen && wp==SIZE_MINIMIZED){DestroyWindow(w);return 0;}break;
     case WM_DESTROY:PostQuitMessage(0);return 0;
     case WM_KEYDOWN:if(fullscreen||wp==VK_ESCAPE)DestroyWindow(w);return 0;
     case WM_LBUTTONDOWN:case WM_RBUTTONDOWN:if(fullscreen)DestroyWindow(w);return 0;
@@ -150,7 +158,7 @@ int main(int argc,char** argv){
         else {fprintf(stderr,"Usage: knc_nbody_graphics [--fullscreen] [--demo FILE]\n");return 1;}
     }
     if(!demo)boinc_parse_init_data_file();
-    auto instance=GetModuleHandle(nullptr);WNDCLASSA wc={};wc.style=CS_OWNDC;wc.lpfnWndProc=proc;wc.hInstance=instance;wc.lpszClassName="KNCNBodyGraphics";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);
+    auto instance=GetModuleHandle(nullptr);WNDCLASSA wc={};wc.style=CS_OWNDC;wc.lpfnWndProc=proc;wc.hInstance=instance;wc.lpszClassName="BOINC_app";wc.hCursor=LoadCursor(nullptr,IDC_ARROW);
     if(!RegisterClassA(&wc))return 1;
     DWORD style=fullscreen?WS_POPUP:WS_OVERLAPPEDWINDOW;
     window=CreateWindowA(wc.lpszClassName,"MilkyWay@home",style,fullscreen?0:CW_USEDEFAULT,fullscreen?0:CW_USEDEFAULT,fullscreen?GetSystemMetrics(SM_CXSCREEN):960,fullscreen?GetSystemMetrics(SM_CYSCREEN):640,nullptr,nullptr,instance,nullptr);

@@ -14,7 +14,7 @@ bash tests/packaging.sh
 `tests/graphics.sh` builds host and card format checks, runs the full medium upstream workunit (1024 bodies, timeEvolve 3.945), converts its
 `--output-file` final-state body rows, launches real OpenGL windows, and captures
 the demo window's client area using OpenGL readback from its actual window framebuffer before presentation. It saves the PNG to
-`docs/img/knc-nbody-graphics.png`. `--screenshot BMP` captures the first rendered window frame. No synthetic particle positions are used for
+`docs/img/knc-nbody-graphics.png`. `--screenshot BMP` captures the first demo frame or first live running frame with bodies. No synthetic particle positions are used for
 the screenshot. The converter needs only Python's standard library. Upstream
 `nbody/src/nbody_io.c:74-105,155-190` writes Cartesian x,y,z first in both output
 variants; its older texinfo's `--output-cartesian` switch no longer exists.
@@ -93,5 +93,7 @@ requires both tags. The package dependency scan starts from both executables.
 No card access is required. The package retains the card science executable and
 its runtime closure; existing `scripts/card-launch.sh` is the lead's card runner.
 Real-client staging and service-session access still need lead integration testing.
-Live fake-card producer updates are covered by `bash tests/wrapper.sh graphics`. The offline window test uses the real BOINC mapping
+The pinned 8.2.8 launch contract and source citations are in [boinc-graphics-launch.md](boinc-graphics-launch.md). Live fake-card producer updates and both BOINC launch modes are covered by `bash tests/wrapper.sh graphics graphics-launch`. The offline window test uses the real BOINC mapping
 implementation, rather than a fake attach function.
+
+The window uses BOINC's `BOINC_app` class. Screensaver minimization closes fullscreen; a terminal relay closes either live mode after two seconds. After 30 seconds without a sequence update, an attached orphan exits. Before any mapping exists it keeps waiting. Demo mode has no task lifetime dependency.
