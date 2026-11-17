@@ -27,4 +27,6 @@ CHECK(offsetof(knc_snapshot,reserved)==16);
 CHECK(offsetof(knc_graphics,magic)==0);
 CHECK(offsetof(knc_graphics,version)==4);
 CHECK(offsetof(knc_graphics,size)==8);
-CHECK(offsetof(knc_graphics,reserved)==20);
+CHECK(offsetof(knc_graphics,generation_done)==20);
+CHECK(offsetof(knc_graphics,generation_total)==24);
+CHECK(offsetof(knc_graphics,reserved)==28);

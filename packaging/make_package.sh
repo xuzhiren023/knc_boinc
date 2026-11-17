@@ -27,7 +27,8 @@ cp dist/card/milkyway_nbody.mic dist/card/*.so* "$package/"
 sed 's/^package_dir=card$/package_dir=./' config/knc_wrapper.cfg.example > "$package/knc_wrapper.cfg.example"
 # Resolve Cygwin runtime imports transitively from the supplied host toolchain.
 # Windows system DLLs stay on Windows; no DLL is downloaded.
-host_bin=/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin
+# A mixed Windows path works in both Git Bash and Cygwin bash.
+host_bin=C:/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin
 pending=("$package/knc_wrapper.exe" "$package/knc_nbody_graphics.exe")
 while ((${#pending[@]})); do
     file=${pending[0]}

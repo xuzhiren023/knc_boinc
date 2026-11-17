@@ -16,3 +16,11 @@ connect_timeout=10
 retry_limit=3
 checkpoint_timeout=60
 bodies=64
+# Periodic card checkpoint cadence in seconds (task argv overrides this default).
+checkpoint_interval=120
+# Shared turn ledger; leave enabled for real BOINC tasks.
+card_booking=1
+booking_ledger=C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl
+dma_stop_latch=C:/Users/xuzhi/Documents/gcc_knc/.work/_state/card-dma-active.lock
+# Release the turn after this many seconds suspended; resume requeues.
+booking_suspend_timeout=300

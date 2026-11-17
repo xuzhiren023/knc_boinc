@@ -34,8 +34,8 @@ Unknown keys and invalid ranges fail the task with a diagnostic.
 | `app` | `milkyway_nbody.mic`; package basename; fake card uses `milkyway_nbody.exe` |
 | `OMP_NUM_THREADS` | 240, positive; also passed as `--nthreads` |
 | `poll_interval` | 10 seconds; minimum 0.05 seconds |
-| `connect_timeout` | 10 seconds; SSH connect limit, 1–600 |
-| `retry_limit` | 3 retries after the first attempt, 0–100 |
+| `connect_timeout` | 10 seconds; SSH connect limit, 1â€“600 |
+| `retry_limit` | 3 retries after the first attempt, 0â€“100 |
 | `checkpoint_timeout` | 60 seconds to acknowledge a checkpoint request |
 | `bodies` | 64; legacy zero-argument sample's final argument |
 
@@ -204,3 +204,65 @@ bash scripts/run_wrapper.sh /path/to/slot --fake-card C:/path/to/fake-card \
 This launcher sets the host DLL search path and local scratch variables, then
 executes the wrapper. Invoking the real-transport form contacts the configured
 card; it has not been invoked by the engineer.
+
+## S11 setup progress, checkpoint cadence and card turns
+
+With the wrapper file protocol enabled, the mixed-dwarf generator atomically
+publishes `generation` as `completed total` before the sampling loop, every 64
+completed bodies, and at the end. This is an Instrumentation patch, separate
+from the correctness file protocol and all performance patches. The wrapper
+assigns **75% to generation** (`0.75 * completed / total`) and **25% to forward
+steps** (`0.75 + 0.25 * step / nStep`). These are stage weights, not an ETA.
+Graphics display `Generating stars N / total` in the window title and scene
+until a simulation progress file appears. Restore, or a generator without body
+count instrumentation, reports simulation progress directly. Graphics retain
+raw simulation fractions in snapshot files; the reader applies the same weights
+when generation counts are available. The shared structure keeps its size and
+snapshot offset; two formerly reserved words now carry generation counts, and
+status 4 means generation. Ship the rebuilt wrapper and graphics together.
+
+`checkpoint_interval` defaults to **120 seconds**, range 1â€“86400. An explicit
+upstream `--checkpoint-interval` / `-w` task operand still takes precedence.
+Requested BOINC quit checkpoints bypass the periodic interval. The upstream
+standalone scheduler compares integer wall time using `>`; interval 1 normally
+means roughly two seconds between safe-step writes. Run
+`bash scripts/measure-checkpoint-cost.sh` for an isolated 110,000-body probe of
+the actual scheduler and writer, with four host threads. It reports writer wall
+cost and bytes for ten seconds each at interval 1 and 120; it does not generate
+or evolve 110,000 bodies, flush disk caches, or predict card filesystem latency.
+
+`card_booking=1` is the default. `booking_ledger` defaults to
+`C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl` and must already exist.
+The wrapper appends `tools/card_turn.py`-shaped knc-boinc queued/finish rows and
+stores its open ID in the slot's `knc_turn`. It never repairs/truncates a ledger.
+Earlier live foreign queues block admission; all open foreign running jobs must
+drain, including jobs recorded with legacy `job_id`. Finished/end/superseded
+rows close their IDs. Only `timingValid: true` queues aged 0â€“3 hours are live.
+At 2.5 hours the wrapper stops the app and appends superseded+queued together,
+losing its old position, then waits for admission before continuing. A restart
+reattaches the saved turn and stops any existing process before admission.
+
+After `booking_suspend_timeout` seconds suspended (default 300, range 1â€“10800),
+the turn closes. Resume queues again and waits with the app stopped. Normal
+completion, abort, and successful checkpoint quit close the turn. Abort and quit
+also work while waiting before launch. An uncertain remote launch or unreachable
+live lease retains its turn and remote directory for reattachment; the wrapper
+cannot safely claim that unknown remote work has ended. Ledger errors fail
+closed. Turn rows are append-only bookings, matching the manual turn tool; this
+wrapper uses SSH transport, not the card runner's DMA transfer helpers.
+
+`card_booking=0` disables ledger reads/writes. The shared DMA stop latch remains
+mandatory: `dma_stop_latch` defaults to
+`C:/Users/xuzhi/Documents/gcc_knc/.work/_state/card-dma-active.lock`. Its presence
+blocks initial staging, launch and resume, even with booking disabled. The
+wrapper never removes it. Path overrides support isolated fake-card acceptance;
+production configurations should use the shared paths.
+
+The lead-only smoke command is:
+
+    bash scripts/s11-card-smoke.sh OWNER_CONFIG
+
+It prepares core-small under build/s11/card-smoke, uses the rebuilt package,
+enables booking, checks the reference likelihood, and refuses to overwrite a
+retained remote lease/turn. The engineer syntax-checks this script only; invoking
+it uses real transport and the owner's config.

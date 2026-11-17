@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         char command[4096];
         if (argc==4) {
             const char* task=getenv("KNC_TASK_ARGS");
-            if (!strcmp(argv[3], "e2e-card"))
+            if (!strcmp(argv[3], "e2e-card") || !strcmp(argv[3], "scp-options"))
                 snprintf(command,sizeof(command),"\"%s\" %s",argv[1],task?task:"");
             else {
                 const char* fake=getenv("KNC_FAKE_CARD"); require(fake,"KNC_FAKE_CARD missing");

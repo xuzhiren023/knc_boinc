@@ -9,6 +9,7 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 
 | Patch | Class | Selector/default or purpose |
 | --- | --- | --- |
+| `zzzzzzzzz-nbody-generation-progress.patch` | Instrumentation | KNC_WRAPPER_FILES unset: no side files; atomic setup body counts |
 | `boinc/cygwin-win32.patch` | Correctness/portability | BOINC Cygwin/Win32 API compatibility |
 | `crlibm-config-path.patch` | Correctness/portability | Handwritten configuration include path |
 | `nbody-king-const.patch` | Correctness/portability | Compatible read-only callback types |
@@ -221,3 +222,5 @@ only into the card diagnostic binary. Both performance options default off.
   libknc_vmath exp/pow and masked gamma convergence; its default is 0.
 
 - `zzzzzzzz-nbody-df-batch.patch` (S10-10), **Performance**: `DF_BATCH=0` by default; requires vector8 and disables the older generator pipeline. `src/nbody_df_batch.h` contains only scheduling, speculative value caches and copied-state RNG lookahead. Counters are injected only into diagnostic translation units.
+
+- `zzzzzzzzz-nbody-generation-progress.patch` (S11-03), **Instrumentation**: opt-in `KNC_WRAPPER_FILES` atomic `generation` body counts every 64 completed mixed-dwarf bodies and at both endpoints. No science arithmetic or RNG changes.

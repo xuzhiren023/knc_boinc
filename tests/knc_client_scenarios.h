@@ -8,6 +8,7 @@
 static std::string contents(const std::string& file) {
     std::ifstream f(file); return {std::istreambuf_iterator<char>(f),{}};
 }
+#include "knc_client_s11.h"
 static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_SHM& ipc, PROCESS_INFORMATION& pi, const char* command) {
     std::string mode=scenario;
     auto heartbeat=[&] {
@@ -38,11 +39,12 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         require(!contents("result.data").empty(),"resolved histogram output missing");
         require(contents("nbody_stderr.txt").find("search_likelihood")!=std::string::npos,"N-body likelihood missing");
     };
-    if (mode=="unreachable") {
+    if (s11_scenario(mode,shm,pi,heartbeat,wait,stopped,exited,trace,cleaned)) return;
+    if (mode=="unreachable" || mode=="scp-options") {
         // BOINC temporary_exit writes this file and deliberately omits finish.
         exited(0,false);
         require(exists("boinc_temporary_exit"),"temporary exit marker missing");
-        require(trace("exhausted retry_limit=2"),"bounded retry diagnostic missing");
+        require(trace(mode=="scp-options"?"exhausted retry_limit=0":"exhausted retry_limit=2"),"bounded retry diagnostic missing");
         puts("PASS wrapper unreachable"); return;
     }
     if (mode=="real") {
@@ -122,7 +124,7 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         if (shm->app_status.get_msg(msg)) {
             auto p=strstr(msg,"<fraction_done>"); if (p) fraction=atof(p+15);
         }
-        return fraction>0 && fraction<.8;
+        return fraction>0 && fraction<1;
     },"wrapper did not report running progress");
     if (mode=="graphics") {
         void* address=nullptr; HANDLE mapping=nullptr;
@@ -161,6 +163,10 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         PostMessageA(gw,WM_CLOSE,0,0);require(WaitForSingleObject(gfx.hProcess,5000)==WAIT_OBJECT_0,"graphics exit");
         CloseHandle(gfx.hThread);CloseHandle(gfx.hProcess);detach_shmem(mapping,address);
         puts("PASS graphics relay: x86 bytes, sequence, suspended heartbeat, resume, finished, live window");return;
+    }
+    if (mode=="suspend" || mode=="quit" || mode=="abort") {
+        wait([&]{auto dir=contents("knc_remote");while(!dir.empty()&&(dir.back()==10||dir.back()==13))dir.pop_back();
+            return !dir.empty() && !contents(dir+"/progress").empty();},"simulation did not start");
     }
     if (mode=="normal") {completed(); puts("PASS wrapper normal outputs"); return;}
     if (mode=="abort") {
