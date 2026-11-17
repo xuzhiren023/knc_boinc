@@ -110,6 +110,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 17:15-17:29Z window (transport timeout 600 s, laptop loaded): core-small 47.80 s; real-steps (20k bodies, 129
+  steps, 117676 Lua) whole 241.4 s = setup 234.2 s + tree 2.28 s + force 4.20 s + likelihood 0.45 s: real tasks are
+  generation-dominated even at 20k bodies. S10-05 release core-small ok; S10-05 special upload FAILED (third DMA
+  helper deadline today, 32 MB libstdc++); latch set; card run dir removed after checks (boot unchanged, no helpers);
+  latch clearing asked of the GCC-KNC lead; card_dma_recover.py card check has a script bug (exit 2).
 - 2026-11-17 card uploads: ssh measured ~20 KB/s to the card (48 MB job = ~40 min), owner chose auto (DMA >= 1 MiB).
   17:02Z window: core-small 47.86 s ok (DMA ~1.3 GB/s); real-steps refused at upload: DMA helper deadline, cleanup
   uncertain, on libgomp.so.1 while the laptop was loaded by engineers (second such failure; GCC-KNC lead: do not
