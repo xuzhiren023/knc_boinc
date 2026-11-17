@@ -100,6 +100,8 @@ Lead-maintained. Last update: 2026-11-16 EST.
 - 2026-11-16 23:52Z S8-02 card check (large case, parallel tree): nbMakeTree 70.4 s (serial build 13.2 s),
   force 13.4 s, whole 88.0 s, bit-identical. 5x slower on the card (x86 also 2.7x slower); not usable; diagnose
   (malloc/free-list contention, serial partitioning, fork/join per level?) before any rework.
+  Same with vector force walk (ptree-vec): force 13.10 s vs scalar 13.39 s: the S6-03 vector walk gives ~2% on
+  the force phase on the card (twin predicted lanes 79-94% busy). Add to the pilot-study predictions (S8-06).
   S8-03 (parallel quad): x86 core-small (4,000 bodies, real 117676 args) generation 140.2 s -> 36.9 s at 12 threads,
   bodies byte-identical, likelihood -2357.216400957532642 identical. Card check pending.
 
