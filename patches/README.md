@@ -19,6 +19,7 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `z-nbody-gen-pipeline.patch` | Performance | NBODY_GEN_PIPELINE=0; exact one-step golden-section root/search speculation |
 | `zzzzz-nbody-gen-profile.patch` | Instrumentation | NBODY_GEN_PROFILE=0; generator nested wall timers and per-body counts |
 | `zzzzzz-nbody-df-special.patch` | Performance | NBODY_DF_SPECIAL=0; concrete Plummer/cored nodes |
+| `zzzzzzzz-nbody-df-batch.patch` | Performance | DF_BATCH=0; exact-order speculative golden-section and rejection integral batches |
 | `zzzzzzz-nbody-df-vector8.patch` | Performance | DF_VECTOR8=0, DF_VECTOR8_GUARD=0; relaxed eight-node integrand and empirical exact replay |
 | `../probes/s10-df-vmath/performance.patch` | Performance | NBODY_DF_VMATH=0; isolated unguarded numerical experiment |
 | `z-nbody-df-reuse.patch` | Performance | NBODY_DF_REUSE=0; share identical stencil samples |
@@ -218,3 +219,5 @@ only into the card diagnostic binary. Both performance options default off.
   The owner comparison `DF_VECTOR8_SCALAR_LOG_ATAN=1` keeps exact crlibm
   log_rn/atan_rn per active lane while retaining vector arithmetic,
   libknc_vmath exp/pow and masked gamma convergence; its default is 0.
+
+- `zzzzzzzz-nbody-df-batch.patch` (S10-10), **Performance**: `DF_BATCH=0` by default; requires vector8 and disables the older generator pipeline. `src/nbody_df_batch.h` contains only scheduling, speculative value caches and copied-state RNG lookahead. Counters are injected only into diagnostic translation units.

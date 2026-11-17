@@ -1,0 +1,113 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -38,6 +38,13 @@
+ #include "nbody_king_model.h"
+ #include "nbody_gen_profile.h"
+ 
++#ifndef NBODY_DF_BATCH
++#define NBODY_DF_BATCH 0
++#endif
++#if NBODY_DF_BATCH && (!NBODY_DF_VECTOR8 || NBODY_GEN_PIPELINE)
++#error DF_BATCH requires DF_VECTOR8=1 and GEN_PIPELINE=0
++#endif
++
+ #ifndef NBODY_DF_VECTOR8
+ #define NBODY_DF_VECTOR8 0
+ #endif
+@@ -89,10 +96,13 @@
+ #include <omp.h>
+ #endif
+ 
++#if (NBODY_GEN_PIPELINE || NBODY_DF_BATCH) && NBODY_PARALLEL_QUAD && defined(_OPENMP)
++typedef struct { real energy, lower, upper; } GenBounds;
++#endif
++
+ #if NBODY_GEN_PIPELINE && NBODY_PARALLEL_QUAD && defined(_OPENMP)
+ /* Two one-step golden-section branches, evaluated alongside the current
+  * integral's nodes. No RNG and no approximate arithmetic enter this path. */
+-typedef struct { real energy, lower, upper; } GenBounds;
+ static struct {
+     int active, count;
+     real radius, requested[2], cached[2];
+@@ -561,8 +571,20 @@
+     return value;
+ }
+ 
++#if NBODY_DF_BATCH
++static int dfb_active;
++static int dfb_ready(const Dwarf*,const Dwarf*);
++static real dfb_max(real, const Dwarf*, const Dwarf*, mwbool, real,real,real,int,real);
++static real dfb_reject(real,real,real,const Dwarf*,const Dwarf*,mwbool,dsfmt_t*);
++static real dist_fun(real,real,const Dwarf*,const Dwarf*,mwbool);
++#endif
++
+ static inline real max_finder(real (*profile)(real , real , const Dwarf*, const Dwarf*, mwbool), real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, real a, real b, real c, int limit, real tolerance)
+ {
++#if NBODY_DF_BATCH
++    if (dfb_active && profile == dist_fun && dfb_ready(comp1,comp2))
++        return dfb_max(r,comp1,comp2,isDark,a,b,c,limit,tolerance);
++#endif
+     /*this is a maxfinding routine to find the maximum of the density.
+      * It uses Golden Section Search as outlined in Numerical Recipes 3rd edition
+      */
+@@ -881,7 +903,7 @@
+     return mw_fabs(upperlimit_r);
+ }
+ 
+-#if NBODY_GEN_PIPELINE && NBODY_PARALLEL_QUAD && defined(_OPENMP)
++#if (NBODY_GEN_PIPELINE || NBODY_DF_BATCH) && NBODY_PARALLEL_QUAD && defined(_OPENMP)
+ static GenBounds gen_prepare(real v, real r, const Dwarf* comp1, const Dwarf* comp2)
+ {
+     //-------------------------------
+@@ -1055,6 +1077,10 @@
+     return distribution_function;
+ }
+ 
++#if NBODY_DF_BATCH
++#include "nbody_df_batch.h"
++#endif
++
+ /*      SAMPLING FUNCTIONS      */
+ static inline real r_mag(dsfmt_t* dsfmtState, const Dwarf* comp, real rho_max, real bound)
+ {
+@@ -1119,9 +1145,20 @@
+     }
+     v_esc = 0.99 * mw_sqrt( mw_fabs(2.0 * (potential( r, comp1, comp2) + potential_offset)) );
+ 
++#if NBODY_DF_BATCH
++    dfb_rng=NULL;dfb_attempts.valid=0;
++    if(dfb_active && dfb_ready(comp1,comp2)){dfb_rng=dsfmtState;dfb_esc=v_esc;}
++#endif
+     GP_BEGIN(max);
+     real dist_max = max_finder(dist_fun, r, comp1, comp2, isDark, 0.0, 0.5 * v_esc, v_esc, 10, 1.0e-2);
+     GP_END();
++#if NBODY_DF_BATCH
++    dfb_rng=NULL;
++#endif
++#if NBODY_DF_BATCH
++    if (dfb_active && dfb_ready(comp1,comp2))
++        return dfb_reject(r,v_esc,dist_max,comp1,comp2,isDark,dsfmtState);
++#endif
+     GP_BEGIN(rejection);
+     while(1)
+     {
+@@ -1157,6 +1194,9 @@
+ #if NBODY_DF_VECTOR8_GUARD
+     dsfmt_t saved=*rng;
+ #endif
++#if NBODY_DF_BATCH
++    dfb_active=dfb_ready(a,b);
++#endif
+     df8_velocity=1; df8_uncertain=0;
+     real v=vel_mag_base(r,a,b,dark,rng);
+ #if NBODY_DF_VECTOR8_GUARD
+@@ -1167,6 +1207,9 @@
+         v=vel_mag_base(r,a,b,dark,rng);
+         df8_exact=0;
+     }
++#endif
++#if NBODY_DF_BATCH
++    dfb_active=0;
+ #endif
+     df8_velocity=0;
+     return v;
