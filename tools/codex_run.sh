@@ -25,7 +25,7 @@ PROMPT="You are an engineer on the knc-boinc project. Read AGENTS.md, then imple
 Use bash. Before compiling, export TMPDIR, TMP and TEMP to \$PWD/build/tmp (create it). Do not run git commands that
 write (no commit, branch, add); the lead commits. End by appending the Engineer report to the ticket file. $EXTRA"
 TRUST="projects.\"${ROOT//\//\\}\".trust_level=\"trusted\""
-"$CODEX" exec --json -C "$ROOT" --sandbox workspace-write --dangerously-bypass-hook-trust \
+"$CODEX" exec --json ${MODEL:+-m "$MODEL"} -C "$ROOT" --sandbox workspace-write --dangerously-bypass-hook-trust \
   -c "$TRUST" -c 'approval_policy="never"' -c "model_reasoning_effort=\"${EFFORT:-medium}\"" \
   -c "sandbox_workspace_write.network_access=$NET" \
   --output-last-message "$LAST" "$PROMPT" < /dev/null > "$LOG" 2>&1
