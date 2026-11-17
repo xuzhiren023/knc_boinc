@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- S9-02 merged: tools/card_run (project knc-boinc), tools/card_turn.py. Turn row auto-queued at 10:45Z by a lead
+  waiter (scratchpad w-book.py); it reports when no earlier foreign job is live. S9-01 staged scripts now call
+  knc-boinc/tools/card_run.
 - 2026-11-17 owner: knc-boinc books its own card windows on the shared ledger (not GCC-KNC turn rows). S9-02 makes a
   local card_run with project "knc-boinc" plus turn-row script. Next window after PhiWeather (~13:30Z): 2 PGO training
   jobs + 8 thread-setting jobs (S9-01, GCC-KNC's order: libgomp defaults first), then the PGO rebuild and its A/B.
