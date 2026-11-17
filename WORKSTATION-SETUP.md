@@ -73,9 +73,10 @@ Read `AGENTS.md`, `STATUS.md`, `docs/PLAN.md` first. Standing rules carried over
 
 Open work at migration time (details in `work/tickets/`):
 
-- **S11-03** (wrapper setup progress, checkpoint interval, automatic card booking): engineer run was still going on
-  the laptop; its result arrives as branch `s11-03` if it finished, otherwise redispatch it here. Review it, merge,
-  rebuild package and installer.
+- **S11-03** (wrapper setup progress, checkpoint interval 120 s, automatic card booking) is merged and its offline
+  tests pass. Not yet proven: the staged card smoke `scripts/s11-card-smoke.sh` and a real BOINC task with the
+  rebuilt package and installer (the booking ledger path in `knc_wrapper.cfg` must point at the workstation's
+  `card-coordination\jobs.jsonl`). Rebuild package and installer here.
 - **S11-05** (portability: `config/local.env`, doctor script, no hardcoded user paths): do it on the workstation, where
   the real paths are known.
 - Owner end-to-end check: double-click install, one real task with progress during star setup.
