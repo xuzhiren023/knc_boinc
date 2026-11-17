@@ -41,8 +41,10 @@ WALK_LAYOUT ?= 0
 WALK_COUNTERS ?= 0
 CPPFLAGS += -DNBODY_TREE_VARIANT=$(TREE_VARIANT) -DNBODY_TREE_IDENTITY=$(TREE_IDENTITY)
 CPPFLAGS += -DNBODY_WALK_LAYOUT=$(WALK_LAYOUT) -DNBODY_WALK_COUNTERS=$(WALK_COUNTERS)
-CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
-CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
+# PGO is opt-in; both compilation and linking need its runtime flags.
+PGOFLAGS ?=
+CFLAGS := $(PGOFLAGS) $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
+CXXFLAGS := $(PGOFLAGS) $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
 export TMPDIR := $(shell $(TOOLCHAIN)/cygpath -am $(ROOT)/build/tmp)
 export TMP := $(TMPDIR)
@@ -51,6 +53,7 @@ ifeq ($(TARGET),card)
 # DT_RPATH, not RUNPATH: dependencies of bundled runtimes must find peers too.
 COMMON_LDFLAGS += -Wl,--disable-new-dtags,-rpath,'$$ORIGIN:$$ORIGIN/../lib'
 endif
+COMMON_LDFLAGS += $(PGOFLAGS)
 .PHONY: x86 card program
 # Track the complete compile/link configuration, including command-line flags.
 # Integration experiments must not silently reuse objects from another variant.
