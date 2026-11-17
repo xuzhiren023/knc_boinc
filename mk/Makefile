@@ -35,6 +35,12 @@ CPPFLAGS += -DNBODY_PHASE_TIMERS=$(PHASE_TIMERS) -DNBODY_STATIC_INTEGRATE=$(STAT
 # Independent mixed-dwarf quadrature nodes; explicitly enabled for S8 card.
 PARALLEL_QUAD ?= 0
 CPPFLAGS += -DNBODY_PARALLEL_QUAD=$(PARALLEL_QUAD)
+TREE_VARIANT ?= 0
+TREE_IDENTITY ?= 0
+WALK_LAYOUT ?= 0
+WALK_COUNTERS ?= 0
+CPPFLAGS += -DNBODY_TREE_VARIANT=$(TREE_VARIANT) -DNBODY_TREE_IDENTITY=$(TREE_IDENTITY)
+CPPFLAGS += -DNBODY_WALK_LAYOUT=$(WALK_LAYOUT) -DNBODY_WALK_COUNTERS=$(WALK_COUNTERS)
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
@@ -46,6 +52,16 @@ ifeq ($(TARGET),card)
 COMMON_LDFLAGS += -Wl,--disable-new-dtags,-rpath,'$$ORIGIN:$$ORIGIN/../lib'
 endif
 .PHONY: x86 card program
+# Track the complete compile/link configuration, including command-line flags.
+# Integration experiments must not silently reuse objects from another variant.
+.PHONY: build-config-check
+build-config-check:
+$(OUT)/.build-options: build-config-check
+	@$(TOOLCHAIN)/mkdir -p $(OUT)
+	@printf '%s\n' '$(CPPFLAGS)' '$(CFLAGS)' '$(CXXFLAGS)' '$(COMMON_LDFLAGS)' '$(COMMON_LDLIBS)' > $@.tmp
+	@$(TOOLCHAIN)/cmp -s $@.tmp $@ || $(TOOLCHAIN)/cp $@.tmp $@
+	@$(TOOLCHAIN)/rm -f $@.tmp
+$(OBJECTS): $(OUT)/.build-options
 # Reusing an OUT directory must not silently keep the other macro setting.
 .PHONY: phase-config-check
 phase-config-check:

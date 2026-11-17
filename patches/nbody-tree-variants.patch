@@ -1,0 +1,529 @@
+--- a/nbody/src/nbody_tree.c
++++ b/nbody/src/nbody_tree.c
+@@ -21,6 +21,81 @@
+ 
+ #include "nbody_priv.h"
+ #include "nbody_tree.h"
++#ifdef _OPENMP
++#include <omp.h>
++#endif
++#ifndef NBODY_TREE_VARIANT
++#define NBODY_TREE_VARIANT 0
++#endif
++/* 0: upstream, 1: serial insertion + parallel moments, 2: pool build. */
++#define NBODY_PARALLEL_TREE (NBODY_TREE_VARIANT != 0)
++#define NB_TREE_DEPTH 3
++#define NB_TREE_BUCKETS 512
++#define NB_SLAB 128
++typedef struct {
++    NBodyCell root;
++    NBodyCell* cells;
++    size_t capacity, cursor;
++    int nbody, threads;
++    unsigned short* keys;
++    Body** bodies;
++    NBodyState* workers;
++} NBTreePool;
++
++/* Allocation routing for the arena and stable scratch. */
++static void* nbTreeAlloc(size_t bytes, int aligned)
++{
++    return aligned ? mwMallocA(bytes) : mwMalloc(bytes);
++}
++
++void nbReleaseTreePool(NBodyState* st)
++{
++    NBTreePool* pool = st->treePool;
++    if (!pool) return;
++    mwFreeA(pool->cells); free(pool->keys); free(pool->bodies);
++    mwFreeA(pool->workers); mwFreeA(pool);
++    st->treePool = NULL; st->tree.root = NULL; st->freeCell = NULL;
++}
++
++static void nbPoolPrepare(NBodyState* st)
++{
++    NBTreePool* p = st->treePool;
++    size_t levels = 1, capacity;
++    real size = st->tree.rsize;
++    int threads = 1;
++#ifdef _OPENMP
++    threads = omp_get_max_threads();
++#endif
++    /* Any insertion either creates a branching cell or traverses a unary
++     * chain. Charging every possible level to every body is a conservative
++     * bound, including the cell made immediately before epsilon rejection. */
++    while (size > REAL_EPSILON) { ++levels; size *= 0.5; }
++    capacity = 1 + (size_t) st->nbody * (levels + 1) +
++               (size_t) (threads + 1) * NB_SLAB;
++    if (capacity > p->capacity) {
++        mwFreeA(p->cells);
++        p->cells = nbTreeAlloc(capacity * sizeof(*p->cells), 1);
++        p->capacity = capacity;
++    }
++    if (p->nbody != st->nbody) {
++        free(p->keys); free(p->bodies);
++        p->keys = nbTreeAlloc(st->nbody * sizeof(*p->keys), 0);
++        p->bodies = nbTreeAlloc(st->nbody * sizeof(*p->bodies), 0);
++        p->nbody = st->nbody;
++    }
++    if (p->threads != threads) {
++        mwFreeA(p->workers);
++        p->workers = nbTreeAlloc(threads * sizeof(*p->workers), 1);
++        p->threads = threads;
++    }
++    /* expandBox used the persistent midpoint scratch root. From insertion
++     * onward every live cell, including the root, is in the same arena. */
++    p->cells[0] = p->root;
++    st->tree.root = p->cells;
++    p->cursor = 1;
++    st->treePoolNext = st->treePoolEnd = 0;
++}
++
+ 
+ #include <lua.h>
+ #include <lauxlib.h>
+@@ -67,7 +142,7 @@
+  * routine is coded so that the Subp() and Quad() components of a cell can
+  * share the same memory locations.
+  */
+-static void hackQuad(NBodyCell* p)
++static void hackQuadTo(NBodyCell* p, int depth)
+ {
+     unsigned int ndesc, i;
+     NBodyNode* desc[NSUB];
+@@ -88,9 +163,9 @@
+     for (i = 0; i < ndesc; ++i)                 /* loop over real subnodes  */
+     {
+         q = desc[i];                            /* access each one in turn  */
+-        if (isCell(q))                          /* if it's also a cell      */
+-        {
+-            hackQuad((NBodyCell*) q);           /* then process it first    */
++        if (isCell(q) && depth != 0)            /* if it's also a cell      */
++        {
++            hackQuadTo((NBodyCell*) q, depth - 1);           /* then process it first    */
+         }
+ 
+         dr = mw_subv(Pos(q), Pos(p));           /* find displacement vect.  */
+@@ -153,21 +228,38 @@
+  * and expand root cell to fit. The size is doubled at each step to
+  * take advantage of exact representation of powers of two.
+  */
+-static void expandBox(NBodyTree* t, const Body* btab, int nbody)
++static void expandBox(NBodyTree* t, const Body* btab, int nbody, int parallel)
+ {
+     real xyzmax;
+-    const Body* p;
++    int i;
+     const NBodyCell* root = t->root;
+ 
+     assert(t->rsize > 0.0);
+ 
+     xyzmax = 0.0;
+-    for (p = btab; p < btab + nbody; ++p)
+-    {
++#if NBODY_TREE_VARIANT == 2
++    if (parallel) {
++#ifdef _OPENMP
++        #pragma omp parallel for reduction(max:xyzmax)
++#endif
++    for (i = 0; i < nbody; ++i)
++    {
++        const Body* p = btab + i;
+         xyzmax = mw_fmax(xyzmax, mw_abs(X(Pos(p)) - X(Pos(root))));
+         xyzmax = mw_fmax(xyzmax, mw_abs(Y(Pos(p)) - Y(Pos(root))));
+         xyzmax = mw_fmax(xyzmax, mw_abs(Z(Pos(p)) - Z(Pos(root))));
+     }
++    } else
++#endif
++    {
++    for (i = 0; i < nbody; ++i)
++    {
++        const Body* p = btab + i;
++        xyzmax = mw_fmax(xyzmax, mw_abs(X(Pos(p)) - X(Pos(root))));
++        xyzmax = mw_fmax(xyzmax, mw_abs(Y(Pos(p)) - Y(Pos(root))));
++        xyzmax = mw_fmax(xyzmax, mw_abs(Z(Pos(p)) - Z(Pos(root))));
++    }
++    }
+ 
+     while (t->rsize < 2.0 * xyzmax)
+     {
+@@ -180,9 +272,24 @@
+ {
+     NBodyCell* c;
+ 
+-    if (st->freeCell == NULL)                   /* no free cells left? */
+-    {
+-        c = (NBodyCell*) mwMallocA(sizeof(*c)); /* allocate a new one */
++    if (st->treePool) {
++        NBTreePool* pool = st->treePool;
++        if (st->treePoolNext == st->treePoolEnd) {
++            size_t base;
++#ifdef _OPENMP
++            #pragma omp atomic capture
++#endif
++            { base = pool->cursor; pool->cursor += NB_SLAB; }
++            if (base + NB_SLAB > pool->capacity)
++                mw_fail("tree pool capacity bound exceeded\n");
++            st->treePoolNext = base;
++            st->treePoolEnd = base + NB_SLAB;
++        }
++        c = pool->cells + st->treePoolNext++;
++    }
++    else if (st->freeCell == NULL)                   /* no free cells left? */
++    {
++        c = (NBodyCell*) nbTreeAlloc(sizeof(*c), 1); /* allocate a new one */
+     }
+     else                                        /* use existing free cell */
+     {
+@@ -199,6 +306,15 @@
+ /* reclaim cells in tree, prepare to build new one. */
+ static void nbNewTree(NBodyState* st, NBodyTree* t)
+ {
++    if (st->treePool) {
++        NBTreePool* pool = st->treePool;
++        t->cellUsed = 1; t->maxDepth = 0;
++        t->root = &pool->root;
++        Type(t->root) = CELL(0); More(t->root) = NULL;
++        memset(&t->root->stuff, 0, sizeof(t->root->stuff));
++        mw_zerov(Pos(t->root));
++        return;
++    }
+     NBodyNode* p = (NBodyNode*) t->root;              /* start with the root */
+ 
+     while (p != NULL)                       /* loop scanning tree */
+@@ -239,7 +355,8 @@
+ }
+ 
+ /* loadBody: descend tree and insert body p in appropriate place. */
+-static void nbLoadBody(NBodyState* st, NBodyTree* t, Body* p)
++static void nbLoadBodyFrom(NBodyState* st, NBodyTree* t, Body* p,
++                           NBodyCell* start, real size, unsigned int level)
+ {
+     NBodyCell* q;
+     NBodyCell* c;
+@@ -247,10 +364,10 @@
+     unsigned int lev;
+     real qsize;
+ 
+-    q = t->root;                                /* start with tree t.root */
++    q = start;                                /* start with tree t.root */
+     qind = nbSubIndex(p, q);                    /* get index of subcell */
+-    qsize = t->rsize;                           /* keep track of cell size */
+-    lev = 0;                                    /* count levels descended */
++    qsize = size;                           /* keep track of cell size */
++    lev = level;                                    /* count levels descended */
+     while (Subp(q)[qind] != NULL)               /* loop descending tree */
+     {
+         if (qsize <= REAL_EPSILON)
+@@ -383,7 +500,7 @@
+ /* hackCofM: descend tree finding center-of-mass coordinates and
+  * setting critical cell radii.
+  */
+-static void hackCofM(const NBodyCtx* ctx, NBodyTree* tree, NBodyCell* p, real psize)
++static void hackCofMTo(const NBodyCtx* ctx, NBodyTree* tree, NBodyCell* p, real psize, int depth)
+ {
+     int i;
+     NBodyNode* q;
+@@ -396,9 +513,9 @@
+     {
+         if ((q = Subp(p)[i]) != NULL)           /* does subnode exist? */
+         {
+-            if (isCell(q))                     /* and is it a cell? */
++            if (isCell(q) && depth != 0)       /* and is it a cell? */
+             {
+-                hackCofM(ctx, tree, (NBodyCell*) q, 0.5 * psize); /* find subcell cm */
++                hackCofMTo(ctx, tree, (NBodyCell*) q, 0.5 * psize, depth - 1); /* find subcell cm */
+             }
+ 
+             Mass(p) += Mass(q);                       /* sum total mass */
+@@ -423,40 +540,193 @@
+     Pos(p) = cmpos;             /* and center-of-mass pos */
+ }
+ 
+-/* nbMakeTree: initialize tree structure for hierarchical force calculation
+- * from body array btab, which contains ctx.nbody bodies.
+- */
++/* D=3 gives up to 512 jobs for 240 card threads, with only 73 serial
++ * internal cells. Stable partitioning retains insertion order in each job.
++ * A lone body is attached directly; only collisions create top cells. */
++typedef struct
++{
++    NBodyCell* cell;
++    Body** bodies;
++    int count;
++    real size;
++} NBTreeBucket;
++
++
++/* The top levels are constructed from contiguous ranges of one stable
++ * counting sort. Keys use the same repeated midpoint arithmetic as insertion. */
++static void nbTopCells(NBodyState* st, NBodyCell* cell, real size,
++                       unsigned depth, Body** bodies, int firstKey, int span,
++                       const int* offsets, NBTreeBucket* buckets, int* used)
++{
++    int oct;
++    if (depth == NB_TREE_DEPTH) {
++        NBTreeBucket* b = &buckets[(*used)++];
++        b->cell = cell; b->size = size;
++        b->bodies = bodies + offsets[firstKey];
++        b->count = offsets[firstKey + span] - offsets[firstKey];
++        return;
++    }
++    span /= NSUB;
++    for (oct = 0; oct < NSUB; ++oct) {
++        int key = firstKey + oct * span;
++        int begin = offsets[key], count = offsets[key + span] - begin;
++        if (count == 1) {
++            Subp(cell)[oct] = (NBodyNode*) bodies[begin];
++            st->tree.maxDepth = MAX(st->tree.maxDepth, depth);
++        } else if (count > 1) {
++            NBodyCell* child = nbMakeCell(st, &st->tree);
++            nbInitMidpoint(child, bodies[begin], cell, size);
++            Subp(cell)[oct] = (NBodyNode*) child;
++            nbTopCells(st, child, size * 0.5, depth + 1, bodies,
++                       key, span, offsets, buckets, used);
++        }
++    }
++}
++
++static void nbCollectFrontier(NBodyCell* cell, real size, int depth,
++                               NBTreeBucket* buckets, int* used)
++{
++    int oct;
++    if (depth == NB_TREE_DEPTH) {
++        buckets[*used].cell = cell; buckets[(*used)++].size = size;
++        return;
++    }
++    for (oct = 0; oct < NSUB; ++oct)
++        if (Subp(cell)[oct] && isCell(Subp(cell)[oct]))
++            nbCollectFrontier((NBodyCell*) Subp(cell)[oct], size * 0.5,
++                              depth + 1, buckets, used);
++}
++
++static void nbPoolPartition(NBodyState* st, NBTreeBucket* buckets, int* used)
++{
++    NBTreePool* pool = st->treePool;
++    int counts[NB_TREE_BUCKETS] = {0}, offsets[NB_TREE_BUCKETS+1], next[NB_TREE_BUCKETS];
++    int i;
++#ifdef _OPENMP
++    #pragma omp parallel for schedule(static)
++#endif
++    for (i = 0; i < st->nbody; ++i) {
++        Body* body = st->bodytab + i;
++        NBodyCell mid;
++        real size = st->tree.rsize;
++        int d, key = 0;
++        mw_zerov(Pos(&mid));
++        for (d = 0; d < NB_TREE_DEPTH; ++d) {
++            int oct = nbSubIndex(body, &mid);
++            key = key * NSUB + oct;
++            nbInitMidpoint(&mid, body, &mid, size);
++            size *= 0.5;
++        }
++        pool->keys[i] = Mass(body) != 0.0 ? key : NB_TREE_BUCKETS;
++    }
++    for (i = 0; i < st->nbody; ++i)
++        if (pool->keys[i] < NB_TREE_BUCKETS) ++counts[pool->keys[i]];
++    offsets[0] = 0;
++    for (i = 0; i < NB_TREE_BUCKETS; ++i) {
++        next[i] = offsets[i]; offsets[i+1] = offsets[i] + counts[i];
++    }
++    for (i = 0; i < st->nbody; ++i)
++        if (pool->keys[i] < NB_TREE_BUCKETS)
++            pool->bodies[next[pool->keys[i]]++] = st->bodytab + i;
++    nbTopCells(st, st->tree.root, st->tree.rsize, 0, pool->bodies,
++               0, NB_TREE_BUCKETS, offsets, buckets, used);
++}
++
++static void nbPoolInsert(NBodyState* st, NBTreeBucket* buckets, int used)
++{
++    NBTreePool* pool = st->treePool;
++    int i;
++    for (i = 0; i < pool->threads; ++i) {
++        NBodyState* w = pool->workers + i;
++        /* Worker state is aligned and private; no free-list construction. */
++        w->tree = st->tree; w->tree.cellUsed = 0; w->tree.maxDepth = 0;
++        w->treePool = pool; w->treePoolNext = w->treePoolEnd = 0;
++    }
++#ifdef _OPENMP
++    #pragma omp parallel
++#endif
++    {
++        int id = 0, j, k;
++#ifdef _OPENMP
++        id = omp_get_thread_num();
++        #pragma omp for schedule(dynamic, 1)
++#endif
++        for (j = 0; j < used; ++j) {
++            NBTreeBucket* b = buckets + j;
++            for (k = 0; k < b->count; ++k)
++                nbLoadBodyFrom(pool->workers + id, &pool->workers[id].tree,
++                               b->bodies[k], b->cell, b->size, NB_TREE_DEPTH);
++        }
++    }
++    for (i = 0; i < pool->threads; ++i) {
++        st->tree.cellUsed += pool->workers[i].tree.cellUsed;
++        st->tree.maxDepth = MAX(st->tree.maxDepth, pool->workers[i].tree.maxDepth);
++        st->tree.structureError |= pool->workers[i].tree.structureError;
++    }
++}
++
++static void nbMoments(const NBodyCtx* ctx, NBodyTree* t, NBTreeBucket* buckets, int used, int parallel)
++{
++    int i, error = 0;
++    if (!parallel) { hackCofMTo(ctx, t, t->root, t->rsize, -1); return; }
++#ifdef _OPENMP
++    #pragma omp parallel for schedule(dynamic, 1) reduction(|:error)
++#endif
++    for (i = 0; i < used; ++i) {
++        NBodyTree local = *t;
++        hackCofMTo(ctx, &local, buckets[i].cell, buckets[i].size, -1);
++        error |= local.structureError;
++    }
++    t->structureError |= error;
++    hackCofMTo(ctx, t, t->root, t->rsize, NB_TREE_DEPTH - 1);
++}
++
++static void nbQuads(NBodyTree* t, NBTreeBucket* buckets, int used, int parallel)
++{
++    int i;
++    if (!parallel) { hackQuadTo(t->root, -1); return; }
++#ifdef _OPENMP
++    #pragma omp parallel for schedule(dynamic, 1)
++#endif
++    for (i = 0; i < used; ++i) hackQuadTo(buckets[i].cell, -1);
++    hackQuadTo(t->root, NB_TREE_DEPTH - 1);
++}
++
++static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel)
++{
++    Body* p;
++    NBodyTree* t = &st->tree;
++    NBTreeBucket buckets[NB_TREE_BUCKETS];
++    int used = 0, pool = parallel && NBODY_TREE_VARIANT == 2;
++    if (pool && !st->treePool) {
++        st->treePool = nbTreeAlloc(sizeof(NBTreePool), 1);
++        memset(st->treePool, 0, sizeof(NBTreePool));
++    }
++    nbNewTree(st, t);
++    expandBox(t, st->bodytab, st->nbody, pool);
++    if (pool) nbPoolPrepare(st);
++    if (pool && t->rsize * 0.125 > REAL_EPSILON) {
++        nbPoolPartition(st, buckets, &used);
++        nbPoolInsert(st, buckets, used);
++    } else {
++        {
++            for (p = st->bodytab; p < st->bodytab + st->nbody; ++p)
++                if (Mass(p) != 0.0) nbLoadBodyFrom(st, t, p, t->root, t->rsize, 0);
++        };
++        if (parallel) nbCollectFrontier(t->root, t->rsize, 0, buckets, &used);
++    }
++    if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
++    nbMoments(ctx, t, buckets, used, parallel);
++    if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
++    threadTree((NBodyNode*) t->root, NULL);
++    if (ctx->useQuad) nbQuads(t, buckets, used, parallel);
++    return NBODY_SUCCESS;
++}
++
++
+ NBodyStatus nbMakeTree(const NBodyCtx* ctx, NBodyState* st)
+ {
+-    Body* p;
+-    const Body* endp = st->bodytab + st->nbody;
+-    NBodyTree* t = &st->tree;
+-
+-    nbNewTree(st, t);                                /* flush existing tree, etc */
+-
+-    expandBox(t, st->bodytab, st->nbody);            /* and expand cell to fit */
+-    for (p = st->bodytab; p < endp; p++)             /* loop over bodies... */
+-    {
+-        if (Mass(p) != 0.0)                  /* exclude test particles */
+-            nbLoadBody(st, t, p);              /* and insert into tree */
+-    }
+-
+-    /* Check if tree structure error occured */
+-    if (st->tree.structureError)
+-        return NBODY_TREE_STRUCTURE_ERROR;
+-
+-
+-    hackCofM(ctx, &st->tree, t->root, t->rsize);   /* find c-of-m coordinates */
+-
+-    /* Check if tree structure error occured */
+-    if (st->tree.structureError)
+-        return NBODY_TREE_STRUCTURE_ERROR;
+-
+-    threadTree((NBodyNode*) t->root, NULL);        /* add Next and More links */
+-    if (ctx->useQuad)                           /* including quad moments? */
+-        hackQuad(t->root);                      /* assign Quad moments */
+-
+-    return NBODY_SUCCESS;
++    return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE);
+ }
+ 
+ #if 0
+--- a/nbody/src/nbody_types.c
++++ b/nbody/src/nbody_types.c
+@@ -23,6 +23,7 @@
+ #include "milkyway_util.h"
+ #include "nbody_util.h"
+ #include "nbody_types.h"
++#include "nbody_tree.h"
+ #include "nbody_show.h"
+ #include "nbody_defaults.h"
+ 
+@@ -107,7 +108,8 @@
+     int i;
+     //mw_printf("After Initial\n");
+ 
+-    freeNBodyTree(&st->tree);
++    if (st->treePool) nbReleaseTreePool(st);
++    else freeNBodyTree(&st->tree);
+     //mw_printf("After Free Tree\n");
+     freeFreeCells(st->freeCell);
+     //mw_printf("After Free Cells\n");
+@@ -188,6 +190,7 @@
+ 
+     st->tree = emptyTree;
+     st->freeCell = NULL;
++    st->treePool = NULL; st->treePoolNext = st->treePoolEnd = 0;
+     st->usesQuad = ctx->useQuad;
+     st->usesExact = (ctx->criterion == Exact);
+ 
+@@ -527,6 +530,7 @@
+     st->tree.rsize = oldSt->tree.rsize;
+ 
+     st->freeCell = NULL;
++    st->treePool = NULL; st->treePoolNext = st->treePoolEnd = 0;
+ 
+     st->lastCheckpoint       = oldSt->lastCheckpoint;
+     st->step                 = oldSt->step;
+@@ -605,6 +609,7 @@
+     st->tree = emptyTree;
+     st->tree.rsize = oldSt->tree.rsize;
+     st->freeCell = NULL;
++    st->treePool = NULL; st->treePoolNext = st->treePoolEnd = 0;
+     st->lastCheckpoint       = oldSt->lastCheckpoint;
+     st->step                 = oldSt->step;
+     st->nbody                = oldSt->nbody;
+--- a/nbody/include/nbody_types.h
++++ b/nbody/include/nbody_types.h
+@@ -435,6 +435,8 @@
+     void* nbb;
+   #endif /* NBODY_OPENCL */
+     NBodyWorkSizes* workSizes;
++    void* treePool;          /* owned arena and persistent build scratch */
++    size_t treePoolNext, treePoolEnd; /* private slab indices */
+ } NBodyState;
+ 
+ #define NBODYSTATE_TYPE "NBodyState"
+--- a/nbody/include/nbody_tree.h
++++ b/nbody/include/nbody_tree.h
+@@ -27,6 +27,7 @@
+ extern "C" {
+ #endif
+ 
++void nbReleaseTreePool(NBodyState*);
+ NBodyStatus nbMakeTree(const NBodyCtx*, NBodyState*);    /* construct tree structure */
+ 
+ #if 0

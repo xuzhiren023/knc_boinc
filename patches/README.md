@@ -2,6 +2,37 @@
 
 `scripts/fetch.sh` applies these idempotently to nbody_1.96. Scalar science follows that tag.
 
+The GCC-KNC M5 baseline applies only **Correctness/portability** patches. It
+excludes both other classes. The ordinary app fetch applies all patches in
+filename order; performance and instrumentation options default off in source.
+S8-09's selected build options are explicit in `config/s8-09.env`.
+
+| Patch | Class | Selector/default or purpose |
+| --- | --- | --- |
+| `boinc/cygwin-win32.patch` | Correctness/portability | BOINC Cygwin/Win32 API compatibility |
+| `crlibm-config-path.patch` | Correctness/portability | Handwritten configuration include path |
+| `nbody-king-const.patch` | Correctness/portability | Compatible read-only callback types |
+| `nbody-result-contract.patch` | Correctness/portability | Stock result banner and wrapper contract |
+| `nbody-wrapper-files.patch` | Correctness/portability | Wrapper checkpoint/progress/graphics file protocol |
+| `popt-cygwin.patch` | Correctness/portability | Avoid duplicate Cygwin declaration |
+| `nbody-force-chunk.patch` | Performance | NBODY_FORCE_CHUNK unset preserves upstream scheduling; card build selects 4 |
+| `nbody-parallel-quad.patch` | Performance | NBODY_PARALLEL_QUAD=0 |
+| `nbody-static-integrate.patch` | Performance | NBODY_STATIC_INTEGRATE=0 |
+| `nbody-tree-variants.patch` | Performance | NBODY_TREE_VARIANT=0 (upstream); 1 CofM, 2 pool |
+| `nbody-vector-gravity.patch` | Performance | NBODY_VECTOR_GRAVITY=0 |
+| `zzz-nbody-walk-layout.patch` | Performance | NBODY_WALK_LAYOUT=0 |
+| `zz-nbody-phase-timers.patch` | Instrumentation | NBODY_PHASE_TIMERS=0 |
+| `zz-nbody-tree-instrumentation.patch` | Instrumentation | Tree subphase timers; NBODY_TREE_IDENTITY=0 |
+| `zzzz-nbody-walk-counters.patch` | Instrumentation | Host-only NBODY_WALK_COUNTERS=0 |
+
+Performance patches contain no numerical correctness fix. S8-09 separated the
+static integrator from phase timers, tree algorithms from tree timers/identity
+checks, and walk layout from debug counter hooks. Applying the complete new
+sequence reconstructs the already-tested source unchanged. Counter helpers in
+`src/nbody_walk_layout.h` are enabled only by the separate instrumentation
+hooks/option; they are compiled out of card timing binaries. The timer patch
+precedes tree instrumentation and layout; walk counters are applied last.
+
 - `popt-cygwin.patch`: do not redeclare Cygwin's existing `glob_pattern_p` (S1-01).
 - `crlibm-config-path.patch`: include `crlibm_config.h` through the include
   path rather than requiring a generated header inside the upstream tree.
@@ -51,8 +82,9 @@ with its context/line numbers. Fetch also verifies the fully patched state.
   whole-run wall times using OpenMP. Default off. PHASE records are emitted
   to stderr after results; steps is a count (seconds is zero). Setup includes
   the initial gravity evaluation and overlaps tree/force totals.
-  `NBODY_STATIC_INTEGRATE=1` selects static scheduling for the two independent
-  per-body integrator loops; default off. Build with make variables
+  `nbody-static-integrate.patch` separately selects static scheduling for the
+  two independent per-body integrator loops with `NBODY_STATIC_INTEGRATE=1`;
+  default off. Build with make variables
   `PHASE_TIMERS=1 STATIC_INTEGRATE=1`; `scripts/build-s8.sh` builds the
   requested three variants, `tests/phase_timers.py` checks large-case outputs.
 - `nbody-parallel-quad.patch` (S8-03): `NBODY_PARALLEL_QUAD=1` records the
@@ -64,3 +96,14 @@ with its context/line numbers. Fetch also verifies the fully patched state.
   `scripts/build-parallel-quad.sh` enables it for the scalar chunk-4 card
   binary; `scripts/test-parallel-quad.sh` checks the actual generator against
   pristine 1.96. Capture hooks live only in the test translation units.
+- `nbody-tree-variants.patch` (S8-07/S8-09): serial insertion with parallel
+  moments or a persistent contiguous arena, stable depth-three partition and
+  slab allocation. TREE_VARIANT=0 keeps the upstream algorithm. Pool ownership
+  is reset when states are initialized/cloned/restored and released on teardown.
+  Its separate instrumentation patch supplies subphase allocation accounting
+  and the every-build serial-tree comparison used by the acceptance proof.
+- `zzz-nbody-walk-layout.patch` (S8-08/S8-09): a transient walk-order cell/body
+  view, guarded successor prefetch, exact original-index force scatter and
+  original storage restoration. Allocation/packing/scatter stay inside the
+  existing force phase. `zzzz-nbody-walk-counters.patch` adds only debug hooks
+  for host traversal/force counters; no timing build enables those counters.

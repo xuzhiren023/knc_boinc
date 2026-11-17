@@ -1,0 +1,424 @@
+{
+  "engine": "0.4.0",
+  "capabilities": "build/s8/twin-capabilities/capabilities.json",
+  "profile": "card-7120-measured",
+  "external_reciprocal_table_supplied": false,
+  "timed_simulate_host_seconds": 134.8750000000582,
+  "engine_python_execution_seconds": 129.7706,
+  "results": [
+    {
+      "status": "unsupported",
+      "result_type": "timing_prediction",
+      "scale": "core",
+      "message": "streams[0]: instruction a4051a2 calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
+      "assumptions": [],
+      "unsupported": [
+        "streams[0]: instruction a4051a2 calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
+      ],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "prediction": null,
+      "python_execution_seconds": 0.1812,
+      "variant": "walk-reference",
+      "contexts": 4,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-core.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "core",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-core",
+        "--force"
+      ],
+      "host_seconds": 0.7029999999795109,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-reference-core\\result.json",
+      "result_sha256": "944db52fe910eb42292e775a361c980c98ae5788ab0bcb606e042aa426675b21"
+    },
+    {
+      "status": "unsupported",
+      "result_type": "timing_prediction",
+      "scale": "ring",
+      "message": "streams[0]: instruction a4051a2 calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
+      "assumptions": [],
+      "unsupported": [
+        "streams[0]: instruction a4051a2 calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
+      ],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "prediction": null,
+      "python_execution_seconds": 0.1982,
+      "variant": "walk-reference",
+      "contexts": 32,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-ring.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "ring",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-ring",
+        "--force"
+      ],
+      "host_seconds": 0.7810000000172295,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-reference-ring\\result.json",
+      "result_sha256": "29e66c8b85dbf4b6cdc196c28e13234fc49ba0fa36677048b544a1aafcc30264"
+    },
+    {
+      "status": "budget_exhausted",
+      "result_type": "timing_prediction",
+      "scale": "core",
+      "message": "python time budget exhausted during functional execution (context 0, step 166400)",
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "held_out_validation_cases": 160,
+        "not_validated_shapes": {
+          "x87_sparse_rows_l1": {
+            "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+            "median_abs_error_pct": 16.0,
+            "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+            "worst_abs_error_pct": 17.9
+          }
+        },
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "imported_microbenchmarks_with_compiled_heldout_check",
+        "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+        "synthetic": false,
+        "validated_shapes": {
+          "l1_l2_dependent_loads": {
+            "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+            "median_abs_error_pct": 2.0,
+            "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+            "worst_abs_error_pct": 14.0
+          },
+          "l1_resident_stores_prefetch_pairing": {
+            "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+            "median_abs_error_pct": 2.0,
+            "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+            "worst_abs_error_pct": 12.0
+          },
+          "register_vector_chain_l1": {
+            "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+            "median_abs_error_pct": 1.0,
+            "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+            "worst_abs_error_pct": 11.0
+          },
+          "scalar_mask_l1": {
+            "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+            "median_abs_error_pct": 1.0,
+            "note": "scalar integer and mask chains, pairing, address-generation interlock",
+            "worst_abs_error_pct": 5.0
+          },
+          "x87_register_chain": {
+            "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+            "median_abs_error_pct": 1.0,
+            "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+            "worst_abs_error_pct": 3.0
+          },
+          "x87_row_loop_l1": {
+            "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+            "median_abs_error_pct": 2.9,
+            "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+            "worst_abs_error_pct": 3.8
+          },
+          "x87_sparse_rows_l2": {
+            "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+            "median_abs_error_pct": 3.7,
+            "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+            "worst_abs_error_pct": 6.6
+          },
+          "x87_sparse_rows_memory_stream": {
+            "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+            "median_abs_error_pct": 3.7,
+            "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+            "worst_abs_error_pct": 4.1
+          }
+        }
+      },
+      "parameters_used": {},
+      "prediction": null,
+      "python_execution_seconds": 30.8278,
+      "variant": "walk-reference-vec",
+      "contexts": 4,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-vec-core.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "core",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-vec-core",
+        "--force"
+      ],
+      "host_seconds": 31.51600000000326,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-reference-vec-core\\result.json",
+      "result_sha256": "9b19423becbbd2f8a664399cefcf51118d744807fd8e1de3739382ab4adcd327"
+    },
+    {
+      "status": "budget_exhausted",
+      "result_type": "timing_prediction",
+      "scale": "ring",
+      "message": "python time budget exhausted during functional execution (context 0, step 173568)",
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {},
+      "prediction": null,
+      "python_execution_seconds": 33.3242,
+      "variant": "walk-reference-vec",
+      "contexts": 32,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-vec-ring.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "ring",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-reference-vec-ring",
+        "--force"
+      ],
+      "host_seconds": 34.07800000003772,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-reference-vec-ring\\result.json",
+      "result_sha256": "cef0b8b3818ad77b39ca7d554b049933509eba191a304e807a96088a9e23e314"
+    },
+    {
+      "status": "unsupported",
+      "result_type": "timing_prediction",
+      "scale": "core",
+      "message": "streams[0]: instruction a4051ff calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
+      "assumptions": [],
+      "unsupported": [
+        "streams[0]: instruction a4051ff calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
+      ],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "prediction": null,
+      "python_execution_seconds": 0.1772,
+      "variant": "walk-layout",
+      "contexts": 4,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-core.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "core",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-core",
+        "--force"
+      ],
+      "host_seconds": 0.6880000000237487,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-layout-core\\result.json",
+      "result_sha256": "3b6641ae430ea3636f165b834aef207b4e224c65b9a8bc3479853e477a68626f"
+    },
+    {
+      "status": "unsupported",
+      "result_type": "timing_prediction",
+      "scale": "ring",
+      "message": "streams[0]: instruction a4051ff calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})",
+      "assumptions": [],
+      "unsupported": [
+        "streams[0]: instruction a4051ff calls 'nbReportTreeIncest', which is not in the region and has no entry in the kernel's 'calls' (declare a costed stub: {\"cycles\": N, \"model\": ...})"
+      ],
+      "limiting_constraints": [],
+      "calibration_status": null,
+      "prediction": null,
+      "python_execution_seconds": 0.2239,
+      "variant": "walk-layout",
+      "contexts": 32,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-ring.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "ring",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-ring",
+        "--force"
+      ],
+      "host_seconds": 0.75,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-layout-ring\\result.json",
+      "result_sha256": "45514583288c798279116a253fe305667a9576825133354b47af2f45f5ce32b1"
+    },
+    {
+      "status": "budget_exhausted",
+      "result_type": "timing_prediction",
+      "scale": "core",
+      "message": "python time budget exhausted during functional execution (context 1, step 71424)",
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "held_out_validation_cases": 160,
+        "not_validated_shapes": {
+          "x87_sparse_rows_l1": {
+            "evidence": "S12-30 small cases, 16 held-out rows, one thread",
+            "median_abs_error_pct": 16.0,
+            "note": "random-column sparse products into a 32 KiB x: uniformly 12 to 18% slow (L1 conflict misses under true LRU, input instance), rankings right; the error exceeds the 10% bar, so results stay unvalidated_scenario_estimate",
+            "worst_abs_error_pct": 17.9
+          }
+        },
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "imported_microbenchmarks_with_compiled_heldout_check",
+        "statement": "Core timing is inherited from core-x100-measured (measured or derived on this card: S6-03, S8-01, S8-12, S12-31). Predictions were compared with 119 characterization rows (held-out median error 0.9/0.4/1.6% at 1/2/4 threads, ranking 0.989) and with 105 held-out compiled rows from the binaries that ran on the card (S12-31 row loops, HPCG kernels L2-resident and memory-bound, S12-30 sparse products): median error 3.1%, right winner 39 of 39 pairs more than 5% apart. The decision bar's error and ranking criteria are met; its breadth (loops from at least five M4 programs) is not: shapes outside validated_shapes are unvalidated_scenario_estimate. Recording run of the final engine (profile hash 2058f0ec...).",
+        "synthetic": false,
+        "validated_shapes": {
+          "l1_l2_dependent_loads": {
+            "evidence": "S6-03 l1.load_lat/rt, l2.load_lat/rt, memory.load_lat, masked/convert store-reload chains",
+            "median_abs_error_pct": 2.0,
+            "note": "pointer chases and independent loads with L1/L2-resident or cold footprints; independent store/reload pairs are over-charged (spill_reload.rt +78%)",
+            "worst_abs_error_pct": 14.0
+          },
+          "l1_resident_stores_prefetch_pairing": {
+            "evidence": "S6-03 l1.store_normal, masked_store rows, store_stream rows, C2 prefetch pairing",
+            "median_abs_error_pct": 2.0,
+            "note": "stores to resident lines, no-read stores, vprefetch0/1 pairing",
+            "worst_abs_error_pct": 12.0
+          },
+          "register_vector_chain_l1": {
+            "evidence": "S6-03 vector .lat/.rt rows, swizzles, conversions, C7, C9 register chains at 1/2/4 threads",
+            "median_abs_error_pct": 1.0,
+            "note": "L1-resident vector arithmetic with register dependencies, pairing and loop control; worst case vpaddd.rt at two threads (measured 2.32, a flagged row)",
+            "worst_abs_error_pct": 11.0
+          },
+          "scalar_mask_l1": {
+            "evidence": "S6-03 scalar_add/xor, kmov/kand/kxor rows, pair.* rows, agi.gap0-4",
+            "median_abs_error_pct": 1.0,
+            "note": "scalar integer and mask chains, pairing, address-generation interlock",
+            "worst_abs_error_pct": 5.0
+          },
+          "x87_register_chain": {
+            "evidence": "S6-03 x87_add/mul/div .lat/.rt rows",
+            "median_abs_error_pct": 1.0,
+            "note": "x87 register chains and the divider occupancy; memory-form x87 chains not separately measured",
+            "worst_abs_error_pct": 3.0
+          },
+          "x87_row_loop_l1": {
+            "evidence": "S12-31 microbench, 65 held-out variants (tests/heldout_native/s12-31-microbench), one thread",
+            "median_abs_error_pct": 2.9,
+            "note": "x87 sparse row products with data in L1, converted from the binary with code layout; padding, prefixes and loop-body order included",
+            "worst_abs_error_pct": 3.8
+          },
+          "x87_sparse_rows_l2": {
+            "evidence": "S12-31 HPCG toy, 16 held-out kernels (ComputeSPMV_ref, ComputeSYMGS_ref, eight builds), one thread",
+            "median_abs_error_pct": 3.7,
+            "note": "HPCG-shaped x87 sparse rows with the matrix resident in L2",
+            "worst_abs_error_pct": 6.6
+          },
+          "x87_sparse_rows_memory_stream": {
+            "evidence": "S12-31 HPCG 104-cubed SpMV, 8 held-out builds, one thread",
+            "median_abs_error_pct": 3.7,
+            "note": "the same shape streaming from memory on one thread (TLB, L2 prefetcher and memory service modeled); not validated at several threads",
+            "worst_abs_error_pct": 4.1
+          }
+        }
+      },
+      "parameters_used": {},
+      "prediction": null,
+      "python_execution_seconds": 30.8595,
+      "variant": "walk-layout-vec",
+      "contexts": 4,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-vec-core.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "core",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-vec-core",
+        "--force"
+      ],
+      "host_seconds": 31.5,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-layout-vec-core\\result.json",
+      "result_sha256": "9fc4128b50f29f5a509fa94b05a01ff13b8824bfb18e9b61cd021da391d8a728"
+    },
+    {
+      "status": "budget_exhausted",
+      "result_type": "timing_prediction",
+      "scale": "ring",
+      "message": "python time budget exhausted during functional execution (context 1, step 52480)",
+      "assumptions": [],
+      "unsupported": [],
+      "limiting_constraints": [],
+      "calibration_status": {
+        "note": "Simulated/analytical outputs are model results, never native measurements. ",
+        "state": "unvalidated",
+        "statement": "Low-core scaling and independent full-card validation pending.",
+        "synthetic": false
+      },
+      "parameters_used": {},
+      "prediction": null,
+      "python_execution_seconds": 33.9786,
+      "variant": "walk-layout-vec",
+      "contexts": 32,
+      "command": [
+        "C:\\Users\\xuzhi\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+        "C:\\Users\\xuzhi\\.claude\\skills\\knc-twin\\scripts\\knc_twin.py",
+        "simulate",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-vec-ring.json",
+        "--profile",
+        "card-7120-measured",
+        "--scale",
+        "ring",
+        "--max-seconds",
+        "30",
+        "--out",
+        "C:\\Users\\xuzhi\\Documents\\knc-boinc\\.work\\S8-08\\build\\s8\\walk-twin\\walk-layout-vec-ring",
+        "--force"
+      ],
+      "host_seconds": 34.85899999999674,
+      "result_class_field_present": false,
+      "result_file": "build\\s8\\walk-twin\\walk-layout-vec-ring\\result.json",
+      "result_sha256": "90ea29ce7d5b48b79ca22fe74ee70774b5c1e2b5c89fa1c71761534c2650c19d"
+    }
+  ]
+}

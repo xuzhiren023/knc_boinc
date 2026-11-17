@@ -5,7 +5,7 @@
  /*
   *  Copyright (c) 2010-2011 Rensselaer Polytechnic Institute
   *  Copyright (c) 2010-2011 Matthew Arsenault
-@@ -610,8 +611,39 @@
+@@ -610,8 +611,41 @@
      return (int) shift - 1;
  }
  
@@ -25,7 +25,9 @@
 +{
 +    static const char* names[NB_PHASE_COUNT] = {
 +        "nbMakeTree", "nbMapForceBody", "advancePosVel", "advanceVelocities",
-+        "get_likelihood", "final_histogram_likelihood", "setup", "steps", "whole_run"
++        "get_likelihood", "final_histogram_likelihood", "setup", "steps", "whole_run",
++        "tree_nbNewTree", "tree_expandBox", "tree_partition", "tree_insertion",
++        "tree_hackCofM", "tree_threadTree", "tree_hackQuad", "tree_malloc", "tree_malloc_bytes"
 +    };
 +    int i;
 +    nbPhaseSeconds[NB_WHOLE] = omp_get_wtime() - nbPhaseStart;
@@ -45,7 +47,7 @@
      NBodyFlags nbf;
      int rc = 0;
      const char** argvCopy = mwFixArgv(argc, argv);
-@@ -691,6 +723,9 @@
+@@ -691,6 +725,9 @@
      freeNBodyFlags(&nbf);
      free(argvCopy);
  
@@ -62,42 +64,7 @@
  /*
   * Copyright (c) 2010-2011 Matthew Arsenault
   * Copyright (c) 2010-2011 Rensselaer Polytechnic Institute
-@@ -28,6 +29,10 @@
- #include "nbody_mass.h"
- #include "nbody_grav.h"
- 
-+#ifndef NBODY_STATIC_INTEGRATE
-+#define NBODY_STATIC_INTEGRATE 0
-+#endif
-+
- /* Preserve upstream scheduling unless the build selects a force chunk. */
- #ifndef NBODY_FORCE_CHUNK
- #define NBODY_FORCE_CHUNK (4096 / sizeof(accs[0]))
-@@ -374,7 +379,11 @@
-     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
- 
-   #ifdef _OPENMP
-+    #if NBODY_STATIC_INTEGRATE
-+    #pragma omp parallel for private(i) shared(bodies, accs) schedule(static)
-+    #else
-     #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, NBODY_FORCE_CHUNK)
-+    #endif
-   #endif
-     for (i = 0; i < nbody; ++i)
-     {
-@@ -407,7 +416,11 @@
-     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
- 
-   #ifdef _OPENMP
-+    #if NBODY_STATIC_INTEGRATE
-+    #pragma omp parallel for private(i) schedule(static)
-+    #else
-     #pragma omp parallel for private(i) schedule(dynamic, NBODY_FORCE_CHUNK)
-+    #endif
-   #endif
-     for (i = 0; i < nbody; ++i)      /* loop over all bodies */
-     {
-@@ -436,7 +449,7 @@
+@@ -448,7 +449,7 @@
      
      real barTime = st->step * dt - st->previousForwardTime;
  
@@ -106,7 +73,7 @@
      if(ctx->LMC){
  	acc_LMC = mw_addv(nbExtAcceleration(&ctx->pot, st->LMCpos, barTime), dynamicalFriction_LMC(&ctx->pot, st->LMCpos, st->LMCvel, ctx->LMCmass, ctx->LMCDynaFric, barTime, ctx->coulomb_log));
          advancePosVel_LMC(st, dt, acc_LMC, acc_i);
-@@ -446,7 +459,7 @@
+@@ -458,7 +459,7 @@
      //mw_printf("LMC position: %f %f %f, LMC mass: %f, LMC scale: %f \n", X(st->LMCpos), Y(st->LMCpos), 
      //       Z(st->LMCpos), ctx->LMCmass, ctx->LMCscale);
      rc = nbGravMap(ctx, st);
@@ -115,7 +82,7 @@
      if(ctx->LMC){
  	acc_LMC = mw_addv(nbExtAcceleration(&ctx->pot, st->LMCpos, barTime), dynamicalFriction_LMC(&ctx->pot, st->LMCpos, st->LMCvel, ctx->LMCmass, ctx->LMCDynaFric, barTime, ctx->coulomb_log));
          advanceVelocities_LMC(st, dt, acc_LMC, acc_i1);
-@@ -456,6 +469,7 @@
+@@ -468,6 +469,7 @@
  //    mw_printf("LMC velocity: [%.15f,%.15f,%.15f]\n",X(st->LMCvel[0]),Y(st->LMCvel[0]),Z(st->LMCvel[0]));
  
      st->step++;
@@ -123,7 +90,7 @@
      #ifdef NBODY_BLENDER_OUTPUT
          blenderPrintBodies(st, ctx);
          printf("Frame: %d\n", (int)(st->step));
-@@ -513,6 +527,7 @@
+@@ -525,6 +527,7 @@
          st->bestLikelihood = DEFAULT_WORST_CASE; //initializing it.
      }
      #pragma GCC diagnostic pop
@@ -131,7 +98,7 @@
      while (st->step < ctx->nStep)
      {
          #ifdef NBODY_BLENDER_OUTPUT
-@@ -543,7 +558,7 @@
+@@ -555,7 +558,7 @@
          
          if(curStep / Nstep >= ctx->BestLikeStart && ctx->useBestLike)
          {
@@ -179,7 +146,7 @@
      destroyNBodyState(st);
 --- /dev/null
 +++ b/nbody/include/nbody_phase_timers.h
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,31 @@
 +/* Optional wall-clock accounting; all calls are on the controlling thread.
 + * Phase times overlap setup (initial gravity); do not sum them as a total. */
 +#ifndef NBODY_PHASE_TIMERS_H
@@ -188,7 +155,10 @@
 +#define NBODY_PHASE_TIMERS 0
 +#endif
 +enum NBPhase { NB_TREE, NB_FORCE, NB_POSVEL, NB_VEL, NB_LIKE, NB_FINAL,
-+               NB_SETUP, NB_STEPS, NB_WHOLE, NB_PHASE_COUNT };
++               NB_SETUP, NB_STEPS, NB_WHOLE,
++               NB_TREE_NEW, NB_TREE_EXPAND, NB_TREE_PARTITION, NB_TREE_INSERT,
++               NB_TREE_COFM, NB_TREE_THREAD, NB_TREE_QUAD, NB_TREE_MALLOC,
++               NB_TREE_BYTES, NB_PHASE_COUNT };
 +#if NBODY_PHASE_TIMERS
 +#include <omp.h>
 +extern double nbPhaseSeconds[NB_PHASE_COUNT];

@@ -1,0 +1,45 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -23,6 +23,7 @@
+ #include "nbody_priv.h"
+ #include "nbody_util.h"
+ #include "nbody_grav.h"
++#include "nbody_walk_layout.h"
+ 
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+@@ -56,6 +57,7 @@
+ 
+     while (q != NULL)               /* while not at end of scan */
+     {
++        nbWalkPrefetch(q);
+         mwvector dr = mw_subv(Pos(q), pos0);   /* Then compute distance */
+         real drSq = mw_sqrv(dr);               /* and distance squared */
+ 
+@@ -165,6 +167,7 @@
+         /* Pointer gathers are guarded: never read Rcrit2/Quad on a body. */
+         for (l = 0; l < 8; ++l)
+         {
++            if (q[l]) nbWalkPrefetch(q[l]);
+             active |= q[l] != NULL;
+             x[l] = q[l] ? Pos(q[l]).x : px[l];
+             y[l] = q[l] ? Pos(q[l]).y : py[l];
+@@ -517,7 +520,17 @@
+         if (nbStatusIsFatal(rc))
+             return rc;
+ 
+-        NB_PHASE(NB_FORCE, nbMapForceBody(ctx, st));
++        /* Copy only after threadTree and hackQuad have completed. Charge
++         * packing/scatter to the force phase so timing includes their cost. */
++        NB_PHASE(NB_FORCE, {
++#if NBODY_WALK_LAYOUT
++            NBWalkLayout walk = nbWalkBegin(st);
++#endif
++            nbMapForceBody(ctx, st);
++#if NBODY_WALK_LAYOUT
++            nbWalkEnd(st, &walk);
++#endif
++        });
+     }
+     else
+     {

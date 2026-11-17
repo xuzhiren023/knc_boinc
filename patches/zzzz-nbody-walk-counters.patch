@@ -1,0 +1,19 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -526,10 +526,16 @@
+ #if NBODY_WALK_LAYOUT
+             NBWalkLayout walk = nbWalkBegin(st);
+ #endif
++#if NBODY_WALK_COUNTERS
++            nbWalkCounts(ctx, st);
++#endif
+             nbMapForceBody(ctx, st);
+ #if NBODY_WALK_LAYOUT
+             nbWalkEnd(st, &walk);
+ #endif
++#if NBODY_WALK_COUNTERS
++            nbWalkForceHash(st);
++#endif
+         });
+     }
+     else
