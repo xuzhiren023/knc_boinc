@@ -58,7 +58,7 @@ def stage():
     prologue = '#!/usr/bin/env bash\nset -euo pipefail\ncd "$(dirname "$0")/../.."\nmkdir -p build/s9/card-results\n'
     def job(variant, case, label, reason, env, threads=240, training=False):
         prefix = 'build/s9/card-results/' + label
-        args = ['python', 'C:/Users/xuzhi/Documents/gcc_knc/tools/card_run',
+        args = ['python', 'tools/card_run',
                 '--benchmark', '--threads', '240', '--timeout', '900', '--receipt', prefix + '.json',
                 '--file', 'build/s9/' + variant + '/milkyway_nbody.mic',
                 '--file', 'workunits/' + case + '/params.lua', '--file', 'workunits/' + case + '/input.hist']

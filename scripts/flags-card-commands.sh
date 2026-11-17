@@ -7,7 +7,7 @@ mkdir -p runs/card/flags
 for variant in V0 "$top"; do
     for spec in small:1:64 small:240:64 medium:240:1024 large:60:20000 large:240:20000; do
         IFS=: read -r case_name threads bodies <<< "$spec"
-        command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run --benchmark
+        command=(python tools/card_run --benchmark
             --threads "$threads" --timeout 43200
             --receipt "runs/card/flags/$variant-$case_name-$threads.json"
             --file "build/flags/$variant/milkyway_nbody.mic"

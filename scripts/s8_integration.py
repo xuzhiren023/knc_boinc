@@ -281,7 +281,7 @@ def stage():
     # Script lives build/s8-09, so two levels gives the worktree root.
     for case in ('large', 'core-small'):
         label = 'batch-%d-%s-240' % (number, case)
-        cmd = ['python', 'C:/Users/xuzhi/Documents/gcc_knc/tools/card_run', '--benchmark',
+        cmd = ['python', 'tools/card_run', '--benchmark',
                '--threads', '240', '--timeout', '900', '--receipt', 'runs/card/s8-09/' + label + '.json',
                '--file', 'build/s8-09/batch-%d/milkyway_nbody.mic' % number,
                '--file', 'workunits/' + case + '/params.lua']

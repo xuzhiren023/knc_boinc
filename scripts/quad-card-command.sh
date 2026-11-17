@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p runs/card/s8-quad
-command=(python C:/Users/xuzhi/Documents/gcc_knc/tools/card_run
+command=(python tools/card_run
     --benchmark --threads 240 --timeout 43200
     --receipt runs/card/s8-quad/core-small-240.json
     --file build/s8/card-quad/milkyway_nbody.mic
