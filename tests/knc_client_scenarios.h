@@ -69,6 +69,53 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
         require(contents("nbody_stderr.txt").find("search_likelihood")!=std::string::npos,"real N-body likelihood missing");
         puts("PASS wrapper real 117676 completed; no declared output files"); return;
     }
+    if (mode=="graphics-launch") {
+        struct GraphicsProcesses {
+            PROCESS_INFORMATION views[2]={};
+            ~GraphicsProcesses(){for(auto& v:views)if(v.hProcess){
+                if(WaitForSingleObject(v.hProcess,0)==WAIT_TIMEOUT)TerminateProcess(v.hProcess,99);
+                WaitForSingleObject(v.hProcess,5000);CloseHandle(v.hThread);CloseHandle(v.hProcess);
+            }}
+        } children;
+        auto& views=children.views; HWND windows[2]={};
+        STARTUPINFOA si={};si.cb=sizeof(si);
+        for(int i=0;i<2;i++) {
+            // Same executable, arguments and slot cwd as BOINC; screenshot
+            // is the only extra argument, for framebuffer evidence.
+            std::string cmd=std::string("\"")+getenv("KNC_GRAPHICS_EXE")+"\""+
+                (i?" --fullscreen":"")+" --screenshot "+(i?"screensaver.bmp":"manager.bmp");
+            require(CreateProcessA(nullptr,cmd.data(),nullptr,nullptr,FALSE,0,nullptr,nullptr,&si,&views[i]),"BOINC-style graphics launch");
+            wait([&]{
+                struct Search {DWORD pid;HWND result;};
+                Search search={views[i].dwProcessId,nullptr};
+                EnumWindows([](HWND w,LPARAM p)->BOOL {
+                    auto* s=reinterpret_cast<Search*>(p);DWORD pid=0;GetWindowThreadProcessId(w,&pid);
+                    char cls[64]={};GetClassNameA(w,cls,sizeof(cls));
+                    if(pid==s->pid && !strcmp(cls,"BOINC_app"))s->result=w;
+                    return TRUE;
+                },reinterpret_cast<LPARAM>(&search));
+                windows[i]=search.result;return windows[i]!=nullptr;
+            },"BOINC screensaver window class missing",5);
+            LONG style=GetWindowLongA(windows[i],GWL_STYLE);
+            require(i?!(style&WS_CAPTION):bool(style&WS_CAPTION),"graphics window mode");
+            if(i) {
+                RECT rect;GetWindowRect(windows[i],&rect);
+                require(rect.left==0 && rect.top==0 && rect.right==GetSystemMetrics(SM_CXSCREEN) &&
+                    rect.bottom==GetSystemMetrics(SM_CYSCREEN),"fullscreen dimensions");
+            }
+            wait([&]{char title[256]={};GetWindowTextA(windows[i],title,sizeof(title));
+                return strstr(title,"running") && exists(i?"screensaver.bmp":"manager.bmp");
+            },"live graphics screenshot missing",20);
+        }
+        CloseWindow(windows[1]); // Windows screensaver shutdown request
+        require(WaitForSingleObject(views[1].hProcess,3000)==WAIT_OBJECT_0,"screensaver graceful shutdown");
+        require(!stopped(),"screensaver stop ended science");
+        completed();
+        require(WaitForSingleObject(views[0].hProcess,5000)==WAIT_OBJECT_0,"Manager graphics stayed open after task end");
+        for(auto& view:views){DWORD code=99;require(GetExitCodeProcess(view.hProcess,&code)&&code==0,"graphics exit status");CloseHandle(view.hThread);CloseHandle(view.hProcess);view={};}
+        puts("PASS graphics-launch: Manager window, screensaver fullscreen, live snapshots/captures, saver stop preserves science, task-end exit");
+        return;
+    }
     double fraction=0;
     wait([&] {
         char msg[MSG_CHANNEL_SIZE];
@@ -103,12 +150,12 @@ static void wrapper_scenario(const char* scenario, SHARED_MEM* shm, APP_CLIENT_S
             !memcmp(file.data(),&copy.snapshot,sizeof(knc_snapshot));},"snapshot differs from x86 file",10);
         // The real reader must show suspension and then live running state.
         HWND gw=nullptr;
-        for(int n=0;n<100 && !gw;n++){gw=FindWindowA("KNCNBodyGraphics","MilkyWay@home - suspended");Sleep(100);}
+        for(int n=0;n<100 && !gw;n++){gw=FindWindowA("BOINC_app","MilkyWay@home - suspended");Sleep(100);}
         require(gw,"live graphics suspended title");
         uint64_t step=copy.snapshot.step;
         require(shm->process_control_request.send_msg("<resume/>"),"send resume");
         wait([&]{return sample() && copy.status==KNC_RUNNING && copy.sequence!=first && copy.snapshot.step>step;},"snapshot did not resume",15);
-        wait([&]{return FindWindowA("KNCNBodyGraphics","MilkyWay@home - running")!=nullptr;},"live graphics running title",5);
+        wait([&]{return FindWindowA("BOINC_app","MilkyWay@home - running")!=nullptr;},"live graphics running title",5);
         completed();
         require(sample() && copy.status==KNC_FINISHED,"graphics did not finish");
         PostMessageA(gw,WM_CLOSE,0,0);require(WaitForSingleObject(gfx.hProcess,5000)==WAIT_OBJECT_0,"graphics exit");

@@ -373,22 +373,57 @@ wall-clock timer is not scientific progress.
 
 ## Graphics and screensaver
 
-In Manager select the running task and click **Show graphics**. Expect N-body
-particles, gold light matter and blue dark matter, with status and progress.
-Snapshots default to five seconds and are retrieved on polling; an idle scene
-before the first snapshot is normal. Suspended work keeps its last body frame;
-missing/stale data show an idle scene. Escape closes graphics without stopping science.
+After installing the reviewed anonymous-platform package above, resume one
+N-body task and wait until its status is **Running**. In Manager use **View →
+Advanced view**, open the **Tasks** tab, select that one task on this local
+computer, and click **Show graphics**. A separate window should show gold stars,
+blue dark matter, a Galactic-disc grid, progress and running status. The first
+snapshot can take the configured snapshot interval (five seconds by default)
+plus polling and transfer time; a waiting scene initially is normal. Resize the
+window to check it stays readable. Suspend the task to see its last frame and
+**suspended** status, then resume it. Escape closes graphics while science
+continues; the button also changes to **Stop graphics** while its window runs.
+Graphics closes shortly after the wrapper ends the task.
 
-In Windows **Settings → Personalization → Lock screen → Screen saver settings**,
-select **BOINC**, choose a wait time and open its **Settings**. Enable project
-application graphics (use a nonzero project-graphics duration if offered).
-Set any blank-screen timeout longer than the preview interval. Use **Preview**,
-then let the machine become idle with a running task. Labels vary by installed
-version. Review Manager's Activity menu and computing preferences if computation
-is allowed only while idle. A service/session mismatch or graphics policy can
+If **Show graphics** is greyed out, select only one resumed N-body task and
+check that its project is resumed, computation is permitted in **Activity**,
+and its status is Running rather than ready, suspended or waiting. Connect
+Manager to the local computer. The reviewed package's `app_info.xml` must
+reference `knc_nbody_graphics.exe` with `<open_name>graphics_app</open_name>`;
+the `<graphics_app/>` marker alone is insufficient on 8.2.8. Confirm that the
+file and its host DLLs are in the project directory and that Manager's task
+**Properties** shows the intended anonymous application version. If discovery
+is still missing, retain the Event Log and package inventory for the lead;
+do not edit a running client's state or slot. See the pinned source/line audit
+in [boinc-graphics-launch.md](boinc-graphics-launch.md).
+
+Open Windows **Settings → Personalization → Lock screen → Screen saver
+settings** (or search Start for **Change screen saver**). Select **BOINC** in
+the screen-saver list; if absent, the owner must install the BOINC screensaver
+component. Choose a wait time and open **Settings**. Enable project application
+graphics and set a nonzero project-graphics duration if offered; keep any
+blank-screen timeout longer than the test interval. Click **Preview**, then
+also let Windows reach the idle timeout with the task running. Settings labels
+vary with the installed version. BOINC may show its default logo/status view
+before switching to project graphics. Expect the same live particles and
+status, filling the primary screen without a window border. Move the mouse or
+press a key to leave fullscreen; science should continue. Screensaver rotation
+or stop also ends its graphics helper.
+
+Review Manager's Activity menu and computing preferences if computation is
+allowed only while idle. A service/session mismatch or graphics policy can
 prevent project graphics; test Show graphics in the interactive login first.
-Fullscreen exits on input after a short grace period. Graphics do not prove
-numerical correctness or server validation.
+If no snapshot arrives, inspect the task's `knc_wrapper.log` and connection
+status. A silent producer becomes stale after five seconds and an attached
+orphan window exits after thirty seconds without a relay heartbeat. Graphics
+do not prove numerical correctness or server validation.
+
+The laptop-only regression is `bash tests/wrapper.sh graphics graphics-launch`.
+Its [windowed capture](img/s11-manager-graphics.png) and
+[fullscreen capture](img/s11-screensaver-graphics.png) use live x86 fake-card
+snapshots. Installed Manager/screensaver behavior and a real-card live view
+remain owner checks; neither the owner's client nor its data directory was
+modified by that regression.
 
 ## Stop, clean up and roll back
 
