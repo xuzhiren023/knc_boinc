@@ -110,6 +110,14 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 window 14 (04:49-05:09Z), 16 jobs, all bit-identical. Large case card seconds (whole / tree / force):
+  reference 27.45/13.33/12.98; vector 27.05/13.13/12.79; S8-07 pool 23.72/9.91/12.69 (best); cofm 27.37 (no gain);
+  S8-08 walk layout+prefetch 34.62/12.96/20.51 (force +58%: copy/remap/scatter + prefetch, negative); S8-09
+  integrated (pool+layout) 30.61. Pool tree split: insertion 3.12 (serial 5.15), hackCofM 2.24 (2.37), threadTree
+  1.80, hackQuad 2.48 (2.69), nbNewTree 0.0002 (1.04): parallel CofM/Quad imbalanced (Plummer core in few depth-3
+  octants). Core-small 60.9-63.6 s for all builds (generation). Best card large 23.7 s vs best x86 18.0, stock 23.1.
+  Next: adaptive frontier (split by body count) for insertion/CofM/Quad, parallel threadTree, drop the walk layout,
+  in-place prefetch test; generator: derivative reuse (S8-10 item 1) and certified vector integrand.
 - 2026-11-17 ~03:05Z owner: stop loading the laptop. S8-10 stopped (killed; worktree .work/S8-10 kept, no work
   saved). No knc-boinc engineers running. Restart S8-10 only with the owner's OK, ideally capped (fewer threads).
 - knc-twin guidance (twin lead, 2026-11-17): regions with cold callees: give the hot-path block range
