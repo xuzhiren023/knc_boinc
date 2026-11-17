@@ -1,0 +1,18 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -28,6 +28,7 @@
+ #include "nbody_walk_profile.h"
+ #include "nbody_walk_snapshot.h"
+ #include "nbody_walk_order.h"
++#include "nbody_walk_memory_proof.h"
+ 
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+@@ -590,6 +591,7 @@
+             nbWalkCounts(ctx, st);
+ #endif
+             nbWalkSnapshot(ctx, st);
++            nbWalkMemoryProof(st);
+             nbMapForceBody(ctx, st);
+             nbWalkProof(st);
+ #if NBODY_WALK_LAYOUT

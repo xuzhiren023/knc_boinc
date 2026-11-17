@@ -1,0 +1,190 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -27,6 +27,7 @@
+ #include "nbody_walk_prefetch.h"
+ #include "nbody_walk_profile.h"
+ #include "nbody_walk_snapshot.h"
++#include "nbody_walk_order.h"
+ 
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+@@ -294,6 +295,9 @@
+ static inline void nbMapForceBody(const NBodyCtx* ctx, NBodyState* st)
+ {
+     int i;
++#if NBODY_WALK_ORDER
++    int* nb_order = nbWalkOrder(ctx, st);
++#endif
+ #if NBODY_VECTOR_GRAVITY
+     int base;
+ #endif
+@@ -352,7 +356,13 @@
+     nbWalkThread.team = omp_get_num_threads();
+ #endif
+   #ifdef _OPENMP
+-#if NBODY_WALK_SCHEDULE == 1
++#if NBODY_WALK_ORDER
++#if NBODY_WALK_PROFILE
++    #pragma omp for schedule(static, 4) nowait
++#else
++    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(static, 4)
++#endif
++#elif NBODY_WALK_SCHEDULE == 1
+ #if NBODY_WALK_PROFILE
+     #pragma omp for schedule(dynamic, 1) nowait
+ #else
+@@ -372,8 +382,14 @@
+ #endif
+ #endif
+   #endif
++#if NBODY_WALK_ORDER
++    for (int nb_walk = 0; nb_walk < nbody; ++nb_walk)
++    {
++        i = nb_order ? nb_order[nb_walk] : nb_walk;
++#else
+     for (i = 0; i < nbody; ++i)      /* get force on each body */
+     {
++#endif
+ #endif
+         /* Repeat the base hackGrav part in each case or else GCC's
+          * -funswitch-loops doesn't happen. Without that this constant
+@@ -440,6 +456,9 @@
+     nbWalkProfilePrint(st, nb_rows);
+     free(nb_rows);
+ #endif
++#if NBODY_WALK_ORDER
++    free(nb_order);
++#endif
+ }
+ 
+ static mwvector nbGravity_Exact(const NBodyCtx* ctx, NBodyState* st, const Body* p)
+--- a/nbody/src/nbody_tree.c
++++ b/nbody/src/nbody_tree.c
+@@ -21,6 +21,7 @@
+ 
+ #include "nbody_priv.h"
+ #include "nbody_tree.h"
++#include "nbody_walk_pages.h"
+ #include "nbody_phase_timers.h"
+ #ifdef _OPENMP
+ #include <omp.h>
+@@ -91,7 +92,7 @@
+ {
+     NBTreePool* pool = st->treePool;
+     if (!pool) return;
+-    mwFreeA(pool->cells); free(pool->keys); free(pool->bodies);
++    nbWalkPageFree(pool->cells); free(pool->keys); free(pool->bodies);
+     mwFreeA(pool->workers); free(pool->scratch);
+     free(pool->frontier); free(pool->top);
+ #if NBODY_TREE_VARIANT == 4
+@@ -117,8 +118,12 @@
+     capacity = 1 + (size_t) st->nbody * (levels + 1) +
+                (size_t) (threads + 1) * NB_SLAB;
+     if (capacity > p->capacity) {
+-        mwFreeA(p->cells);
++        nbWalkPageFree(p->cells);
++#if NBODY_WALK_HUGEPAGES
++        p->cells = nbWalkPageAlloc(capacity * sizeof(*p->cells));
++#else
+         p->cells = nbTreeAlloc(capacity * sizeof(*p->cells), 1);
++#endif
+         p->capacity = capacity;
+     }
+     if (p->nbody != st->nbody) {
+@@ -1278,7 +1283,7 @@
+     serial->nbody = st->nbody;
+     serial->tree.rsize = st->tree.rsize;
+     serial->tree.structureError = st->tree.structureError;
+-    serial->bodytab = mwMallocA(st->nbody * sizeof(Body));
++    serial->bodytab = nbWalkPageAlloc(st->nbody * sizeof(Body));
+     memcpy(serial->bodytab, st->bodytab, st->nbody * sizeof(Body));
+ #if NBODY_PHASE_TIMERS
+     double savedSeconds[NB_PHASE_COUNT];
+@@ -1311,7 +1316,7 @@
+             p = next;
+         }
+     }
+-    mwFreeA(serial->bodytab); free(serial);
++    nbWalkPageFree(serial->bodytab); free(serial);
+     return result;
+   #else
+     return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE, NULL);
+--- a/nbody/src/nbody_types.c
++++ b/nbody/src/nbody_types.c
+@@ -23,6 +23,7 @@
+ #include "milkyway_util.h"
+ #include "nbody_util.h"
+ #include "nbody_types.h"
++#include "nbody_walk_pages.h"
+ #include "nbody_tree.h"
+ #include "nbody_show.h"
+ #include "nbody_defaults.h"
+@@ -113,7 +114,7 @@
+     //mw_printf("After Free Tree\n");
+     freeFreeCells(st->freeCell);
+     //mw_printf("After Free Cells\n");
+-    mwFreeA(st->bodytab);
++    nbWalkPageFree(st->bodytab);
+     //mw_printf("After Free bodytab\n");
+     mwFreeA(st->bestLikelihoodBodyTab);
+     //mw_printf("After Free bestLikeTabl\n");
+@@ -197,7 +198,13 @@
+     st->tree.rsize = ctx->treeRSize;
+     st->step = 0;
+     st->nbody = nbody;
++#if NBODY_WALK_HUGEPAGES
++    st->bodytab = nbWalkPageAlloc(nbody * sizeof(Body));
++    memcpy(st->bodytab, bodies, nbody * sizeof(Body));
++    mwFreeA(bodies);
++#else
+     st->bodytab = bodies;
++#endif
+     st->bestLikelihoodBodyTab = (Body*) mwMallocA(nbody * sizeof(Body));
+     memcpy(st->bestLikelihoodBodyTab, st->bodytab, nbody * sizeof(Body));
+     st->bestLikelihood         = DEFAULT_WORST_CASE;
+@@ -552,7 +559,7 @@
+     assert(nbody > 0);
+     assert(st->bodytab == NULL && st->acctab == NULL);
+ 
+-    st->bodytab = (Body*) mwMallocA(nbody * sizeof(Body));
++    st->bodytab = (Body*) nbWalkPageAlloc(nbody * sizeof(Body));
+     memcpy(st->bodytab, oldSt->bodytab, nbody * sizeof(Body));
+     
+     st->bestLikelihoodBodyTab = (Body*) mwMallocA(nbody * sizeof(Body));
+--- a/nbody/src/nbody_checkpoint.c
++++ b/nbody/src/nbody_checkpoint.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "nbody_types.h"
++#include "nbody_walk_pages.h"
+ #include "nbody_checkpoint.h"
+ #include "milkyway_util.h"
+ #include "nbody_defaults.h"
+@@ -426,7 +427,7 @@
+     }
+     
+     /* Read the bodies */
+-    st->bodytab = (Body*) mwMallocA(bodySize);
++    st->bodytab = (Body*) nbWalkPageAlloc(bodySize);
+     memcpy(st->bodytab, p, bodySize);
+     p += bodySize;
+     
+@@ -483,7 +484,7 @@
+ 
+     if (strncmp(p, tail, sizeof(tail)))
+     {
+-        mwFreeA(st->bodytab);
++        nbWalkPageFree(st->bodytab);
+         st->bodytab = NULL;
+         
+         mwFreeA(st->bestLikelihoodBodyTab);
+@@ -552,7 +553,7 @@
+         return TRUE;
+     }
+ 
+-    st->bodytab = (Body*) mwMallocA(st->nbody * sizeof(Body));
++    st->bodytab = (Body*) nbWalkPageAlloc(st->nbody * sizeof(Body));
+     fread(st->bodytab, bodySize, 1, f);
+ 
+     st->bestLikelihoodBodyTab = (Body*) mwMallocA(st->nbody * sizeof(Body));
