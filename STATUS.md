@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- Card power (owner's panel readings, 2026-11-17): scalar N-body builds ~133-137 W; S10-10 batched vector build
+  ~145 W; best seen on this card is PhiWeather's WRF (GCC-KNC vectorized) at 178-181 W. Use it as a rough
+  vector-activity yardstick next to card time.
 - knc-twin gap to report when the twin session is back: S10-09/S10-10 vector node kernel cannot be simulated
   (0.4.0): absolute-rodata indirect jump table; unsupported vpaddsetcd, vpadcd, fild; crlibm SCS internals (do_add,
   pw_core_exp, scs_get_d, scs_set_d); one-operand imul (S10-07). Evidence .work/S10-10/twin/, .work/S10-09/build/s10/
