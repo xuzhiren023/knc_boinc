@@ -57,6 +57,56 @@ function Clear-Data {
 function Read-Json($Path) { return ([IO.File]::ReadAllText($Path) | ConvertFrom-Json) }
 function Save-Json($Path, $Value) { [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 8)) }
 function Hash($Path) { return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash }
+# Recognition is read-only. Persist adoption only after confirmation, shutdown and backup.
+function Recognize-ManualInstall {
+    $info = Join-Path $Project 'app_info.xml'
+    if ($Action -ne 'Install' -or -not (Test-Path -LiteralPath $info -PathType Leaf) -or
+        -not (Test-Path -LiteralPath (Join-Path $Project 'knc_wrapper.cfg') -PathType Leaf)) { return $null }
+    $packageFiles = @(Assert-Package $Package)
+    $installed = [IO.File]::ReadAllText($info).Replace("`r`n", "`n")
+    $current = [IO.File]::ReadAllText((Join-Path $Package 'app_info.xml')).Replace("`r`n", "`n")
+    $reason = 'package app_info (CRLF normalized)'
+    if ($installed -cne $current) {
+        # Earlier 196/mt packages may differ in formatting/copy/graphics metadata.
+        # Identity, the sole main program, and BOTH file inventories must still match.
+        try {
+            $doc = New-Object Xml.XmlDocument; $doc.XmlResolver = $null; $doc.LoadXml($installed)
+            $root = $doc.DocumentElement
+            if ($root.Name -cne 'app_info' -or @($root.SelectNodes('app')).Count -ne 1 -or
+                @($root.SelectNodes('app_version')).Count -ne 1) { return $null }
+            $appNames = @($root.SelectNodes('app/name'))
+            if ($appNames.Count -ne 1 -or $appNames[0].InnerText -cne 'milkyway_nbody') { return $null }
+            $version = $root.SelectSingleNode('app_version')
+            foreach ($entry in @(@('app_name','milkyway_nbody'), @('version_num','196'), @('plan_class','mt'), @('platform','windows_x86_64'))) {
+                $nodes = @($version.SelectNodes($entry[0]))
+                if ($nodes.Count -ne 1 -or $nodes[0].InnerText -cne $entry[1]) { return $null }
+            }
+            $mains = @($version.SelectNodes('file_ref[main_program]'))
+            if ($mains.Count -ne 1 -or @($mains[0].SelectNodes('main_program')).Count -ne 1 -or
+                $mains[0].SelectSingleNode('file_name').InnerText -cne 'knc_wrapper.exe') { return $null }
+            $expected = @($packageFiles | Where-Object { $_ -cne 'app_info.xml' })
+            foreach ($query in @('file_info/name','app_version/file_ref/file_name')) {
+                $names = @($root.SelectNodes($query) | ForEach-Object { $_.InnerText })
+                if ($names.Count -ne $expected.Count -or @(Compare-Object $expected $names -CaseSensitive).Count) { return $null }
+            }
+            if (@($root.SelectNodes('file_info')).Count -ne $expected.Count -or
+                @($version.SelectNodes('file_ref')).Count -ne $expected.Count) { return $null }
+        } catch { return $null }
+        $reason = 'earlier knc-boinc app_info (milkyway_nbody 196/mt, wrapper and file list)'
+    }
+    $hashes = @{'app_info.xml'=(Hash $info)}
+    $appConfig = Join-Path $Project 'app_config.xml'
+    if (Test-Path -LiteralPath $appConfig) {
+        # The manual install script wrote this same one-task config. Other configs stay foreign.
+        try {
+            $cfgDoc = New-Object Xml.XmlDocument; $cfgDoc.XmlResolver = $null; $cfgDoc.Load($appConfig)
+            if ($cfgDoc.OuterXml -cne '<app_config><project_max_concurrent>1</project_max_concurrent></app_config>') { return $null }
+        } catch { return $null }
+        $hashes['app_config.xml'] = Hash $appConfig
+    }
+    Write-Log "Recognized manual installation: $reason; keep existing knc_wrapper.cfg"
+    return [pscustomobject]@{Brand=$Brand;Files=@($packageFiles) + @('knc_wrapper.cfg','app_config.xml');Manifests=$hashes;Adopt=$true}
+}
 function Check-Ownership {
     $path = Join-Path $Project $Marker
     $owner = $null
@@ -66,6 +116,10 @@ function Check-Ownership {
         foreach ($n in $owner.Files) {
             if ($n -notmatch '^[A-Za-z0-9_][A-Za-z0-9_.+-]*$' -or $n -in @('.','..',$Marker)) { throw 'Unsafe installation inventory' }
         }
+    }
+    if (-not $owner) {
+        $adopt = Recognize-ManualInstall
+        if ($adopt) { return $adopt }
     }
     foreach ($n in @('app_info.xml','app_config.xml')) {
         $manifest = Join-Path $Project $n
@@ -297,6 +351,10 @@ checkpoint_timeout=60
         Clear-Data; Copy-Tree (Join-Path $BackupPath 'data') $Data
     } else {
         if ($owner) {
+            if ($owner.Adopt) {
+                Save-Json (Join-Path $Project $Marker) @{Brand=$owner.Brand;Files=$owner.Files;Manifests=$owner.Manifests}
+                Write-Log 'Adopted manual installation: ownership marker/inventory written; updating normally'
+            }
             foreach ($n in $owner.Files) {
                 if ($Action -eq 'Install' -and $n -eq 'knc_wrapper.cfg') { continue }
                 $target = Join-Path $Project $n

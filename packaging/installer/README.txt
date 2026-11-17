@@ -13,7 +13,9 @@ Restore KNC BOINC backup.cmd asks for a backup folder containing backup.json and
 Restore replaces ALL BOINC state; avoid replaying already reported tasks from old state.
 Every operation saves the current data first. Keep backups and logs for review.
 Foreign app_info.xml/app_config.xml cause refusal without changing BOINC data.
-Older manual installations have no ownership marker and need lead review first.
+Manual KNC installs with matching package app_info, or recognized 196/mt wrapper
+and file inventory, plus knc_wrapper.cfg are adopted on install/update. The config
+is preserved and adoption is logged. Other unmarked installs remain foreign.
 Shutdown waits 90 seconds and never kills a process. If it times out, close the
 BOINC client through Manager and retry. Backups/logs live next to these launchers.
 Client/Manager restart is requested through the interactive Windows desktop.
