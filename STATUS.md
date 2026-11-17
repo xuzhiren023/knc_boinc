@@ -110,6 +110,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- knc-twin guidance (twin lead, 2026-11-17): regions with cold callees: give the hot-path block range
+  (`schedule --block`, T1-04 merged) and treat call sites as boundaries. Indirect calls/jump tables (`fun`
+  dispatch) will not be simulated: cut the kernel at the dispatch and model each target as its own kernel (stub
+  rule under T1-07 later). Vector walk hit the 30 s budget: use --max-seconds. Gravity reproducer rerun on T1-06
+  still pending.
 - GCC-KNC S14-48 (dispatched): models the force walk's 4-5x gap, audits emitted walk code vs GCC 5.1.1, bounds a
   next-node prefetch pass; stages hand-prefetch on/off at 1/2/4 threads per core for a GCC-KNC window. Keep
   S8-08's guarded hand prefetch; send its card effect to the GCC-KNC lead when measured.
