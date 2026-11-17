@@ -185,5 +185,28 @@
   "sources": [
    "work/tickets/S9-06.md"
   ]
+ },
+ {
+  "id": "s10-gen-pipeline",
+  "tickets": [
+   "S10-03"
+  ],
+  "method": "model",
+  "predicted_text": "card core-small setup: baseline 46.9 s (node team 30.0, root/search 15.0); GEN_PIPELINE candidate ~39 s (35-50), recorded before the card run",
+  "predicted_range": [
+   35,
+   50
+  ],
+  "predicted_winner": "pipeline",
+  "measured_winner": null,
+  "measured": null,
+  "measured_text": "",
+  "baseline": 46.9,
+  "unit": "s",
+  "notes": "Host-informed manual prediction; on the laptop the candidate was slower (41.3 vs 33.5 s).",
+  "sources": [
+   "work/tickets/S10-03.md",
+   "docs/research/s10-gen.md"
+  ]
  }
 ]
