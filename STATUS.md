@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 knc-boinc window 3 (13:40-13:42Z, closed, card clean): S9-05 DF_REUSE core-small 47.61 s (was 62.45;
+  setup 46.89 vs 61.72), bit-identical; stock 1.96 149.3 s (3.1x). x86 generation 30.2 -> 18.2 s with the same patch,
+  so the card gains less (serial generation parts outside `fun`). Full 117676 generation x86 493 s, bytes identical.
+  Certified vector integrand rejected (81% exact replays, slower).
 - 2026-11-17 knc-boinc window 2 (13:32-13:35Z, closed, card clean): S9-04 TREE_VARIANT=3 large whole 20.95 s (was
   23.99), nbMakeTree 7.08 s: partition 5.93 (serial, dominant), insertion 0.10, CofM 0.15, Quad 0.21, threadTree
   0.55; core-small 62.45 s (generation). Bit-identical. Prediction 2.13 s missed on the serial partition (1.53).
