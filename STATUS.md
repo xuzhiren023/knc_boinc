@@ -110,6 +110,13 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 FIRST REAL MILKYWAY RESULT FROM THE CARD: task de_nbody_v196_OCS_north_core_fitting_110k_bodies__data__1_
+  1794499202_117676_0 ran on the card through BOINC Manager and our wrapper (release = S10-10 batched vector build),
+  computation 22:11-22:33Z (~22 min), result fetched after the wrapper scp -T fix, "Computation finished" and
+  "Reporting 1 completed tasks" at 17:58:21 EST, exit status 0. Server validation pending (wingman). BOINC's job log
+  shows et 34.8 s (only the last wrapper session after restarts). Card booking closed, card task dir cleaned.
+  Bugs found: wrapper scp legacy download needs -T (fixed 5562e24); manual install not adopted by the installer
+  (S11-04); 0% during star setup (S11-03).
 - 2026-11-17 21:00-21:22Z FULL 117676 with the S10-10 batched vector build: 1,294 s card (21.6 min, incl. staging)
   vs 1,678 s release (27.97 min): -23%. All 8 likelihood tags identical to the stock 1.96 app (-92.418153851030638).
   Owner's panel: ~163 W during the run (scalar builds ~137 W, WRF 178-181 W). Receipts runs/card/real-117676/.
