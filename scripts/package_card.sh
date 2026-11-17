@@ -6,7 +6,7 @@ shared=/cygdrive/c/Users/xuzhi/Documents/gcc_knc/.work/_shared
 readelf="$shared/toolchain/cross/bin/k1om-mpss-linux-readelf"
 runtime="$shared/gcc-knc-16.2.0/k1om-mpss-linux/lib64"
 mkdir -p dist/card
-cp build/card/milkyway_nbody.mic dist/card/
+cp "${1:-build/card/milkyway_nbody.mic}" dist/card/milkyway_nbody.mic
 pending=(dist/card/milkyway_nbody.mic)
 declare -A seen=()
 : > dist/card/runtime-manifest.txt

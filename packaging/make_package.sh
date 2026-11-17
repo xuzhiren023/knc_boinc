@@ -6,7 +6,10 @@ export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin
 mkdir -p build/tmp
 export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
 # Sources must already have been fetched/patched with scripts/fetch.sh.
-make -C mk -j6 knc-wrapper card graphics
+bash scripts/build-release.sh
+make -C mk -j2 knc-wrapper graphics
+# Package the timers-off release; never rebuild the default card configuration.
+bash scripts/package_card.sh build/s10/card-release/milkyway_nbody.mic
 package=dist/milkyway_package
 # A fresh inventory prevents stale app versions or DLLs surviving a rebuild.
 # Fixed, repository-relative generated directory only.

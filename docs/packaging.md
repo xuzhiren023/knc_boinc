@@ -1,8 +1,8 @@
 # MilkyWay project-directory package
 
 `bash packaging/make_package.sh` builds `dist/milkyway_package/` from the
-repository's wrapper, card and graphics targets. It does not install files, request work,
-connect to a card, or modify a BOINC installation. This is an experimental
+repository's wrapper, combined release card binary and graphics targets.
+It does not install files, request work, connect to a card, or modify a BOINC installation. This is an experimental
 anonymous-platform package, not a demonstrated production MilkyWay client.
 
 ## Public application survey (checked 2026-11-16)
@@ -62,6 +62,17 @@ The builder sets the same scratch variables before compilation and prepends
 the supplied Cygwin bin directory. It performs no fetch itself. `scripts/fetch.sh`
 verifies the pinned revisions and applies the repository patches; it is the
 only source-fetch entry point. No CMake, MinGW, MSVC, or installations are used.
+
+S10 release options live in `config/release.env`: O2, tree variant 4,
+derivative reuse, parallel quadrature, static integration, chunk 4, scalar
+gravity and the default walk layout. Source performance options remain off
+by default. The builder uses `make -j2`, builds `build/s10/card-release/`
+with timers off and `build/s10/card-release-timers/` with timers on, and
+packages the timers-off binary. `bash scripts/test-release.sh` retains the
+12-thread exact-reference proofs in `build/s10/proof.txt` and stages
+`build/s10/release-window.sh` (large and core-small, timers on, lead only).
+Run packaging before that proof script so the package and runtime closure
+are available for acceptance checks.
 
 The flat package contains `knc_wrapper.exe`, `knc_nbody_graphics.exe`, the transitive Cygwin DLL imports
 resolved from both executables (currently five), `knc_wrapper.cfg.example`,
