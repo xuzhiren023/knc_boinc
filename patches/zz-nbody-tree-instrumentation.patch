@@ -1,0 +1,236 @@
+--- a/nbody/src/nbody_tree.c
++++ b/nbody/src/nbody_tree.c
+@@ -21,6 +21,7 @@
+ 
+ #include "nbody_priv.h"
+ #include "nbody_tree.h"
++#include "nbody_phase_timers.h"
+ #ifdef _OPENMP
+ #include <omp.h>
+ #endif
+@@ -42,10 +43,15 @@
+     NBodyState* workers;
+ } NBTreePool;
+ 
+-/* Allocation routing for the arena and stable scratch. */
++/* Allocation counters cover tree construction, excluding debug identity. */
+ static void* nbTreeAlloc(size_t bytes, int aligned)
+ {
+-    return aligned ? mwMallocA(bytes) : mwMalloc(bytes);
++    void* p;
++    NB_PHASE(NB_TREE_MALLOC, p = aligned ? mwMallocA(bytes) : mwMalloc(bytes));
++#if NBODY_PHASE_TIMERS
++    nbPhaseCalls[NB_TREE_BYTES] += bytes;
++#endif
++    return p;
+ }
+ 
+ void nbReleaseTreePool(NBodyState* st)
+@@ -96,6 +102,9 @@
+     st->treePoolNext = st->treePoolEnd = 0;
+ }
+ 
++#ifndef NBODY_TREE_IDENTITY
++#define NBODY_TREE_IDENTITY 0
++#endif
+ 
+ #include <lua.h>
+ #include <lauxlib.h>
+@@ -551,6 +560,24 @@
+     real size;
+ } NBTreeBucket;
+ 
++#if NBODY_TREE_IDENTITY
++static void nbShapeWalk(NBodyCell* p, unsigned char** out)
++{
++    int i;
++    unsigned char mask = 0;
++    for (i = 0; i < NSUB; ++i) if (Subp(p)[i]) mask |= 1u << i;
++    *(*out)++ = mask;
++    for (i = 0; i < NSUB; ++i)
++        if (Subp(p)[i] && isCell(Subp(p)[i])) nbShapeWalk((NBodyCell*) Subp(p)[i], out);
++}
++static void nbRecordShape(NBodyTree* t, unsigned char** shape)
++{
++    unsigned char* cursor;
++    if (!shape) return;
++    *shape = cursor = mwMalloc(t->cellUsed);
++    nbShapeWalk(t->root, &cursor);
++}
++#endif
+ 
+ /* The top levels are constructed from contiguous ranges of one stable
+  * counting sort. Keys use the same repeated midpoint arithmetic as insertion. */
+@@ -692,7 +719,7 @@
+     hackQuadTo(t->root, NB_TREE_DEPTH - 1);
+ }
+ 
+-static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel)
++static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel, unsigned char** shape)
+ {
+     Body* p;
+     NBodyTree* t = &st->tree;
+@@ -702,31 +729,151 @@
+         st->treePool = nbTreeAlloc(sizeof(NBTreePool), 1);
+         memset(st->treePool, 0, sizeof(NBTreePool));
+     }
+-    nbNewTree(st, t);
+-    expandBox(t, st->bodytab, st->nbody, pool);
+-    if (pool) nbPoolPrepare(st);
++    NB_PHASE(NB_TREE_NEW, nbNewTree(st, t));
++    NB_PHASE(NB_TREE_EXPAND, expandBox(t, st->bodytab, st->nbody, pool));
++    if (pool) NB_PHASE(NB_TREE_PARTITION, nbPoolPrepare(st));
+     if (pool && t->rsize * 0.125 > REAL_EPSILON) {
+-        nbPoolPartition(st, buckets, &used);
+-        nbPoolInsert(st, buckets, used);
++        NB_PHASE(NB_TREE_PARTITION, nbPoolPartition(st, buckets, &used));
++        NB_PHASE(NB_TREE_INSERT, nbPoolInsert(st, buckets, used));
+     } else {
+-        {
++        NB_PHASE(NB_TREE_INSERT, {
+             for (p = st->bodytab; p < st->bodytab + st->nbody; ++p)
+                 if (Mass(p) != 0.0) nbLoadBodyFrom(st, t, p, t->root, t->rsize, 0);
+-        };
+-        if (parallel) nbCollectFrontier(t->root, t->rsize, 0, buckets, &used);
++        });
++        if (parallel) NB_PHASE(NB_TREE_PARTITION,
++            nbCollectFrontier(t->root, t->rsize, 0, buckets, &used));
+     }
+     if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
+-    nbMoments(ctx, t, buckets, used, parallel);
++    NB_PHASE(NB_TREE_COFM, nbMoments(ctx, t, buckets, used, parallel));
+     if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
+-    threadTree((NBodyNode*) t->root, NULL);
+-    if (ctx->useQuad) nbQuads(t, buckets, used, parallel);
++#if NBODY_TREE_IDENTITY
++    nbRecordShape(t, shape);
++#endif
++    NB_PHASE(NB_TREE_THREAD, threadTree((NBodyNode*) t->root, NULL));
++    if (ctx->useQuad) NB_PHASE(NB_TREE_QUAD, nbQuads(t, buckets, used, parallel));
+     return NBODY_SUCCESS;
+ }
+ 
++#if NBODY_TREE_IDENTITY
++static void nbIdentityFail(unsigned step, const char* field)
++{
++    mw_fail("TREE_IDENTITY step=%u mismatch: %s\n", step, field);
++}
++
++/* Address-independent preorder IDs compare topology after Quad has
++ * overwritten Subp. Next encodes subtree boundaries; More the first child. */
++static void nbCompareTrees(const NBodyCtx* ctx, NBodyState* st, NBodyState* serial)
++{
++    size_t count = st->tree.cellUsed + st->nbody, n = 0, i;
++    NBodyNode** a = mwMalloc(count * sizeof(*a));
++    NBodyNode** b = mwMalloc(count * sizeof(*b));
++    NBodyNode* p = (NBodyNode*) st->tree.root;
++    NBodyNode* q = (NBodyNode*) serial->tree.root;
++    if (st->tree.cellUsed != serial->tree.cellUsed || st->tree.maxDepth != serial->tree.maxDepth ||
++        st->tree.structureError != serial->tree.structureError ||
++        memcmp(&st->tree.rsize, &serial->tree.rsize, sizeof(real)))
++        nbIdentityFail(st->step, "tree metadata");
++    while (p && q && n < count)
++    {
++        a[n] = p; b[n++] = q;
++        if (Type(p) != Type(q)) nbIdentityFail(st->step, "shape/type");
++        if (isCell(p))
++        {
++            if (memcmp(&X(Pos(p)), &X(Pos(q)), sizeof(real)) ||
++                memcmp(&Y(Pos(p)), &Y(Pos(q)), sizeof(real)) ||
++                memcmp(&Z(Pos(p)), &Z(Pos(q)), sizeof(real)) ||
++                memcmp(&Mass(p), &Mass(q), sizeof(real)) ||
++                memcmp(&Rcrit2(p), &Rcrit2(q), sizeof(real)) ||
++                (ctx->useQuad && memcmp(&Quad(p), &Quad(q), sizeof(NBodyQuadMatrix))))
++                nbIdentityFail(st->step, "cell Pos/Mass/Rcrit2/Quad bits");
++        }
++        else if ((Body*) p - st->bodytab != (Body*) q - serial->bodytab)
++            nbIdentityFail(st->step, "body walk order");
++        p = isCell(p) ? More(p) : Next(p);
++        q = isCell(q) ? More(q) : Next(q);
++    }
++    if (p || q) nbIdentityFail(st->step, "walk length");
++    {
++        size_t* stack = mwMalloc(n * sizeof(*stack));
++        size_t depth = 0;
++        for (i = 0; i < n; ++i)
++        {
++            while (depth && Next(a[stack[depth-1]]) == a[i])
++            {
++                if (Next(b[stack[depth-1]]) != b[i]) nbIdentityFail(st->step, "Next boundary");
++                --depth;
++            }
++            if (depth && Next(b[stack[depth-1]]) == b[i]) nbIdentityFail(st->step, "Next boundary");
++            if (isCell(a[i]))
++            {
++                if (i + 1 == n || More(a[i]) != a[i+1] || More(b[i]) != b[i+1])
++                    nbIdentityFail(st->step, "More");
++                stack[depth++] = i;
++            }
++            else if ((Next(a[i]) != (i+1 < n ? a[i+1] : NULL)) ||
++                     (Next(b[i]) != (i+1 < n ? b[i+1] : NULL)))
++                nbIdentityFail(st->step, "body Next");
++        }
++        while (depth)
++        {
++            i = stack[--depth];
++            if (Next(a[i]) || Next(b[i])) nbIdentityFail(st->step, "terminal Next");
++        }
++        free(stack);
++    }
++    fprintf(stderr, "TREE_IDENTITY step=%u cells=%u nodes=%lu PASS\n",
++            st->step, st->tree.cellUsed, (unsigned long) n);
++    free(a); free(b);
++}
++#endif
+ 
+ NBodyStatus nbMakeTree(const NBodyCtx* ctx, NBodyState* st)
+ {
+-    return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE);
++  #if NBODY_TREE_IDENTITY
++    NBodyState* serial = mwCalloc(1, sizeof(*serial));
++    NBodyStatus reference, result;
++    unsigned char *serialShape = NULL, *parallelShape = NULL;
++    serial->nbody = st->nbody;
++    serial->tree.rsize = st->tree.rsize;
++    serial->tree.structureError = st->tree.structureError;
++    serial->bodytab = mwMallocA(st->nbody * sizeof(Body));
++    memcpy(serial->bodytab, st->bodytab, st->nbody * sizeof(Body));
++#if NBODY_PHASE_TIMERS
++    double savedSeconds[NB_PHASE_COUNT];
++    unsigned long savedCalls[NB_PHASE_COUNT];
++    memcpy(savedSeconds, nbPhaseSeconds, sizeof(savedSeconds));
++    memcpy(savedCalls, nbPhaseCalls, sizeof(savedCalls));
++#endif
++    reference = nbBuildTree(ctx, serial, 0, &serialShape);
++#if NBODY_PHASE_TIMERS
++    memcpy(nbPhaseSeconds, savedSeconds, sizeof(savedSeconds));
++    memcpy(nbPhaseCalls, savedCalls, sizeof(savedCalls));
++#endif
++    result = nbBuildTree(ctx, st, NBODY_PARALLEL_TREE, &parallelShape);
++    if (reference != result) nbIdentityFail(st->step, "status");
++    if (result == NBODY_SUCCESS)
++    {
++        if (st->tree.cellUsed != serial->tree.cellUsed ||
++            memcmp(serialShape, parallelShape, st->tree.cellUsed))
++            nbIdentityFail(st->step, "octant occupancy/shape");
++        nbCompareTrees(ctx, st, serial);
++    }
++    free(serialShape); free(parallelShape);
++    if (reference == NBODY_SUCCESS)
++    {
++        NBodyNode* p = (NBodyNode*) serial->tree.root;
++        while (p)
++        {
++            NBodyNode* next = isCell(p) ? More(p) : Next(p);
++            if (isCell(p)) mwFreeA(p);
++            p = next;
++        }
++    }
++    mwFreeA(serial->bodytab); free(serial);
++    return result;
++  #else
++    return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE, NULL);
++  #endif
+ }
+ 
+ #if 0

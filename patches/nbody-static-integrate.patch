@@ -1,0 +1,37 @@
+--- a/nbody/src/nbody_plain.c
++++ b/nbody/src/nbody_plain.c
+@@ -28,6 +28,10 @@
+ #include "nbody_mass.h"
+ #include "nbody_grav.h"
+ 
++#ifndef NBODY_STATIC_INTEGRATE
++#define NBODY_STATIC_INTEGRATE 0
++#endif
++
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+ #define NBODY_FORCE_CHUNK (4096 / sizeof(accs[0]))
+@@ -374,7 +378,11 @@
+     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
+ 
+   #ifdef _OPENMP
++    #if NBODY_STATIC_INTEGRATE
++    #pragma omp parallel for private(i) shared(bodies, accs) schedule(static)
++    #else
+     #pragma omp parallel for private(i) shared(bodies, accs) schedule(dynamic, NBODY_FORCE_CHUNK)
++    #endif
+   #endif
+     for (i = 0; i < nbody; ++i)
+     {
+@@ -407,7 +415,11 @@
+     const mwvector* accs = mw_assume_aligned(st->acctab, 16);
+ 
+   #ifdef _OPENMP
++    #if NBODY_STATIC_INTEGRATE
++    #pragma omp parallel for private(i) schedule(static)
++    #else
+     #pragma omp parallel for private(i) schedule(dynamic, NBODY_FORCE_CHUNK)
++    #endif
+   #endif
+     for (i = 0; i < nbody; ++i)      /* loop over all bodies */
+     {

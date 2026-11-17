@@ -38,4 +38,5 @@ static void s8_capture_end(double start, unsigned int count,
     }
     if (fclose(out)) abort();
     fprintf(stderr, "S8_GENERATION_SECONDS=%.9f\n", seconds);
+    if (getenv("S8_GENERATION_ONLY")) exit(0);
 }
