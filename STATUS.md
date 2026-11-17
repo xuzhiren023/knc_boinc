@@ -113,6 +113,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
 - GCC-KNC S14-44: no-go on lane-0 scalar double (tree-octant model 1.20x < 1.5x bar; exponent range/exceptions
   differ from x87); no existing flag beats -O2 -march=knc -ffp-contract=off by more than 0.7%. Asked whether the model
   changes for today's hot x87 regions (`fun` 34.3 s, force walk 12.7 s). Remaining x87 cost treated as algorithmic.
+  Follow-up (lead lead confirmed): no change for `fun`/walk (no IMCI double div/sqrt; crlibm add/mul 4 vs 3 cycles).
+  Asked GCC-KNC for correctly rounded 8-lane log/atan in libknc_vmath: bit-identical node values would let the
+  integrand run 8 nodes per vector with no fallback (the S9-05 vector path failed at 81% replays on 1-ULP vmath).
 - 2026-11-17 knc-boinc window 6 (15:21-15:27Z, ssh transfers, card clean): S10-01 release large 15.89 s, core-small
   47.95 s, bit-identical. S10-03 card generator split (core-small): parallel nodes 34.3 s, root/search serial 10.9 s,
   quad serial 2.3 s; GEN_PIPELINE setup 47.99 -> 43.71 s (-9%, root/search 2.6 s, nodes 38.9 s), exact. Node phase
