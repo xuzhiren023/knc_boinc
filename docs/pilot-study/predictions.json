@@ -198,12 +198,12 @@
    50
   ],
   "predicted_winner": "pipeline",
-  "measured_winner": null,
-  "measured": null,
-  "measured_text": "",
+  "measured_winner": "pipeline",
+  "measured": 43.71,
+  "measured_text": "card setup 47.99 -> 43.71 s; split baseline nodes 34.3 / root-search 10.9 / quad serial 2.3 s; pipeline root-search 2.6 s but nodes 38.9 s",
   "baseline": 46.9,
   "unit": "s",
-  "notes": "Host-informed manual prediction; on the laptop the candidate was slower (41.3 vs 33.5 s).",
+  "notes": "Host-informed manual prediction; on the laptop the candidate was slower (41.3 vs 33.5 s). Direction right, value inside range (pred 39, 35-50); split predicted 30.0/15.0 vs measured 34.3/10.9.",
   "sources": [
    "work/tickets/S10-03.md",
    "docs/research/s10-gen.md"

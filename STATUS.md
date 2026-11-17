@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 knc-boinc window 6 (15:21-15:27Z, ssh transfers, card clean): S10-01 release large 15.89 s, core-small
+  47.95 s, bit-identical. S10-03 card generator split (core-small): parallel nodes 34.3 s, root/search serial 10.9 s,
+  quad serial 2.3 s; GEN_PIPELINE setup 47.99 -> 43.71 s (-9%, root/search 2.6 s, nodes 38.9 s), exact. Node phase
+  ~580 us per integral (330 nodes over 240 threads, two waves) is the next term.
 - 2026-11-17 14:53Z knc-boinc window 5 FAILED (infrastructure): first S10-01 release job, card_run exit 126, DMA
   helper deadline / SCIF endpoint cleanup unresolved during claude-pin upload; leftover /tmp/claude/claude-b03d34bf...
   (claude-dma-active marker, part file); no card processes; turn closed. Holding card jobs until the GCC-KNC lead
