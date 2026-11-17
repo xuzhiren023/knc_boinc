@@ -116,6 +116,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   Follow-up (lead lead confirmed): no change for `fun`/walk (no IMCI double div/sqrt; crlibm add/mul 4 vs 3 cycles).
   Asked GCC-KNC for correctly rounded 8-lane log/atan in libknc_vmath: bit-identical node values would let the
   integrand run 8 nodes per vector with no fallback (the S9-05 vector path failed at 81% replays on 1-ULP vmath).
+  GCC-KNC answer: feasible and bit-identical by definition (quick double-double phase over 8 lanes + per-lane
+  rounding test + rare accurate fallback; ~2-4x today's vmath per lane, several times faster than scalar crlibm);
+  exp easy, log/atan medium, pow hard; multi-week clean-room library work (crlibm is LGPL); proposed to the owner
+  as a GCC-KNC M6 candidate (deferred vmath contract S12-20). Owner's call.
 - 2026-11-17 knc-boinc window 6 (15:21-15:27Z, ssh transfers, card clean): S10-01 release large 15.89 s, core-small
   47.95 s, bit-identical. S10-03 card generator split (core-small): parallel nodes 34.3 s, root/search serial 10.9 s,
   quad serial 2.3 s; GEN_PIPELINE setup 47.99 -> 43.71 s (-9%, root/search 2.6 s, nodes 38.9 s), exact. Node phase
