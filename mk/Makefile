@@ -35,6 +35,16 @@ CPPFLAGS += -DNBODY_PHASE_TIMERS=$(PHASE_TIMERS) -DNBODY_STATIC_INTEGRATE=$(STAT
 # Independent mixed-dwarf quadrature nodes; explicitly enabled for S8 card.
 PARALLEL_QUAD ?= 0
 CPPFLAGS += -DNBODY_PARALLEL_QUAD=$(PARALLEL_QUAD)
+DF_REUSE ?= 0
+DF_VECTOR ?= 0
+DF_STATS ?= 0
+DF_SOURCE ?=
+ifeq ($(DF_VECTOR),1)
+ifeq ($(strip $(DF_SOURCE)),)
+$(error DF_VECTOR is a rejected experiment: use scripts/build-s9-df.sh with vector=1)
+endif
+endif
+CPPFLAGS += -DNBODY_DF_REUSE=$(DF_REUSE) -DNBODY_DF_VECTOR=$(DF_VECTOR) -DNBODY_DF_STATS=$(DF_STATS)
 TREE_VARIANT ?= 0
 TREE_IDENTITY ?= 0
 WALK_LAYOUT ?= 0
@@ -52,6 +62,11 @@ export TEMP := $(TMPDIR)
 ifeq ($(TARGET),card)
 # DT_RPATH, not RUNPATH: dependencies of bundled runtimes must find peers too.
 COMMON_LDFLAGS += -Wl,--disable-new-dtags,-rpath,'$$ORIGIN:$$ORIGIN/../lib'
+endif
+ifeq ($(TARGET),card)
+ifeq ($(DF_VECTOR),1)
+CFLAGS += -mveclibabi=knc
+endif
 endif
 COMMON_LDFLAGS += $(PGOFLAGS)
 .PHONY: x86 card program
@@ -104,6 +119,11 @@ $(OUT)/%.c.o: $(UPSTREAM)/%.c sources.mk Makefile $(wildcard $(ROOT)/config/*.h)
 $(OUT)/%.cc.o: $(UPSTREAM)/%.cc sources.mk Makefile $(wildcard $(ROOT)/config/*.h) $(ROOT)/src/knc_graphics_format.h
 	@$(TOOLCHAIN)/mkdir -p $(dir $@) ../build/tmp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+ifneq ($(strip $(DF_SOURCE)),)
+$(OUT)/nbody/src/nbody_mixeddwarf.c.o: $(DF_SOURCE) $(dir $(DF_SOURCE))../include/nbody_df_vector.h
+	@$(TOOLCHAIN)/mkdir -p $(dir $@) ../build/tmp
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I$(dir $(DF_SOURCE))../include -MMD -MP -c $(DF_SOURCE) -o $@
+endif
 $(filter $(OUT)/nbody/src/nbody_lua%,$(OBJECTS)): CPPFLAGS += $(NBODY_LUA_CPPFLAGS)
 $(filter $(OUT)/milkyway/src/milkyway_lua%,$(OBJECTS)): CPPFLAGS += $(MW_LUA_CPPFLAGS)
 -include $(OBJECTS:.o=.d)
