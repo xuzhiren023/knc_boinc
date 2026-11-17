@@ -40,3 +40,13 @@ Histogram capture uses upstream `--print-histogram`; no output patch is needed.
 CORE-MATH portability patches were removed: that code does not exist in 1.96.
 All remaining patches were checked against pristine 1.96 and regenerated
 with its context/line numbers. Fetch also verifies the fully patched state.
+
+- `nbody-parallel-quad.patch` (S8-03): `NBODY_PARALLEL_QUAD=1` records the
+  original mixed-dwarf quadrature recurrence, evaluates its nodes with an
+  OpenMP static loop, then accumulates in the original order. The original
+  decimal constants, counter exit, sign and expression grouping are retained.
+  Nested parallel calls, uninitialized lazy models and unsupported profiles
+  use the original serial routine. Default off (`PARALLEL_QUAD=0` in make).
+  `scripts/build-parallel-quad.sh` enables it for the scalar chunk-4 card
+  binary; `scripts/test-parallel-quad.sh` checks the actual generator against
+  pristine 1.96. Capture hooks live only in the test translation units.

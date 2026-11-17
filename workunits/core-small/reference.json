@@ -1,0 +1,10 @@
+{
+  "upstream_commit": "1e640779f1cabf88aaa49e4db569cfe7e09016c4",
+  "body_count": 4000,
+  "light_body_count": 364,
+  "likelihood_text": "-2357.216400957532642",
+  "likelihood_hex": "-0x1.26a6ecc1b36dap+11",
+  "initial_bodies_bytes": 224000,
+  "initial_bodies_sha256": "7117b750caad318ab42a781346ca480a9f43fa1828e0832b58ad06fc00b88b59",
+  "histogram_sha256": "6d36f686aecd7b00b41df1eb0c425083ec4f97f4eb9fc95917f09053ca3c8f17"
+}
