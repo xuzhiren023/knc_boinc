@@ -32,6 +32,9 @@ CPPFLAGS += -DNBODY_VECTOR_GRAVITY=$(VECTOR_GRAVITY)
 PHASE_TIMERS ?= 0
 STATIC_INTEGRATE ?= 0
 CPPFLAGS += -DNBODY_PHASE_TIMERS=$(PHASE_TIMERS) -DNBODY_STATIC_INTEGRATE=$(STATIC_INTEGRATE)
+# Independent mixed-dwarf quadrature nodes; explicitly enabled for S8 card.
+PARALLEL_QUAD ?= 0
+CPPFLAGS += -DNBODY_PARALLEL_QUAD=$(PARALLEL_QUAD)
 CFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(C_LANGUAGE_FLAGS)
 CXXFLAGS := $(COMMON_CFLAGS) $(TARGET_FLAGS) $(CXX_LANGUAGE_FLAGS)
 # Always local scratch, even when invoked directly from a fresh checkout.
@@ -60,6 +63,14 @@ $(OUT)/.vector-gravity: vector-config-check
 	@$(TOOLCHAIN)/cmp -s $@.tmp $@ || $(TOOLCHAIN)/cp $@.tmp $@
 	@$(TOOLCHAIN)/rm -f $@.tmp
 $(OUT)/nbody/src/nbody_grav.c.o: $(OUT)/.vector-gravity
+.PHONY: quad-config-check
+quad-config-check:
+$(OUT)/.parallel-quad: quad-config-check
+	@$(TOOLCHAIN)/mkdir -p $(OUT)
+	@echo '$(PARALLEL_QUAD)' > $@.tmp
+	@$(TOOLCHAIN)/cmp -s $@.tmp $@ || $(TOOLCHAIN)/cp $@.tmp $@
+	@$(TOOLCHAIN)/rm -f $@.tmp
+$(OUT)/nbody/src/nbody_mixeddwarf.c.o: $(OUT)/.parallel-quad
 x86:
 	$(MAKE) TARGET=x86 program
 card:

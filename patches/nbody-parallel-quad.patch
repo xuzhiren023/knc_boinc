@@ -1,0 +1,198 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -37,6 +37,13 @@
+ #include "nbody_io.h"
+ #include "nbody_king_model.h"
+ 
++#ifndef NBODY_PARALLEL_QUAD
++#define NBODY_PARALLEL_QUAD 0
++#endif
++#if NBODY_PARALLEL_QUAD && defined(_OPENMP)
++#include <omp.h>
++#endif
++
+ /*Note: minusfivehalves(x) raises to x^-5/2 power and minushalf(x) is x^-1/2*/
+ 
+  
+@@ -91,7 +98,7 @@
+     return deriv;
+ }
+ 
+-static real gauss_quad(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
++static real gauss_quad_serial(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
+ {
+     /*This is a guassian quadrature routine. It will test to always integrate from the lower to higher of the two limits.
+      * If switching the order of the limits was needed to do this then the negative of the integral is returned.
+@@ -187,6 +194,172 @@
+ 
+     return intv;
+ }
++
++#if NBODY_PARALLEL_QUAD && defined(_OPENMP)
++typedef struct
++{
++    real x[3], coef1, f[3];
++} QuadInterval;
++
++static mwbool quad_model_ready(const Dwarf* model)
++{
++    switch (model->type)
++    {
++        case Plummer:
++        case General_Hernquist:
++            return TRUE;
++        case NFW:
++        case Cored:
++            return model->p0 != 0.0;
++        default:
++            return FALSE;
++    }
++}
++
++static real gauss_quad(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool), real lower, real upper, const Dwarf* comp1, const Dwarf* comp2, real energy, mwbool isDark)
++{
++    /*This is a guassian quadrature routine. It will test to always integrate from the lower to higher of the two limits.
++     * If switching the order of the limits was needed to do this then the negative of the integral is returned.
++     */
++    /* Lazy initialization in 1.96's dispatchers must never run on workers.
++     * The mixed generator calls set_model_params before reaching quadrature.
++     * Keep other/uninitialized models and nested callers on the original path. */
++    if (omp_in_parallel() || !quad_model_ready(comp1) || !quad_model_ready(comp2))
++        return gauss_quad_serial(func, lower, upper, comp1, comp2, energy, isDark);
++
++    QuadInterval local[128];
++    QuadInterval* nodes = local;
++    size_t count = 0, capacity = 128;
++    real intv = 0.0;//initial value of integral
++    real a = 0.0, b = 0.0;
++
++    if(lower > upper)
++    {
++        a = upper;
++        b = lower;
++    }
++    else
++    {
++        a = lower; 
++        b = upper;
++    }
++
++    real benchmark = 1.5 * a;
++    real Ng = 100.0;//integral resolution
++    real hg = (benchmark - a) / (Ng);
++    real lowerg = a;
++    real upperg = lowerg + hg;
++
++
++    real coef2 = (lowerg + upperg) / 2.0;//initializes the first coeff to change the function limits
++    real coef1 = (upperg - lowerg) / 2.0;//initializes the second coeff to change the function limits
++    const real c1 = 0.55555555555; //5.0 / 9.0;
++    const real c2 = 0.88888888888; //8.0 / 9.0;
++    const real c3 = 0.55555555555; //5.0 / 9.0;
++    const real x1 = -0.77459666924;//-sqrt(3.0 / 5.0);
++    const real x2 __attribute__((unused)) = 0.00000000000;
++    const real x3 = 0.77459666924; //sqrt(3.0 / 5.0);
++    real x1n = (coef1 * x1 + coef2);
++    /*should be: x2n = (coef1 * x2 + coef2);*/
++    real x2n = (coef2);
++    real x3n = (coef1 * x3 + coef2);
++    int counter = 0;
++    while (1)
++    {
++                //gauss quad
++        if (count == capacity)
++        {
++            size_t next_capacity = capacity * 2;
++            QuadInterval* next = malloc(next_capacity * sizeof(*next));
++            if (!next)
++            {
++                if (nodes != local) free(nodes);
++                return gauss_quad_serial(func, lower, upper, comp1, comp2, energy, isDark);
++            }
++            memcpy(next, nodes, count * sizeof(*next));
++            if (nodes != local) free(nodes);
++            nodes = next;
++            capacity = next_capacity;
++        }
++        nodes[count].x[0] = x1n;
++        nodes[count].x[1] = x2n;
++        nodes[count].x[2] = x3n;
++        nodes[count].coef1 = coef1;
++        count++;
++
++        lowerg = upperg;
++        upperg = upperg + hg;
++        coef2 = (lowerg + upperg) / 2.0;//initializes the first coeff to change the function limits
++        coef1 = (upperg - lowerg) / 2.0;
++
++        x1n = ((coef1) * x1 + coef2);
++        /*should be: x2n = (coef1 * x2 + coef2);*/
++        x2n = (coef2);
++        x3n = ((coef1) * x3 + coef2);
++
++        if(lowerg > benchmark)
++        {
++            Ng = 10.0;//integral resolution
++            hg = (b - benchmark) / (Ng);
++        }
++
++        if(upper > lower)
++        {
++            if(lowerg >= upper)//loop termination clause
++            {
++                break;
++            }
++        }
++        else if(lower > upper)
++        {
++            if(lowerg >= lower)//loop termination clause
++            {
++                break;
++            }
++        }
++
++        if(counter > 100000)
++        {
++            break;
++        }
++        else
++        {
++            counter++;
++        }
++
++
++    }
++
++    /* Only independent function evaluations run in parallel. No reduction:
++     * retain the truncated 1.96 constants and left-to-right accumulation. */
++    long node;
++    #pragma omp parallel for schedule(static)
++    for (node = 0; node < (long)(3 * count); ++node)
++    {
++        size_t interval = (size_t)node / 3;
++        size_t k = (size_t)node % 3;
++        nodes[interval].f[k] = (*func)(nodes[interval].x[k], comp1, comp2, energy, isDark);
++    }
++    size_t i;
++    for (i = 0; i < count; ++i)
++    {
++        coef1 = nodes[i].coef1;
++        intv = intv + c1 * nodes[i].f[0] * coef1 +
++                      c2 * nodes[i].f[1] * coef1 +
++                      c3 * nodes[i].f[2] * coef1;
++    }
++    if (nodes != local) free(nodes);
++
++    if(lower > upper)
++    {
++        intv *= -1.0;
++    }
++
++    return intv;
++}
++#else
++#define gauss_quad gauss_quad_serial
++#endif
+ 
+ static inline real max_finder(real (*profile)(real , real , const Dwarf*, const Dwarf*, mwbool), real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, real a, real b, real c, int limit, real tolerance)
+ {

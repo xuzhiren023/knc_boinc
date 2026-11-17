@@ -55,3 +55,12 @@ with its context/line numbers. Fetch also verifies the fully patched state.
   per-body integrator loops; default off. Build with make variables
   `PHASE_TIMERS=1 STATIC_INTEGRATE=1`; `scripts/build-s8.sh` builds the
   requested three variants, `tests/phase_timers.py` checks large-case outputs.
+- `nbody-parallel-quad.patch` (S8-03): `NBODY_PARALLEL_QUAD=1` records the
+  original mixed-dwarf quadrature recurrence, evaluates its nodes with an
+  OpenMP static loop, then accumulates in the original order. The original
+  decimal constants, counter exit, sign and expression grouping are retained.
+  Nested parallel calls, uninitialized lazy models and unsupported profiles
+  use the original serial routine. Default off (`PARALLEL_QUAD=0` in make).
+  `scripts/build-parallel-quad.sh` enables it for the scalar chunk-4 card
+  binary; `scripts/test-parallel-quad.sh` checks the actual generator against
+  pristine 1.96. Capture hooks live only in the test translation units.
