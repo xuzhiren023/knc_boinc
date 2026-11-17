@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 19:42-20:19Z windows (tcp-large, card clean): S10-09 vector star setup, card seconds (incl. staging),
+  core-small / real-steps: exact release 54.3 / 246.1; all-vector 57.3 / 283.4; all-vector+guard 57.3 / 290.3;
+  scalar log/atan 57.3 / 284.2; scalar+guard 58.2 / 279.8. Every likelihood identical to exact. Slower than exact:
+  one integral is ~42 vectors for 240 threads. S10-10 batches 12 integrals per wave.
 - 2026-11-17 18:01-18:28Z window (tcp-large, card clean): S10-07. Force large/real-steps: base 12.70/4.19 s; WALK_ORDER
   13.71/5.34 (worse, +8%/+27%); WALK_HUGEPAGES 12.65/4.13 (-0.4%/-1.3%, noise level; smaps on this kernel cannot show
   THP backing); both 13.62/5.29. All bit-identical. Twin had said no clear winner, spatial sample slower: consistent.
