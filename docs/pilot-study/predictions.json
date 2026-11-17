@@ -231,5 +231,25 @@
    "work/tickets/S10-02.md",
    "docs/research/s10-force-walk.md"
   ]
+ },
+ {
+  "id": "s10-walk-order",
+  "tickets": [
+   "S10-07"
+  ],
+  "method": "twin",
+  "predicted_text": "twin (1 core and 8-tile): no clear difference, spatial sample slower (127,994 vs 119,423 cycles/call); screen 0-20% lower walk or a loss",
+  "predicted_range": null,
+  "predicted_winner": "none (spatial slower in sample)",
+  "measured_winner": "generation order",
+  "measured": 13.71,
+  "measured_text": "card force large 12.70 -> 13.71 s (+8%), real-steps 4.19 -> 5.34 s (+27%) with WALK_ORDER; huge pages 12.65 / 4.13 s (-0.4% / -1.3%)",
+  "baseline": 12.7,
+  "unit": "s",
+  "notes": "Twin direction consistent (spatial not better). Host line-union counters (-40%) suggested a gain that did not appear.",
+  "sources": [
+   "work/tickets/S10-07.md",
+   "runs/card/w-knc12/"
+  ]
  }
 ]

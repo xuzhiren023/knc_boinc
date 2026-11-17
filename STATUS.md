@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 18:01-18:28Z window (tcp-large, card clean): S10-07. Force large/real-steps: base 12.70/4.19 s; WALK_ORDER
+  13.71/5.34 (worse, +8%/+27%); WALK_HUGEPAGES 12.65/4.13 (-0.4%/-1.3%, noise level; smaps on this kernel cannot show
+  THP backing); both 13.62/5.29. All bit-identical. Twin had said no clear winner, spatial sample slower: consistent.
+  Real-steps whole 241-249 s with setup 234-241 s: the walk is <2% of a real task. Walk memory work stops here.
 - 2026-11-17 17:47-17:52Z window (tcp-large uploads, no DMA, card clean): S10-05 core-small card_seconds release
   52.61, DF_SPECIAL 52.31, DF_VMATH (1 lane) 52.22; all three likelihoods identical (vmath difference 0.0). The exact
   specialization gives no measurable card gain (host -10.7%); the integrand stays scalar x87 on the card.
