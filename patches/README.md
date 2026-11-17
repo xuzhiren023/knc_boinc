@@ -19,6 +19,7 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `nbody-parallel-quad.patch` | Performance | NBODY_PARALLEL_QUAD=0 |
 | `nbody-static-integrate.patch` | Performance | NBODY_STATIC_INTEGRATE=0 |
 | `nbody-tree-variants.patch` | Performance | NBODY_TREE_VARIANT=0 (upstream); 1 CofM, 2 pool |
+| `nbody-tree3.patch` | Performance | NBODY_TREE_VARIANT=3 opts into balanced pool and parallel threading; default remains 0 |
 | `nbody-vector-gravity.patch` | Performance | NBODY_VECTOR_GRAVITY=0 |
 | `zzz-nbody-walk-layout.patch` | Performance | NBODY_WALK_LAYOUT=0 |
 | `zz-nbody-phase-timers.patch` | Instrumentation | NBODY_PHASE_TIMERS=0 |
@@ -107,3 +108,11 @@ with its context/line numbers. Fetch also verifies the fully patched state.
   original storage restoration. Allocation/packing/scatter stay inside the
   existing force phase. `zzzz-nbody-walk-counters.patch` adds only debug hooks
   for host traversal/force counters; no timing build enables those counters.
+
+- `nbody-tree3.patch` (S9-04): variant 3 extends the pool with a stable adaptive
+  frontier capped at max(2, nbody/(4*threads)) bodies per job. Largest jobs run
+  first with dynamic scheduling. Serial top cells preserve octant arithmetic;
+  parallel threading uses local boundaries followed by serial successor repair.
+  All new algorithm paths require TREE_VARIANT=3. Frontier balance counts and
+  model diagnostics belong to `zz-nbody-tree-instrumentation.patch` and require
+  TREE_IDENTITY=1; the card timing build excludes them.

@@ -1,17 +1,17 @@
 --- a/nbody/src/nbody_tree.c
 +++ b/nbody/src/nbody_tree.c
 @@ -21,6 +21,7 @@
- 
+
  #include "nbody_priv.h"
  #include "nbody_tree.h"
 +#include "nbody_phase_timers.h"
  #ifdef _OPENMP
  #include <omp.h>
  #endif
-@@ -42,10 +43,15 @@
-     NBodyState* workers;
+@@ -55,10 +56,15 @@
+     int frontierUsed, topUsed;
  } NBTreePool;
- 
+
 -/* Allocation routing for the arena and stable scratch. */
 +/* Allocation counters cover tree construction, excluding debug identity. */
  static void* nbTreeAlloc(size_t bytes, int aligned)
@@ -24,22 +24,23 @@
 +#endif
 +    return p;
  }
- 
+
  void nbReleaseTreePool(NBodyState* st)
-@@ -96,6 +102,9 @@
+@@ -115,6 +121,10 @@
      st->treePoolNext = st->treePoolEnd = 0;
  }
- 
+
++
 +#ifndef NBODY_TREE_IDENTITY
 +#define NBODY_TREE_IDENTITY 0
 +#endif
- 
+
  #include <lua.h>
  #include <lauxlib.h>
-@@ -551,6 +560,24 @@
-     real size;
- } NBTreeBucket;
- 
+@@ -565,6 +575,25 @@
+
+
+
 +#if NBODY_TREE_IDENTITY
 +static void nbShapeWalk(NBodyCell* p, unsigned char** out)
 +{
@@ -58,19 +59,81 @@
 +    nbShapeWalk(t->root, &cursor);
 +}
 +#endif
- 
++
  /* The top levels are constructed from contiguous ranges of one stable
   * counting sort. Keys use the same repeated midpoint arithmetic as insertion. */
-@@ -692,7 +719,7 @@
-     hackQuadTo(t->root, NB_TREE_DEPTH - 1);
+ static void nbTopCells(NBodyState* st, NBodyCell* cell, real size,
+@@ -845,7 +874,68 @@
  }
- 
+ #endif
+
 -static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel)
++
++#if NBODY_TREE_IDENTITY && NBODY_TREE_VARIANT == 3
++typedef struct {
++    int *jobs, used, top;
++    unsigned long visits;
++} NBBalanceCounts;
++
++/* Reconstruct prospective card frontiers from this exact snapshot. The
++ * threshold summary collapses descendants, without changing any tree node. */
++static int nbCountBalanced(NBodyNode* node, real size, int depth, int limit,
++                           int fixed, NBBalanceCounts* out)
++{
++    int count = 0, oct, before = out->used, top = out->top;
++    unsigned long visits = out->visits;
++    if (!isCell(node)) return 1;
++    for (oct = 0; oct < NSUB; ++oct) if (Subp(node)[oct])
++        count += nbCountBalanced(Subp(node)[oct], size * 0.5,
++                                 depth + 1, limit, fixed, out);
++    if ((fixed && depth == NB_TREE_DEPTH) ||
++        (!fixed && (count <= limit || size <= REAL_EPSILON))) {
++        out->used = before;
++        out->jobs[out->used++] = count;
++        out->top = top; out->visits = visits;
++    } else if (!fixed || depth < NB_TREE_DEPTH) {
++        ++out->top; out->visits += count;
++    }
++    return count;
++}
++
++static void nbBalancedCounts(NBodyState* st)
++{
++    NBTreePool* pool = st->treePool;
++    int i, max = 0, sum = 0;
++    for (i = 0; i < pool->frontierUsed; ++i) {
++        max = MAX(max, pool->frontier[i].count);
++        sum += pool->frontier[i].count;
++    }
++    fprintf(stderr, "TREE_FRONTIER step=%u threads=%d jobs=%d top=%d bodies=%d max=%d limit=%d\n",
++            st->step, pool->threads, pool->frontierUsed, pool->topUsed, sum, max,
++            MAX(2, st->nbody / (4 * pool->threads)));
++    /* Both fixed-D3 and adaptive-240 counts on identical bodies. Only the
++     * 12-thread proof emits model samples, so there are no timing sweeps. */
++    if (pool->threads == 12) {
++        int fixed;
++        NBBalanceCounts counts;
++        counts.jobs = mwMalloc((st->nbody + 1) * sizeof(*counts.jobs));
++        for (fixed = 0; fixed <= 1; ++fixed) {
++            counts.used = counts.top = 0; counts.visits = 0;
++            nbCountBalanced((NBodyNode*) st->tree.root, st->tree.rsize, 0,
++                             MAX(2, st->nbody / (4 * 240)), fixed, &counts);
++            fprintf(stderr, "TREE_MODEL step=%u variant=%d threads=240 top=%d visits=%lu counts=",
++                    st->step, fixed ? 2 : 3, counts.top, counts.visits);
++            for (i = 0; i < counts.used; ++i)
++                fprintf(stderr, "%s%d", i ? "," : "", counts.jobs[i]);
++            fprintf(stderr, "\n");
++        }
++        free(counts.jobs);
++    }
++}
++#endif
++
 +static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel, unsigned char** shape)
  {
      Body* p;
      NBodyTree* t = &st->tree;
-@@ -702,31 +729,151 @@
+@@ -855,52 +945,175 @@
          st->treePool = nbTreeAlloc(sizeof(NBTreePool), 1);
          memset(st->treePool, 0, sizeof(NBTreePool));
      }
@@ -80,6 +143,18 @@
 +    NB_PHASE(NB_TREE_NEW, nbNewTree(st, t));
 +    NB_PHASE(NB_TREE_EXPAND, expandBox(t, st->bodytab, st->nbody, pool));
 +    if (pool) NB_PHASE(NB_TREE_PARTITION, nbPoolPrepare(st));
+ #if NBODY_TREE_VARIANT == 3
+     if (pool) {
+         NBTreePool* arena = st->treePool;
+-        nbBalancedPartition(st);
+-        nbPoolInsert(st, arena->frontier, arena->frontierUsed);
++        NB_PHASE(NB_TREE_PARTITION, nbBalancedPartition(st));
++        NB_PHASE(NB_TREE_INSERT, nbPoolInsert(st, arena->frontier, arena->frontierUsed));
++#if NBODY_TREE_IDENTITY
++        nbBalancedCounts(st);
++#endif
+     } else
+ #endif
      if (pool && t->rsize * 0.125 > REAL_EPSILON) {
 -        nbPoolPartition(st, buckets, &used);
 -        nbPoolInsert(st, buckets, used);
@@ -93,23 +168,40 @@
 -        };
 -        if (parallel) nbCollectFrontier(t->root, t->rsize, 0, buckets, &used);
 +        });
-+        if (parallel) NB_PHASE(NB_TREE_PARTITION,
-+            nbCollectFrontier(t->root, t->rsize, 0, buckets, &used));
++        if (parallel) NB_PHASE(NB_TREE_PARTITION, nbCollectFrontier(t->root, t->rsize, 0, buckets, &used));
      }
      if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
+ #if NBODY_TREE_VARIANT == 3
+-    if (pool) nbBalancedMoments(ctx, t, st->treePool);
++    if (pool) NB_PHASE(NB_TREE_COFM, nbBalancedMoments(ctx, t, st->treePool));
+     else
+ #endif
 -    nbMoments(ctx, t, buckets, used, parallel);
 +    NB_PHASE(NB_TREE_COFM, nbMoments(ctx, t, buckets, used, parallel));
      if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
--    threadTree((NBodyNode*) t->root, NULL);
--    if (ctx->useQuad) nbQuads(t, buckets, used, parallel);
 +#if NBODY_TREE_IDENTITY
 +    nbRecordShape(t, shape);
 +#endif
+ #if NBODY_TREE_VARIANT == 3
+-    if (pool) nbBalancedThread(st->treePool);
++    if (pool) NB_PHASE(NB_TREE_THREAD, nbBalancedThread(st->treePool));
+     else
+ #endif
+-    threadTree((NBodyNode*) t->root, NULL);
 +    NB_PHASE(NB_TREE_THREAD, threadTree((NBodyNode*) t->root, NULL));
-+    if (ctx->useQuad) NB_PHASE(NB_TREE_QUAD, nbQuads(t, buckets, used, parallel));
+     if (ctx->useQuad) {
+ #if NBODY_TREE_VARIANT == 3
+-        if (pool) nbBalancedQuads(st->treePool);
++        if (pool) NB_PHASE(NB_TREE_QUAD, nbBalancedQuads(st->treePool));
+         else
+ #endif
+-        nbQuads(t, buckets, used, parallel);
++        NB_PHASE(NB_TREE_QUAD, nbQuads(t, buckets, used, parallel));
+     }
      return NBODY_SUCCESS;
  }
- 
+
+
 +#if NBODY_TREE_IDENTITY
 +static void nbIdentityFail(unsigned step, const char* field)
 +{
@@ -182,7 +274,7 @@
 +    free(a); free(b);
 +}
 +#endif
- 
++
  NBodyStatus nbMakeTree(const NBodyCtx* ctx, NBodyState* st)
  {
 -    return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE);
@@ -232,5 +324,5 @@
 +    return nbBuildTree(ctx, st, NBODY_PARALLEL_TREE, NULL);
 +  #endif
  }
- 
+
  #if 0

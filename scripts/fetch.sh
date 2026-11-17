@@ -34,6 +34,16 @@ fi
 actual=$(git -C "$dest" rev-parse HEAD)
 [[ "$actual" == "$commit" ]] || { echo "Unexpected source commit: $actual (expected $commit)" >&2; exit 1; }
 echo "$tag $actual"
+# Later performance/instrumentation patches intentionally overlap earlier
+# hunks. Their individual reverse dry-runs need not match the final source.
+# Verify that complete state by replaying pinned blobs before treating it as
+# already applied. A pristine checkout still takes the normal forward path.
+mkdir -p build/tmp
+if python scripts/s8_patch_check.py > build/tmp/fetch-patch-verify.log 2>&1; then
+    echo 'All app patches already applied (verified against pinned blobs)'
+    bash "$0" boinc
+    exit 0
+fi
 # Cygwin already declares glob_pattern_p, just as glibc does.
 for patchfile in "$PWD"/patches/*.patch; do
     # This patch preserves nbody.c's upstream CRLF bytes alongside LF files.
