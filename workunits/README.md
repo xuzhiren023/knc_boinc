@@ -139,3 +139,10 @@ variables and Cygwin PATH above, run `python tests/nbody_196_matrix.py` to
 verify those references, scalar chunk 4 and vector chunk 4, including 4096
 first-force XYZ acceleration triples. `--record` explicitly replaces the
 baseline only after all identity checks pass.
+
+## Benchmark roles (S10)
+
+Use `core-small` for generation and `real-steps` for the real-workunit step
+phase. Full `117676` is the occasional headline benchmark. `small`, `medium`
+and `large` are correctness cases only. See [the benchmark protocol](../docs/benchmarks.md)
+for inputs, arguments, references and the lead-only card window.
