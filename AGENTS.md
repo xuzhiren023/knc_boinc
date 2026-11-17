@@ -23,3 +23,5 @@ You implement one ticket from `work/tickets/`. The ticket is the only channel to
   `-fopt-info-vec-missed` or knc-twin evidence; the lead files it as a GCC-KNC ticket. What is outside the
   compiler's control (algorithm, data layout, bit-exact ordering, exact-fallback logic) you write by hand with IMCI
   intrinsics or vector code in our patches.
+- Pilot study (owner 2026-11-16): in every Engineer report add an "Effort" line: knc-twin commands run and their
+  status, twin host seconds, whether a model table was used, card jobs you staged for the lead.

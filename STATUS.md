@@ -97,11 +97,22 @@ Lead-maintained. Last update: 2026-11-16 EST.
   The card force walk is already ~2x the laptop; the serial tree build is half the card time. Static integrator:
   bit-identical, saves 0.1 s. Parallel tree (S8-02) is the large-case fix; S8-03 the real-task fix.
 
+- 2026-11-16 23:52Z S8-02 card check (large case, parallel tree): nbMakeTree 70.4 s (serial build 13.2 s),
+  force 13.4 s, whole 88.0 s, bit-identical. 5x slower on the card (x86 also 2.7x slower); not usable; diagnose
+  (malloc/free-list contention, serial partitioning, fork/join per level?) before any rework.
+  S8-03 (parallel quad): x86 core-small (4,000 bodies, real 117676 args) generation 140.2 s -> 36.9 s at 12 threads,
+  bodies byte-identical, likelihood -2357.216400957532642 identical. Card check pending.
+
 - Twin use (owner 2026-11-16): knc-twin 0.4 simulates 1 core or up to 8 detailed cores on the ring
   (`simulate --scale ring`, `streams[].core`, 4 contexts per core; multicore results are
   unvalidated_scenario_estimate). Use 1 core with 4 contexts for per-thread speed at 4 threads/core (the 82x
   assumption in docs/research/s8-model.md) and to rank vector `fun` variants; 8-tile for the miss- and
   ring-bound regions: parallel tree insertion (S8-02) and the force walk.
+
+- GCC-KNC has libknc_vmath (double exp/log/pow, atan/atan2, 8 lanes) via -mveclibabi=knc with -fno-math-errno;
+  not correctly rounded (crlibm is), so only inside S8-05's guarded fast path. GCC-KNC S14-44 (lane-0 IMCI instead
+  of x87) wants our nbMakeTree repro/object after S8-04. knc-optimize "combined vs hand" mode by GCC-KNC detection
+  requested from the GCC-KNC lead (owner 2026-11-16).
 
 - Force bound method (GCC-KNC lead): interactions per step (body-cell + body-body, from walk counters) x ~20-25
   FP64 ops / 1.2 TFLOPS FP64 = T_lb; compare with measured 13.0 s. Same count x a GPU's FP64/FP32 rate gives the
