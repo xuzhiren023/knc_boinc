@@ -22,11 +22,12 @@ Runner source: `C:/Users/xuzhi/Documents/gcc_knc/tools/card_run`, upstream commi
    Hold upstream's card-wide `card.lock` in addition to our local execution
    lock for the whole job, even with custom `--lock`. Check the shared stop
    latch before connecting and again after taking the card lock.
-5. Default transfer is `auto` with a **1 MiB** DMA threshold (owner 2026-11-17, after ssh measured ~20 KB/s to the card: a 48 MB job upload took ~40 min). Files below 1 MiB go by ssh, larger ones (program, runtimes) by DMA, under the shared card-wide DMA latch and lock. `--transfer ssh` remains available.
-   Below it use SSH; at or above it try DMA. Explicit `--transfer ssh` and
-   `--transfer dma` remain available. Fallback is limited to DMA unavailable
-   before endpoints open (`kind=unavailable`, `data_started=false`); never
-   replay a started DMA transfer. Integrity and uncertain-cleanup stops remain.
+5. Default transfer is `auto` with a **1 MiB** threshold. Below it use SSH;
+   at or above it try DMA, then TCP only if DMA is unavailable during preflight
+   (`kind=unavailable`, `data_started=false`). Never replay a started DMA
+   transfer. Integrity and uncertain-cleanup stops and shared latches remain.
+   `--transfer tcp` and `--transfer tcp-large` add a card-pull TCP upload path;
+   see the policy and firewall section below. Explicit `ssh` and `dma` remain.
    Allow `--collect` over the SSH helper pipe when both helpers are present.
 6. Default transport timeout is **120 seconds**, with a floor on the old config's
    10-second value. Explicit `--transport-timeout` overrides it. Staging retains
@@ -81,6 +82,69 @@ path and cannot bypass the mandatory card-wide lock.
 | External locks | Caller-configured paths | Unchanged | Shared where configured; checked, never removed. |
 | Card directories / physical aliases | `/tmp/claude/claude-*`, physical `/tmp` alias plus `/claude/claude-*` | `/tmp/knc-boinc/claude-*`, physical alias plus `/knc-boinc/claude-*` | Per-tool; watchdog, stale reaper and cleanup cannot target upstream directories. |
 | Recovery archives | None | `B/.work/_state/dma-recovery/*.json` | Per-tool durable copy before shared latch deletion. |
+
+## TCP uploads, policy and owner firewall setting
+
+| `--transfer` | Upload below `--dma-threshold` | Upload at or above it |
+| --- | --- | --- |
+| `auto` (default) | SSH | DMA; TCP if DMA preflight is unavailable |
+| `tcp-large` | SSH | TCP |
+| `tcp` | TCP | TCP |
+| `ssh` | SSH | SSH |
+| `dma` | DMA | DMA |
+
+The threshold defaults to **1048576 bytes (1 MiB)**. Use `tcp-large` while
+laptop load makes DMA unreliable, e.g.:
+
+```bash
+python tools/card_run --transfer tcp-large --stage-timeout 600 program
+```
+
+Each TCP upload binds a fresh ephemeral port **only on 192.168.1.99**, listens
+for one connection, and checks that the peer is **192.168.1.100**. Its accept
+budget is at most five seconds (one quarter of the remaining file budget when
+shorter). The card runs BusyBox client `nc -w SECONDS 192.168.1.99 PORT` through
+authenticated SSH, under the usual boot/directory guards and private umask,
+redirected into a fresh `claude-part-*` file. The host closes its sending stream,
+waits for nc success, checks the card byte count, then uses the existing guarded
+chmod/rename publication. Integrity is byte length only; no checksums.
+Generated controls and packed file lists follow the same policy. TCP-only jobs
+without collection need no DMA transfer helpers.
+
+**TCP depends on the owner allowing inbound TCP from 192.168.1.100** to the
+host Python process on the mic-side adapter. The tool never changes firewall
+rules. A bind failure, refused card connection or accept timeout before an
+accepted card connection prints a clear diagnostic and falls back to SSH with
+a new private staging name. This may be slow; the same staging/file deadlines
+still apply. Receipts record the fallback reason (and both reasons if DMA then
+TCP were unavailable). A wrong peer is rejected, with no payload sent to it.
+TCP errors after accepting the card, including length mismatch, fail the job;
+no data replay follows an integrity failure. The card nc has a finite `-w`
+budget; an abandoned private file is unpublished and handled by owned cleanup.
+
+DMA fallback remains **preflight only**. Once DMA endpoints/data start, failure
+never falls back to TCP or SSH; uncertain cleanup retains the shared stop
+latch and blocks both projects until lead/owner recovery. Downloads under
+`tcp`/`tcp-large` retain the SSH helper pipe (collection still needs both
+helpers); `auto`/`dma` collection retains the existing size policy.
+
+For S10-08, the lead smoke script is `scripts/s10-08-card-smoke.sh` (pass an
+existing card executable and optional arguments). No new card binary is needed.
+Offline acceptance: `python -m unittest discover -s tests -p 'test_card_run*.py' -v`.
+The recovery fake SSH test runs the POSIX script with LF bytes under Cygwin
+dash and a fake proc tree; binary stdin avoids Windows text-mode CRLF which
+BusyBox sh cannot parse. Actual card BusyBox/network checks remain lead-only.
+
+## Engineer launcher affinity (install between sessions)
+
+`tools/codex_run.sh.next` is the complete replacement launcher staged for the
+lead; **the active `tools/codex_run.sh` was not edited**. Between engineer
+sessions, install it as `tools/codex_run.sh` together with
+`tools/codex_affinity.py`. The wrapper sets its Windows affinity to `0x3ff`
+(logical CPUs 0-9) before launching Codex, and children inherit the mask.
+CPUs 10-11 stay available for DMA helpers launched outside that tree. It fails
+if Windows refuses the mask. The offline test verifies the inherited child mask.
+The separate engineer workload cap (make -j2, OMP_NUM_THREADS=4) still applies.
 
 ## DMA recovery (lead/owner only)
 
@@ -169,7 +233,7 @@ Audited every caller in `scripts/`: `card-check.sh`, `flags-card-commands.sh`,
 `s8-card-commands.sh`, `vector-card-commands.sh`, `s8_integration.py`,
 `s9-df.py`, `s9-pgo.py`, `s9-tree3.py`, `s9-tree4.py`, and `s10-release.py`.
 All use `tools/card_run` and none overrides transfer, threshold or transport
-timeout, so they inherit auto at 64 MiB and the larger transport budget.
+timeout, so they inherit auto at 1 MiB and the larger transport budget.
 This includes generators for `build/s8-09/`, `build/s9/` (including DF and tree
 subdirectories), and `build/s10/` job scripts. No staged
 job scripts existed under this ticket's `build/` at the audit; no callers exist
@@ -191,7 +255,7 @@ python -m unittest discover -s tests -p 'test_card_run*.py' -v
 The five S9-02 tests still pass (old path assertions reflect the new per-tool
 contract). Four S10-04 tests cover per-tool state and foreign-path shell
 rejection, actual shared-latch writes and card-wide lock contention with fake
-transport, 64 MiB routing and preflight-only fallback, and dry-run/confirmed
+transport, threshold routing and preflight-only fallback, and dry-run/confirmed
 recovery refusal for each changed health check. All writes use test temp paths;
 no real card or transfer-helper process runs. Run both suites with:
 

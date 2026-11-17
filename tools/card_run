@@ -24,6 +24,7 @@ from pathlib import Path
 import queue
 import re
 import shlex
+import socket
 import subprocess
 import sys
 import threading
@@ -733,24 +734,120 @@ def run(program, argv, *, lock_path, external_locks, baseline_names, timeout,
 
 
 def transfer_file(source, destination, *, size, direction, method, threshold_bytes, backends):
-    selected = ('dma' if size >= threshold_bytes else 'ssh') if method == 'auto' else method
-    fallback = None
-    try:
-        row = card_dma.transfer_file(source, destination, size=size, direction=direction,
-                                     method=selected, threshold_bytes=threshold_bytes, backends=backends)
-    except card_dma.TransferFailure as error:
-        if not (method == 'auto' and selected == 'dma' and error.kind == 'unavailable'
-                and not error.data_started):
-            raise
-        fallback = dict(method='dma', reason=str(error))
+    if method not in ('auto', 'ssh', 'dma', 'tcp', 'tcp-large'):
+        raise ValueError('invalid transfer policy')
+    selected = method
+    if method in ('auto', 'tcp-large'):
+        selected = ('dma' if method == 'auto' else 'tcp') if size >= threshold_bytes else 'ssh'
+    # Collection retains the existing authenticated SSH helper pipe.
+    if direction == 'down' and selected == 'tcp':
+        selected = 'ssh'
+    fallbacks = []
+    while True:
         try:
+            # Reuse the shared exact-length/completion and publication contract.
+            # Its method enum predates TCP; adapt the backend under its SSH key.
             row = card_dma.transfer_file(source, destination, size=size, direction=direction,
-                                         method='ssh', threshold_bytes=threshold_bytes, backends=backends)
-        except card_dma.TransferFailure as fallback_error:
-            fallback_error.fallback = fallback
-            raise
-    row['fallback'] = fallback
-    return row
+                                         method='ssh' if selected == 'tcp' else selected,
+                                         threshold_bytes=threshold_bytes,
+                                         backends={'ssh': backends['tcp']} if selected == 'tcp' else backends)
+            row['method'] = selected
+            row['fallback'] = fallbacks[-1] if fallbacks else None
+            if len(fallbacks) > 1:
+                row['fallbacks'] = fallbacks
+            return row
+        except card_dma.TransferFailure as error:
+            safe = error.kind == 'unavailable' and not error.data_started
+            if safe and method == 'auto' and selected == 'dma':
+                replacement = 'tcp' if direction == 'up' else 'ssh'
+            elif safe and selected == 'tcp':
+                replacement = 'ssh'
+            else:
+                if fallbacks:
+                    error.fallback = fallbacks[-1]
+                raise
+            fallbacks.append(dict(method=selected, reason=str(error)))
+            print('%s unavailable before data: %s; falling back to %s' %
+                  (selected.upper(), error, replacement.upper()), file=sys.stderr)
+            selected = replacement
+
+
+class SSHEndpoint(card_dma.Endpoint):
+    """Helper-free authenticated upload with the same length-only contract."""
+    def stage(self, source, private, *, size, direction):
+        if direction != 'up':
+            return super().stage(source, private, size=size, direction=direction)
+        self.direction = direction
+        started = time.monotonic()
+        self.session.upload('upload-file', 'cat > ' + shlex.quote(private),
+                            Path(source).read_bytes(), self.timeout)
+        count = self.session.rpc('guard_boot && wc -c < ' + shlex.quote(private),
+                                 self.session.remaining(started + self.timeout), step='upload-length')
+        return dict(bytes=int(count), file_complete=True, seconds=time.monotonic() - started)
+
+
+class TCPEndpoint(card_dma.Endpoint):
+    """Card client pulls from one mic-only host listener; never touches SCIF."""
+    def __init__(self, session, timeout, mode='600'):
+        super().__init__(session, 'tcp', timeout, mode)
+
+    def stage(self, source, private, *, size, direction):
+        if direction != 'up':
+            raise ValueError('TCP supports uploads only')
+        self.direction = direction
+        started = time.monotonic()
+        deadline = started + self.timeout
+        child, connected = None, False
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+                # No wildcard, hostname resolution, firewall changes or second accept.
+                listener.bind(('192.168.1.99', 0))
+                listener.listen(1)
+                listener.settimeout(min(5.0, self.timeout / 4))
+                port = listener.getsockname()[1]
+                command = 'nc -w %d 192.168.1.99 %d > %s' % (
+                    max(1, math.ceil(self.timeout)), port, shlex.quote(private))
+                child = subprocess.Popen(self.session.file_command(command), stdin=subprocess.DEVNULL,
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                try:
+                    connection, peer = listener.accept()
+                except socket.timeout as error:
+                    raise OSError('card connection refused or timed out on 192.168.1.99; '
+                                  'check owner inbound TCP/firewall setting') from error
+                with connection:
+                    if peer[0] != '192.168.1.100':
+                        raise OSError('TCP rejected unexpected peer ' + peer[0])
+                    connected = True
+                    with Path(source).open('rb') as stream:
+                        while True:
+                            data = stream.read(1024 * 1024)
+                            if not data:
+                                break
+                            connection.settimeout(self.session.remaining(deadline))
+                            connection.sendall(data)
+                    connection.shutdown(socket.SHUT_WR)
+            _, stderr = child.communicate(timeout=self.session.remaining(deadline))
+            if child.returncode:
+                raise OSError('card nc failed (status %s): %s' %
+                              (child.returncode, stderr.decode('utf8', 'replace')[-1000:]))
+            count = self.session.rpc('guard_boot && wc -c < ' + shlex.quote(private),
+                                     self.session.remaining(deadline), step='tcp-length')
+            if int(count) != size:
+                raise card_dma.TransferFailure('TCP upload length mismatch', kind='integrity',
+                                               data_started=True, cleanup_confirmed=True)
+            return dict(bytes=size, file_complete=True, seconds=time.monotonic() - started)
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            if isinstance(error, card_dma.TransferFailure):
+                raise
+            raise card_dma.TransferFailure('TCP upload failed: ' + str(error),
+                                           kind='io' if connected else 'unavailable',
+                                           data_started=connected, cleanup_confirmed=True) from error
+        finally:
+            if child is not None and child.poll() is None:
+                # Only local SSH is killed. Remote nc has its own finite -w budget;
+                # it can write only the unpublished private file, never a DMA latch.
+                child.kill()
+                child.communicate()
 
 
 class SSHTransport:
@@ -766,7 +863,7 @@ class SSHTransport:
         self.collect_names, self.collect_dir = collect, collect_dir
         self.dma_latch = main_root(UPSTREAM_ROOT) / ".work/_state/card-dma-active.lock"
         self.card_lock = main_root(UPSTREAM_ROOT) / ".work/_state/card.lock"
-        self.helper_free = (transfer == "ssh" and not collect) or not all(
+        self.helper_free = (transfer in ("ssh", "tcp", "tcp-large") and not collect) or not all(
             self.helper(key, name).is_file() for key, name in
             (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe")))
         if self.helper_free and (transfer == "dma" or collect):
@@ -970,15 +1067,9 @@ class SSHSession:
                                   ("claude-watchdog.sh", watchdog_bytes())] +
                                  [(Path(path).name, Path(path).read_bytes()) for path in files])
             stream = pack_stream(entries)
-            if self.helper_free:
-                started = time.monotonic()
-                self.upload("upload-pack", "./claude-unpack %d" % len(stream), stream, step_limit())
-                for name, data in entries:
-                    self.finish_ssh(name, len(data), started, step_limit(), "shared pack wall time")
-            else:
-                self.send_file("claude-pack", stream, step_limit())
-                self.rpc("guard_boot && ./claude-unpack %d < claude-pack && rm -- claude-pack" % len(stream),
-                         step_limit(), step="unpack-verified-pack")
+            self.send_file("claude-pack", stream, step_limit())
+            self.rpc("guard_boot && ./claude-unpack %d < claude-pack && rm -- claude-pack" % len(stream),
+                     step_limit(), step="unpack-verified-pack")
             self.rpc("guard_boot && chmod 700 claude-program claude-pin", step_limit(),
                      step="stage-chmod")
             return
@@ -1002,13 +1093,6 @@ class SSHSession:
                  step="stage-chmod")
 
     def send_file(self, name, data, timeout):
-        if self.helper_free:
-            started = time.monotonic()
-            staging_name(name)
-            private = "claude-part-" + uuid.uuid4().hex
-            self.upload("upload-" + name, "cat > " + private, data, timeout)
-            return self.finish_ssh(name, len(data), started, self.remaining(started + timeout),
-                                   private=private, mode=self.file_mode(name, data[:4]))
         # Generated controls and the suite pack share the file transport.
         # Temporary host bytes are bounded by the existing maxStageMiB check.
         scratch = main_root(ROOT) / ".work/_state/card-scratch"
@@ -1023,8 +1107,6 @@ class SSHSession:
             path.unlink()
 
     def send_path(self, name, source, timeout):
-        if self.helper_free:
-            return self.send_file(name, source.read_bytes(), timeout)
         destination = staging_name(name)
         with source.open("rb") as stream:
             mode = self.file_mode(name, stream.read(4))
@@ -1034,31 +1116,32 @@ class SSHSession:
     def file_mode(name, prefix):
         return "700" if name in ("claude-program", "claude-pin", "claude-unpack") or prefix == b"\x7fELF" else "600"
 
-    def finish_ssh(self, name, size, started, timeout, scope="file wall time", *, private=None, mode="600"):
-        deadline = time.monotonic() + timeout
-        count = self.rpc("guard_boot && wc -c < " + shlex.quote(private or staging_name(name)),
-                         timeout, step="upload-length")
-        if int(count) != size:
-            self.transfer_stop = True
-            raise OSError("SSH upload length mismatch: " + name)
-        if private:
-            self.rpc("guard_boot && chmod %s -- %s && mv -- %s %s" %
-                     (mode, private, private, shlex.quote(staging_name(name))),
-                     self.remaining(deadline), step="upload-publish")
-        seconds = time.monotonic() - started
-        self.transfers.append(dict(method="ssh", bytes=size, seconds=seconds,
-                                   mib_per_second=size / 1048576 / seconds if seconds else 0,
-                                   file_complete=True, wall_seconds=seconds,
-                                   fallback=(dict(method="dma", reason="dma unavailable: helper missing")
-                                             if self.transfer_method == "auto" else None),
-                                   direction="up", destination=name, timing_scope=scope))
-
     def transfer_file(self, source, destination, size, direction, timeout, *, mode="600"):
+        deadline = time.monotonic() + timeout
+        backends = dict(ssh=SSHEndpoint(self, 'ssh', timeout, mode),
+                        dma=card_dma.Endpoint(self, 'dma', timeout, mode),
+                        tcp=TCPEndpoint(self, timeout, mode))
+        if self.helper_free:
+            class MissingDMA:
+                def stage(self, *args, **kwargs):
+                    raise card_dma.TransferFailure('DMA helpers missing', kind='unavailable',
+                                                   data_started=False, cleanup_confirmed=True)
+            backends['dma'] = MissingDMA()
+        # Each attempted backend and publication shares the caller's deadline.
+        for backend in backends.values():
+            if isinstance(backend, card_dma.Endpoint):
+                original_stage, original_publish = backend.stage, backend.publish
+                def stage(*args, _backend=backend, _stage=original_stage, **kwargs):
+                    _backend.timeout = self.remaining(deadline)
+                    return _stage(*args, **kwargs)
+                def publish(*args, _backend=backend, _publish=original_publish):
+                    _backend.timeout = self.remaining(deadline)
+                    return _publish(*args)
+                backend.stage, backend.publish = stage, publish
         try:
             row = transfer_file(source, destination, size=size, direction=direction,
                                         method=self.transfer_method, threshold_bytes=self.threshold_bytes,
-                                        backends={method: card_dma.Endpoint(self, method, timeout, mode)
-                                                  for method in ("ssh", "dma")})
+                                        backends=backends)
         except card_dma.TransferFailure as error:
             # The suite must not retry integrity or uncertain-cleanup failures
             # as a fresh job (including failures on the SSH fallback).
@@ -1074,6 +1157,9 @@ class SSHSession:
         self.transfers.append(row)
 
     def bootstrap_helper(self, timeout):
+        if self.transfer_method in ('tcp', 'tcp-large'):
+            # Collection needs the helper, but its bootstrap still obeys TCP policy.
+            return self.send_path('claude-transfer', self.card_helper, timeout)
         # Publish the authenticated bootstrap stream after its exact length check.
         data = self.card_helper.read_bytes()
         private = "claude-part-" + uuid.uuid4().hex
@@ -1310,7 +1396,7 @@ def main():
     parser.add_argument("--transport-timeout", type=float)
     parser.add_argument("--stage-timeout", type=float, default=STAGE_TIMEOUT,
                         help="seconds allowed for staging; a slower upload is an infrastructure failure")
-    parser.add_argument("--transfer", choices=("ssh", "dma", "auto"), default="auto")  # owner 2026-11-17: auto (ssh below the threshold, DMA at or above)
+    parser.add_argument("--transfer", choices=("ssh", "dma", "auto", "tcp", "tcp-large"), default="auto")  # owner 2026-11-17: auto (ssh below the threshold, DMA at or above)
     parser.add_argument("--dma-threshold", type=int, default=1048576, metavar="BYTES")
     parser.add_argument("--collect", action="append", default=[], metavar="CLAUDE_FILE",
                         help="collect an owned regular file after the program completes")
