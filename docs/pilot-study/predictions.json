@@ -1,78 +1,167 @@
 [
-  {
-    "id": "s6-vector-walk",
-    "tickets": ["S6-03"],
-    "method": "twin",
-    "predicted_text": "79-94% busy lanes; ~272k-293k cycles/body",
-    "predicted_cycles_range": [272000, 293000],
-    "predicted_lane_busy_pct_range": [79, 94],
-    "measured_text": "Window 12 large: vector 30.7 s vs scalar 30.9 s whole run",
-    "notes": "Tree dominated. No vector force-only split or comparable scalar twin ranking; whole-run near-tie cannot score cycles/body.",
-    "sources": ["STATUS.md (window 12)", "work/tickets/S6-03.md"]
-  },
-  {
-    "id": "s5-flags",
-    "tickets": ["S5-01"],
-    "method": "twin",
-    "predicted_text": "V0 = V3 identical code; -O3 within twin band",
-    "measured_text": "No card run",
-    "notes": "No card direction available. V0/V3 A/B staged; no documented discarded variant, so no avoided run credited.",
-    "sources": ["STATUS.md", "work/tickets/S5-01.md"]
-  },
-  {
-    "id": "s8-parallel-tree",
-    "tickets": ["S8-02"],
-    "method": "model",
-    "predicted_text": "1-2 s tree (less than 13.2 s serial)",
-    "predicted_range": [1, 2],
-    "predicted_winner": "parallel",
-    "measured_winner": "serial",
-    "measured": 70.4,
-    "measured_text": "70.4 s tree vs 13.2 s serial",
-    "baseline": 13.2,
-    "unit": "s",
-    "notes": "Direction missed; a prediction range is retained instead of inventing a point estimate.",
-    "sources": ["docs/research/s8-model.md", "STATUS.md (23:52Z S8-02)", "work/tickets/S8-02.md"]
-  },
-  {
-    "id": "s8-serial-share",
-    "tickets": ["S8-01"],
-    "method": "model",
-    "predicted": 27,
-    "predicted_text": "~27 s serial share (S + P/t fit)",
-    "measured": 14.7,
-    "measured_text": "~14.7 s = tree 13.2 s + other serial ~1.5 s",
-    "unit": "s",
-    "notes": "Magnitude only; no variant winner or sign prediction to score. Force 13.0 s did not scale as P/t predicted; the fitted serial term is not just serial tree work.",
-    "sources": ["STATUS.md (thread sweep and phase timers)", "docs/research/s8-model.md"]
-  },
-  {
-    "id": "s8-tree-insertion",
-    "tickets": ["S8-04"],
-    "method": "twin",
-    "status": "unsupported",
-    "predicted_text": "unsupported",
-    "measured_text": "Tree total ~7300 cycles/body (includes other tree passes)",
-    "notes": "Cold calls, indirect call and jump table prevent the requested regions; no stub cost substituted.",
-    "sources": ["work/tickets/S8-04.md"]
-  },
-  {
-    "id": "s8-mixed-dwarf-fun",
-    "tickets": ["S8-04"],
-    "method": "twin",
-    "status": "unsupported",
-    "predicted_text": "unsupported",
-    "measured_text": "No per-fun card split",
-    "notes": "Cold calls, indirect call and jump table; no comparable prediction.",
-    "sources": ["work/tickets/S8-04.md"]
-  },
-  {
-    "id": "s1-functional-gravity",
-    "tickets": ["S1-05", "S1-06", "S1-07"],
-    "method": "twin",
-    "predicted_text": "Gravity functional ok; 1-ULP x87 double rounding found",
-    "measured_text": "Card likelihoods bit-identical to x86 (not a timing comparison)",
-    "notes": "Twin defect fixed as knc-twin T1-06. Native x87 PC=53 matches SSE. Functional evidence is retained but is not a scored variant ranking.",
-    "sources": ["STATUS.md (Proven and T1-06 lead notes)", "work/tickets/S1-05.md", "work/tickets/S1-06.md", "work/tickets/S1-07.md"]
-  }
+ {
+  "id": "s6-vector-walk",
+  "tickets": [
+   "S6-03"
+  ],
+  "method": "twin",
+  "predicted_text": "79-94% busy lanes; ~272k-293k cycles/body",
+  "predicted_cycles_range": [
+   272000,
+   293000
+  ],
+  "predicted_lane_busy_pct_range": [
+   79,
+   94
+  ],
+  "measured_text": "Window 12 large: vector 30.7 s vs scalar 30.9 s whole run",
+  "notes": "Tree dominated. No vector force-only split or comparable scalar twin ranking; whole-run near-tie cannot score cycles/body.",
+  "sources": [
+   "STATUS.md (window 12)",
+   "work/tickets/S6-03.md"
+  ]
+ },
+ {
+  "id": "s5-flags",
+  "tickets": [
+   "S5-01"
+  ],
+  "method": "twin",
+  "predicted_text": "V0 = V3 identical code; -O3 within twin band",
+  "measured_text": "No card run",
+  "notes": "No card direction available. V0/V3 A/B staged; no documented discarded variant, so no avoided run credited.",
+  "sources": [
+   "STATUS.md",
+   "work/tickets/S5-01.md"
+  ]
+ },
+ {
+  "id": "s8-parallel-tree",
+  "tickets": [
+   "S8-02"
+  ],
+  "method": "model",
+  "predicted_text": "1-2 s tree (less than 13.2 s serial)",
+  "predicted_range": [
+   1,
+   2
+  ],
+  "predicted_winner": "parallel",
+  "measured_winner": "serial",
+  "measured": 70.4,
+  "measured_text": "70.4 s tree vs 13.2 s serial",
+  "baseline": 13.2,
+  "unit": "s",
+  "notes": "Direction missed; a prediction range is retained instead of inventing a point estimate.",
+  "sources": [
+   "docs/research/s8-model.md",
+   "STATUS.md (23:52Z S8-02)",
+   "work/tickets/S8-02.md"
+  ]
+ },
+ {
+  "id": "s8-serial-share",
+  "tickets": [
+   "S8-01"
+  ],
+  "method": "model",
+  "predicted": 27,
+  "predicted_text": "~27 s serial share (S + P/t fit)",
+  "measured": 14.7,
+  "measured_text": "~14.7 s = tree 13.2 s + other serial ~1.5 s",
+  "unit": "s",
+  "notes": "Magnitude only; no variant winner or sign prediction to score. Force 13.0 s did not scale as P/t predicted; the fitted serial term is not just serial tree work.",
+  "sources": [
+   "STATUS.md (thread sweep and phase timers)",
+   "docs/research/s8-model.md"
+  ]
+ },
+ {
+  "id": "s8-tree-insertion",
+  "tickets": [
+   "S8-04"
+  ],
+  "method": "twin",
+  "status": "unsupported",
+  "predicted_text": "unsupported",
+  "measured_text": "Tree total ~7300 cycles/body (includes other tree passes)",
+  "notes": "Cold calls, indirect call and jump table prevent the requested regions; no stub cost substituted.",
+  "sources": [
+   "work/tickets/S8-04.md"
+  ]
+ },
+ {
+  "id": "s8-mixed-dwarf-fun",
+  "tickets": [
+   "S8-04"
+  ],
+  "method": "twin",
+  "status": "unsupported",
+  "predicted_text": "unsupported",
+  "measured_text": "No per-fun card split",
+  "notes": "Cold calls, indirect call and jump table; no comparable prediction.",
+  "sources": [
+   "work/tickets/S8-04.md"
+  ]
+ },
+ {
+  "id": "s1-functional-gravity",
+  "tickets": [
+   "S1-05",
+   "S1-06",
+   "S1-07"
+  ],
+  "method": "twin",
+  "predicted_text": "Gravity functional ok; 1-ULP x87 double rounding found",
+  "measured_text": "Card likelihoods bit-identical to x86 (not a timing comparison)",
+  "notes": "Twin defect fixed as knc-twin T1-06. Native x87 PC=53 matches SSE. Functional evidence is retained but is not a scored variant ranking.",
+  "sources": [
+   "STATUS.md (Proven and T1-06 lead notes)",
+   "work/tickets/S1-05.md",
+   "work/tickets/S1-06.md",
+   "work/tickets/S1-07.md"
+  ]
+ },
+ {
+  "id": "s9-tree3",
+  "tickets": [
+   "S9-04"
+  ],
+  "method": "model",
+  "predicted_text": "nbMakeTree ~2.13 s on the card (partition 1.53 serial dominates), recorded before the card run",
+  "predicted_range": [
+   2.13,
+   2.13
+  ],
+  "predicted_winner": "tree3",
+  "measured_winner": null,
+  "measured": null,
+  "measured_text": "",
+  "baseline": 9.91,
+  "unit": "s",
+  "notes": "LPT frontier model from x86 counts (work/tickets/S9-04.md); baseline = S8-07 pool tree on the card (window 14).",
+  "sources": [
+   "work/tickets/S9-04.md"
+  ]
+ },
+ {
+  "id": "s9-pgo",
+  "tickets": [
+   "S9-01"
+  ],
+  "method": "none",
+  "predicted_text": "no prediction recorded (twin blocked, S9-03)",
+  "predicted_range": null,
+  "predicted_winner": null,
+  "measured_winner": "pgo",
+  "measured": 59.73,
+  "measured_text": "core-small 62.37 -> 59.73 s; large 23.99 -> 23.94 s",
+  "baseline": 62.37,
+  "unit": "s",
+  "notes": "Card A/B 2026-11-17 knc-boinc window; twin could not run the regions (live-in state missing).",
+  "sources": [
+   "STATUS.md",
+   "runs/card/w-knc1/"
+  ]
+ }
 ]
