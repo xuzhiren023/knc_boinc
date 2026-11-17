@@ -30,6 +30,8 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `zzz-nbody-walk-layout.patch` | Performance | NBODY_WALK_LAYOUT=0 |
 | `zz-nbody-phase-timers.patch` | Instrumentation | NBODY_PHASE_TIMERS=0 |
 | `zz-nbody-tree-instrumentation.patch` | Instrumentation | Tree subphase timers; NBODY_TREE_IDENTITY=0 |
+| `zzzzz-nbody-walk-performance.patch` | Performance | WALK_PREFETCH=0, WALK_HOT=0, WALK_SCHEDULE=0; in-place hints, tree-time hot fields, force scheduling |
+| `zzzzzz-nbody-walk-profile.patch` | Instrumentation | WALK_PROFILE=0, WALK_PROOF=0; per-thread counters/timers and force byte proof |
 | `zzzz-nbody-walk-counters.patch` | Instrumentation | Host-only NBODY_WALK_COUNTERS=0 |
 
 Performance patches contain no numerical correctness fix. S8-09 separated the
@@ -163,3 +165,13 @@ isolated source; they cannot silently select an absent implementation.
   inclusive max/rejection times plus integral/attempt/RNG counts. Node dispatch
   includes team overhead and the implicit barrier. See
   `docs/research/s10-gen.md` for timer semantics, measurements and predictions.
+S10-02 performance helpers: `src/nbody_walk_prefetch.h`; instrumentation helpers:
+`src/nbody_walk_profile.h` and `src/nbody_walk_snapshot.h`. Each new patch and
+helper has exactly one class.
+WALK_HOT reuses common-node padding for rcrit2, puts mass beside position and
+quad immediately after the node; More follows it. FP64 node/body/cell sizes
+stay 64/96/160. Existing pool construction writes this layout directly. Body
+checkpoint offsets change: resume with the same build options. WALK_SCHEDULE=1
+selects dynamic1; 2 guided with FORCE_CHUNK minimum; 0 preserves existing
+dynamic scheduling. Profiling requires OpenMP and scalar gravity. All new
+options default off.

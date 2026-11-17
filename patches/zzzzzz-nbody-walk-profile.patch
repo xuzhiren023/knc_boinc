@@ -1,0 +1,101 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -25,6 +25,8 @@
+ #include "nbody_grav.h"
+ #include "nbody_walk_layout.h"
+ #include "nbody_walk_prefetch.h"
++#include "nbody_walk_profile.h"
++#include "nbody_walk_snapshot.h"
+ 
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+@@ -49,6 +51,7 @@
+  */
+ static inline mwvector nbGravity(const NBodyCtx* ctx, NBodyState* st, const Body* p)
+ {
++    NB_WALK_ENTER;
+     mwbool skipSelf = FALSE;
+ 
+     mwvector pos0 = Pos(p);
+@@ -58,6 +61,7 @@
+ 
+     while (q != NULL)               /* while not at end of scan */
+     {
++        NB_WALK_NODE;
+         nbWalkPrefetch(q);
+         nbWalkNextPrefetch(q);
+         mwvector dr = mw_subv(Pos(q), pos0);   /* Then compute distance */
+@@ -67,6 +71,7 @@
+         {
+             if (mw_likely((const Body*) q != p))   /* self-interaction? */
+             {
++                NB_WALK_HIT(q);
+                 real drab, phii, mor3;
+ 
+                 /* Compute gravity */
+@@ -137,6 +142,7 @@
+         nbReportTreeIncest(ctx, st);
+     }
+ 
++    NB_WALK_LEAVE;
+     return acc0;
+ }
+ 
+@@ -336,13 +342,34 @@
+         for (i = base; i < base+(int)count; ++i)
+         {
+ #else
++#if NBODY_WALK_PROFILE
++    NBWalkProfile* nb_rows = calloc(omp_get_max_threads(), sizeof(*nb_rows));
++    if (!nb_rows) abort();
++    #pragma omp parallel private(i, b, a, externAcc) shared(bodies, accels, nb_rows)
++    {
++    double nb_loop_start = omp_get_wtime();
++    nbWalkThread = (NBWalkProfile){0};
++    nbWalkThread.team = omp_get_num_threads();
++#endif
+   #ifdef _OPENMP
+ #if NBODY_WALK_SCHEDULE == 1
++#if NBODY_WALK_PROFILE
++    #pragma omp for schedule(dynamic, 1) nowait
++#else
+     #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 1)
++#endif
+ #elif NBODY_WALK_SCHEDULE == 2
++#if NBODY_WALK_PROFILE
++    #pragma omp for schedule(guided, NBODY_FORCE_CHUNK) nowait
++#else
+     #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(guided, NBODY_FORCE_CHUNK)
++#endif
++#else
++#if NBODY_WALK_PROFILE
++    #pragma omp for schedule(dynamic, NBODY_FORCE_CHUNK) nowait
+ #else
+     #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, NBODY_FORCE_CHUNK)
++#endif
+ #endif
+   #endif
+     for (i = 0; i < nbody; ++i)      /* get force on each body */
+@@ -406,6 +433,12 @@
+     }
+ #if NBODY_VECTOR_GRAVITY
+     }
++#elif NBODY_WALK_PROFILE
++    nbWalkThread.active = omp_get_wtime() - nb_loop_start;
++    nb_rows[omp_get_thread_num()] = nbWalkThread;
++    }
++    nbWalkProfilePrint(st, nb_rows);
++    free(nb_rows);
+ #endif
+ }
+ 
+@@ -537,7 +570,9 @@
+ #if NBODY_WALK_COUNTERS
+             nbWalkCounts(ctx, st);
+ #endif
++            nbWalkSnapshot(ctx, st);
+             nbMapForceBody(ctx, st);
++            nbWalkProof(st);
+ #if NBODY_WALK_LAYOUT
+             nbWalkEnd(st, &walk);
+ #endif

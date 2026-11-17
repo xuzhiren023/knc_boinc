@@ -208,5 +208,28 @@
    "work/tickets/S10-03.md",
    "docs/research/s10-gen.md"
   ]
+ },
+ {
+  "id": "s10-walk-twin",
+  "tickets": [
+   "S10-02"
+  ],
+  "method": "twin",
+  "predicted_text": "knc-twin nbGravity, one core 4 contexts, real tree: base 148,351 core cycles/body; prefetch -3.2%, hot layout +0.7%, both -1.6% (no winner within 20%); card force scenarios 10.8-16.5 s",
+  "predicted_range": [
+   10.8,
+   16.5
+  ],
+  "predicted_winner": null,
+  "measured_winner": null,
+  "measured": null,
+  "measured_text": "",
+  "baseline": 12.7,
+  "unit": "s",
+  "notes": "First status-ok twin simulation of the force walk; unvalidated_scenario_estimate.",
+  "sources": [
+   "work/tickets/S10-02.md",
+   "docs/research/s10-force-walk.md"
+  ]
  }
 ]

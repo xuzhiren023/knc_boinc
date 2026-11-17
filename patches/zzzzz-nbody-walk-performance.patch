@@ -1,0 +1,103 @@
+--- a/nbody/src/nbody_grav.c
++++ b/nbody/src/nbody_grav.c
+@@ -24,6 +24,7 @@
+ #include "nbody_util.h"
+ #include "nbody_grav.h"
+ #include "nbody_walk_layout.h"
++#include "nbody_walk_prefetch.h"
+ 
+ /* Preserve upstream scheduling unless the build selects a force chunk. */
+ #ifndef NBODY_FORCE_CHUNK
+@@ -58,6 +59,7 @@
+     while (q != NULL)               /* while not at end of scan */
+     {
+         nbWalkPrefetch(q);
++        nbWalkNextPrefetch(q);
+         mwvector dr = mw_subv(Pos(q), pos0);   /* Then compute distance */
+         real drSq = mw_sqrv(dr);               /* and distance squared */
+ 
+@@ -335,7 +337,13 @@
+         {
+ #else
+   #ifdef _OPENMP
++#if NBODY_WALK_SCHEDULE == 1
++    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, 1)
++#elif NBODY_WALK_SCHEDULE == 2
++    #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(guided, NBODY_FORCE_CHUNK)
++#else
+     #pragma omp parallel for private(i, b, a, externAcc) shared(bodies, accels) schedule(dynamic, NBODY_FORCE_CHUNK)
++#endif
+   #endif
+     for (i = 0; i < nbody; ++i)      /* get force on each body */
+     {
+--- a/nbody/include/nbody_types.h
++++ b/nbody/include/nbody_types.h
+@@ -99,17 +99,37 @@
+ 
+ typedef short body_t;
+ 
++#ifndef NBODY_WALK_HOT
++#define NBODY_WALK_HOT 0
++#endif
++
+ /* node: data common to BODY and CELL structures. */
+ typedef struct MW_ALIGN_TYPE _NBodyNode
+ {
++#if NBODY_WALK_HOT
++    /* Reuse node padding for cell opening radius. Pool construction writes
++     * moments directly in this layout; no force-time conversion is needed.
++     * Body rcrit2 is unused. Common node stays 64 bytes in FP64 builds. */
++    mwvector pos;
++    real mass;
++    real rcrit2;
++    struct _NBodyNode* next;
++    body_t type;
++    unsigned int id;
++#else
+     mwvector pos;             /* position of node */
+     struct _NBodyNode* next;  /* link to next force-calc */
+     real mass;                /* total mass of node */
+     body_t type;              /* code for node type */
+     unsigned int id;          /* body id */
++#endif
+ } NBodyNode;
+ 
++#if NBODY_WALK_HOT
++#define EMPTY_NODE { ZERO_VECTOR, 0.0, 0.0, NULL, 0, 0 }
++#else
+ #define EMPTY_NODE { ZERO_VECTOR, NULL, 0.0, 0, 0  }
++#endif
+ 
+ #define Type(x) (((NBodyNode*) (x))->type)
+ #define Mass(x) (((NBodyNode*) (x))->mass)
+@@ -146,13 +166,18 @@
+ typedef struct MW_ALIGN_TYPE
+ {
+     NBodyNode cellnode;         /* data common to all nodes */
++#if !NBODY_WALK_HOT
+     real rcrit2;                /* critical c-of-m radius^2 */
+     NBodyNode* more;            /* link to first descendent */
++#endif
+     union MW_ALIGN_V(16)        /* shared storage for... */
+     {
+         NBodyNode* subp[NSUB];  /* descendents of cell */
+         NBodyQuadMatrix quad;   /* quad. moment of cell. Unique symmetric matrix components */
+     } stuff;
++#if NBODY_WALK_HOT
++    NBodyNode* more;            /* link after contiguous hot fields */
++#endif
+ } NBodyCell;
+ 
+ /* use alternate criteria */
+@@ -174,7 +199,11 @@
+ } ExternalPotentialType;
+ 
+ 
++#if NBODY_WALK_HOT
++#define Rcrit2(x) (((NBodyNode*) (x))->rcrit2)
++#else
+ #define Rcrit2(x) (((NBodyCell*) (x))->rcrit2)
++#endif
+ #define More(x)   (((NBodyCell*) (x))->more)
+ #define Subp(x)   (((NBodyCell*) (x))->stuff.subp)
+ #define Quad(x)   (((NBodyCell*) (x))->stuff.quad)
