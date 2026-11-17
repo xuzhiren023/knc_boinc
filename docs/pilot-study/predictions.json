@@ -163,5 +163,27 @@
    "STATUS.md",
    "runs/card/w-knc1/"
   ]
+ },
+ {
+  "id": "s9-tree4",
+  "tickets": [
+   "S9-06"
+  ],
+  "method": "model",
+  "predicted_text": "partition ~0.92 s (from 5.93), nbMakeTree ~2.07 s, large whole ~15.9 s, recorded before the card run",
+  "predicted_range": [
+   15.9,
+   15.9
+  ],
+  "predicted_winner": "tree4",
+  "measured_winner": null,
+  "measured": null,
+  "measured_text": "",
+  "baseline": 20.95,
+  "unit": "s",
+  "notes": "Scaling model in .work/S9-06/build/s9/tree4-prediction.txt; baseline S9-04 tree3 on the card.",
+  "sources": [
+   "work/tickets/S9-06.md"
+  ]
  }
 ]

@@ -1,0 +1,305 @@
+--- a/nbody/src/nbody_tree.c
++++ b/nbody/src/nbody_tree.c
+@@ -27,7 +27,7 @@
+ #ifndef NBODY_TREE_VARIANT
+ #define NBODY_TREE_VARIANT 0
+ #endif
+-/* 0: upstream, 1: parallel moments, 2: fixed pool, 3: balanced pool. */
++/* 0: upstream, 1: parallel moments, 2: fixed pool, 3: balanced pool, 4: parallel partition. */
+ #define NBODY_PARALLEL_TREE (NBODY_TREE_VARIANT != 0)
+ #define NB_TREE_DEPTH 3
+ #define NB_TREE_BUCKETS 512
+@@ -40,6 +40,22 @@
+     real size;
+     unsigned depth;
+ } NBTreeBucket;
++
++#if NBODY_TREE_VARIANT == 4
++/* Contiguous tiles permit every worker to classify a long unary path. A
++ * per-group prefix in tile order gives disjoint destinations; each tile then
++ * scatters in body order. Thus stability is independent of worker scheduling.
++ * No coordinate quantization: every level uses the actual serial midpoint. */
++#define NB_PATH_TILE 64
++typedef struct {
++    NBTreeBucket bucket;
++    int firstTile, endTile, offsets[NSUB + 1];
++} NBPathGroup;
++typedef struct {
++    int group, first, count, next[NSUB];
++} NBPathTile;
++
++#endif
+
+ typedef struct {
+     NBodyCell root;
+@@ -53,6 +69,10 @@
+     NBTreeBucket *frontier, *top;
+     size_t topCapacity;
+     int frontierUsed, topUsed;
++#if NBODY_TREE_VARIANT == 4
++    NBPathGroup *pathGroups, *pathNext;
++    NBPathTile* pathTiles;
++#endif
+ } NBTreePool;
+
+ /* Allocation routing for the arena and stable scratch. */
+@@ -67,7 +87,11 @@
+     if (!pool) return;
+     mwFreeA(pool->cells); free(pool->keys); free(pool->bodies);
+     mwFreeA(pool->workers); free(pool->scratch);
+-    free(pool->frontier); free(pool->top); mwFreeA(pool);
++    free(pool->frontier); free(pool->top);
++#if NBODY_TREE_VARIANT == 4
++    free(pool->pathGroups); free(pool->pathNext); free(pool->pathTiles);
++#endif
++    mwFreeA(pool);
+     st->treePool = NULL; st->tree.root = NULL; st->freeCell = NULL;
+ }
+
+@@ -95,10 +119,16 @@
+         free(p->keys); free(p->bodies);
+         p->keys = nbTreeAlloc(st->nbody * sizeof(*p->keys), 0);
+         p->bodies = nbTreeAlloc(st->nbody * sizeof(*p->bodies), 0);
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+         free(p->scratch); free(p->frontier);
+         p->scratch = nbTreeAlloc(st->nbody * sizeof(*p->scratch), 0);
+         p->frontier = nbTreeAlloc((st->nbody + 1) * sizeof(*p->frontier), 0);
++#if NBODY_TREE_VARIANT == 4
++        free(p->pathGroups); free(p->pathNext); free(p->pathTiles);
++        p->pathGroups = nbTreeAlloc((st->nbody + 1) * sizeof(*p->pathGroups), 0);
++        p->pathNext = nbTreeAlloc((st->nbody + 1) * sizeof(*p->pathNext), 0);
++        p->pathTiles = nbTreeAlloc((st->nbody + 1) * sizeof(*p->pathTiles), 0);
++#endif
+ #endif
+         p->nbody = st->nbody;
+     }
+@@ -710,7 +740,7 @@
+ /* Four jobs per thread trade serial top work against tail imbalance. Each
+  * stable scatter retains original body order. Midpoints use nbInitMidpoint,
+  * including repeated rounding, exactly as serial collision insertion does. */
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+ static void nbBalancedSplit(NBodyState* st, NBodyCell* cell, real size,
+                             unsigned depth, Body** bodies, Body** scratch,
+                             int count, int limit)
+@@ -767,8 +797,179 @@
+     return (na < nb) - (na > nb);
+ }
+
++#if NBODY_TREE_VARIANT == 4
++static void nbParallelPartition(NBodyState* st)
++{
++    NBTreePool* pool = st->treePool;
++    NBPathGroup *groups = pool->pathGroups, *nextGroups = pool->pathNext;
++    NBPathTile* tiles = pool->pathTiles;
++    int limit = MAX(2, st->nbody / (4 * pool->threads));
++    int initialTiles = (st->nbody + NB_PATH_TILE - 1) / NB_PATH_TILE;
++    int active = 0, tileCount = 0, count = 0, i;
++    pool->frontierUsed = pool->topUsed = 0;
++#ifdef _OPENMP
++    #pragma omp parallel shared(groups, nextGroups, active, tileCount, count)
++#endif
++    {
++        int j;
++        /* Stable compaction excludes zero-mass bodies just as serial insertion
++         * does. Scratch slots belong to the original contiguous input tile. */
++#ifdef _OPENMP
++        #pragma omp for schedule(static)
++#endif
++        for (j = 0; j < initialTiles; ++j) {
++            int first = j * NB_PATH_TILE, k, used = 0;
++            int end = MIN(st->nbody, first + NB_PATH_TILE);
++            for (k = first; k < end; ++k)
++                if (Mass(st->bodytab + k) != 0.0)
++                    pool->scratch[first + used++] = st->bodytab + k;
++            tiles[j].count = used;
++        }
++#ifdef _OPENMP
++        #pragma omp single
++#endif
++        {
++            for (j = 0; j < initialTiles; ++j) {
++                tiles[j].first = count;
++                count += tiles[j].count;
++            }
++        }
++#ifdef _OPENMP
++        #pragma omp for schedule(static)
++#endif
++        for (j = 0; j < initialTiles; ++j)
++            memcpy(pool->bodies + tiles[j].first, pool->scratch + j * NB_PATH_TILE,
++                   tiles[j].count * sizeof(*pool->bodies));
++#ifdef _OPENMP
++        #pragma omp single
++#endif
++        {
++            NBTreeBucket b;
++            b.cell = st->tree.root; b.size = st->tree.rsize; b.depth = 0;
++            b.bodies = pool->bodies; b.count = count;
++            if (count <= limit || b.size <= REAL_EPSILON)
++                pool->frontier[pool->frontierUsed++] = b;
++            else { groups[0].bucket = b; active = 1; }
++        }
++        while (active) {
++#ifdef _OPENMP
++            #pragma omp single
++#endif
++            {
++                tileCount = 0;
++                for (j = 0; j < active; ++j) {
++                    NBPathGroup* g = groups + j;
++                    int first = (int) (g->bucket.bodies - pool->bodies), k;
++                    g->firstTile = tileCount;
++                    for (k = 0; k < g->bucket.count; k += NB_PATH_TILE) {
++                        NBPathTile* tile = tiles + tileCount++;
++                        tile->group = j; tile->first = first + k;
++                        tile->count = MIN(NB_PATH_TILE, g->bucket.count - k);
++                    }
++                    g->endTile = tileCount;
++                }
++            }
++#ifdef _OPENMP
++            #pragma omp for schedule(static)
++#endif
++            for (j = 0; j < tileCount; ++j) {
++                NBPathTile* tile = tiles + j;
++                NBodyCell* cell = groups[tile->group].bucket.cell;
++                int k, oct;
++                for (oct = 0; oct < NSUB; ++oct) tile->next[oct] = 0;
++                for (k = tile->first; k < tile->first + tile->count; ++k) {
++                    oct = nbSubIndex(pool->bodies[k], cell);
++                    pool->keys[k] = (unsigned short) oct;
++                    ++tile->next[oct];
++                }
++            }
++#ifdef _OPENMP
++            #pragma omp for schedule(static)
++#endif
++            for (j = 0; j < active; ++j) {
++                NBPathGroup* g = groups + j;
++                int oct, t, offset = (int) (g->bucket.bodies - pool->bodies);
++                for (oct = 0; oct < NSUB; ++oct) {
++                    g->offsets[oct] = offset;
++                    for (t = g->firstTile; t < g->endTile; ++t) {
++                        int n = tiles[t].next[oct];
++                        tiles[t].next[oct] = offset; offset += n;
++                    }
++                }
++                g->offsets[NSUB] = offset;
++            }
++#ifdef _OPENMP
++            #pragma omp for schedule(static)
++#endif
++            for (j = 0; j < tileCount; ++j) {
++                NBPathTile* tile = tiles + j;
++                int k;
++                for (k = tile->first; k < tile->first + tile->count; ++k)
++                    pool->scratch[tile->next[pool->keys[k]]++] = pool->bodies[k];
++            }
++#ifdef _OPENMP
++            #pragma omp for schedule(static)
++#endif
++            for (j = 0; j < tileCount; ++j)
++                memcpy(pool->bodies + tiles[j].first, pool->scratch + tiles[j].first,
++                       tiles[j].count * sizeof(*pool->bodies));
++#ifdef _OPENMP
++            #pragma omp single
++#endif
++            {
++                int nextUsed = 0;
++                for (j = 0; j < active; ++j) {
++                    NBPathGroup* g = groups + j;
++                    NBTreeBucket b = g->bucket;
++                    int oct;
++                    /* Append parents in breadth order, then reverse below.
++                     * Only parent/child order matters between upper cells;
++                     * each individual moment still sums in octant order. */
++                    if ((size_t) pool->topUsed == pool->topCapacity) {
++                        size_t capacity = pool->topCapacity ? 2 * pool->topCapacity : 128;
++                        NBTreeBucket* top = nbTreeAlloc(capacity * sizeof(*top), 0);
++                        if (pool->topUsed) memcpy(top, pool->top, pool->topUsed * sizeof(*top));
++                        free(pool->top); pool->top = top; pool->topCapacity = capacity;
++                    }
++                    pool->top[pool->topUsed++] = b;
++                    for (oct = 0; oct < NSUB; ++oct) {
++                        int first = g->offsets[oct];
++                        int n = g->offsets[oct + 1] - first;
++                        if (n == 1) {
++                            Subp(b.cell)[oct] = (NBodyNode*) pool->bodies[first];
++                            st->tree.maxDepth = MAX(st->tree.maxDepth, b.depth);
++                        } else if (n > 1) {
++                            NBTreeBucket child;
++                            child.cell = nbMakeCell(st, &st->tree);
++                            nbInitMidpoint(child.cell, pool->bodies[first], b.cell, b.size);
++                            Subp(b.cell)[oct] = (NBodyNode*) child.cell;
++                            child.size = b.size * 0.5; child.depth = b.depth + 1;
++                            child.bodies = pool->bodies + first; child.count = n;
++                            if (n <= limit || child.size <= REAL_EPSILON)
++                                pool->frontier[pool->frontierUsed++] = child;
++                            else nextGroups[nextUsed++].bucket = child;
++                        }
++                    }
++                }
++                { NBPathGroup* swap = groups; groups = nextGroups; nextGroups = swap; }
++                active = nextUsed;
++            }
++        }
++    }
++    for (i = 0; i < pool->topUsed / 2; ++i) {
++        NBTreeBucket swap = pool->top[i];
++        pool->top[i] = pool->top[pool->topUsed - 1 - i];
++        pool->top[pool->topUsed - 1 - i] = swap;
++    }
++    qsort(pool->frontier, pool->frontierUsed, sizeof(*pool->frontier), nbBiggestFirst);
++}
++#endif
++
+ static void nbBalancedPartition(NBodyState* st)
+ {
++#if NBODY_TREE_VARIANT == 4
++    nbParallelPartition(st);
++#else
+     NBTreePool* pool = st->treePool;
+     int i, count = 0;
+     int limit = MAX(2, st->nbody / (4 * pool->threads));
+@@ -778,6 +979,7 @@
+     nbBalancedSplit(st, st->tree.root, st->tree.rsize, 0,
+                     pool->bodies, pool->scratch, count, limit);
+     qsort(pool->frontier, pool->frontierUsed, sizeof(*pool->frontier), nbBiggestFirst);
++#endif
+ }
+
+ static void nbBalancedMoments(const NBodyCtx* ctx, NBodyTree* t, NBTreePool* pool)
+@@ -858,7 +1060,7 @@
+     nbNewTree(st, t);
+     expandBox(t, st->bodytab, st->nbody, pool);
+     if (pool) nbPoolPrepare(st);
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+     if (pool) {
+         NBTreePool* arena = st->treePool;
+         nbBalancedPartition(st);
+@@ -876,19 +1078,19 @@
+         if (parallel) nbCollectFrontier(t->root, t->rsize, 0, buckets, &used);
+     }
+     if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+     if (pool) nbBalancedMoments(ctx, t, st->treePool);
+     else
+ #endif
+     nbMoments(ctx, t, buckets, used, parallel);
+     if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+     if (pool) nbBalancedThread(st->treePool);
+     else
+ #endif
+     threadTree((NBodyNode*) t->root, NULL);
+     if (ctx->useQuad) {
+-#if NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_VARIANT >= 3
+         if (pool) nbBalancedQuads(st->treePool);
+         else
+ #endif

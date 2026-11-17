@@ -8,8 +8,8 @@
  #ifdef _OPENMP
  #include <omp.h>
  #endif
-@@ -55,10 +56,15 @@
-     int frontierUsed, topUsed;
+@@ -75,10 +76,15 @@
+ #endif
  } NBTreePool;
 
 -/* Allocation routing for the arena and stable scratch. */
@@ -26,7 +26,7 @@
  }
 
  void nbReleaseTreePool(NBodyState* st)
-@@ -115,6 +121,10 @@
+@@ -145,6 +151,10 @@
      st->treePoolNext = st->treePoolEnd = 0;
  }
 
@@ -37,10 +37,11 @@
 
  #include <lua.h>
  #include <lauxlib.h>
-@@ -565,6 +575,25 @@
+@@ -594,6 +604,25 @@
+  * A lone body is attached directly; only collisions create top cells. */
 
 
-
++
 +#if NBODY_TREE_IDENTITY
 +static void nbShapeWalk(NBodyCell* p, unsigned char** out)
 +{
@@ -59,17 +60,16 @@
 +    nbShapeWalk(t->root, &cursor);
 +}
 +#endif
-+
+
  /* The top levels are constructed from contiguous ranges of one stable
   * counting sort. Keys use the same repeated midpoint arithmetic as insertion. */
- static void nbTopCells(NBodyState* st, NBodyCell* cell, real size,
-@@ -845,7 +874,68 @@
+@@ -1047,7 +1076,68 @@
  }
  #endif
 
 -static NBodyStatus nbBuildTree(const NBodyCtx* ctx, NBodyState* st, int parallel)
 +
-+#if NBODY_TREE_IDENTITY && NBODY_TREE_VARIANT == 3
++#if NBODY_TREE_IDENTITY && NBODY_TREE_VARIANT >= 3
 +typedef struct {
 +    int *jobs, used, top;
 +    unsigned long visits;
@@ -133,7 +133,7 @@
  {
      Body* p;
      NBodyTree* t = &st->tree;
-@@ -855,52 +945,175 @@
+@@ -1057,52 +1147,175 @@
          st->treePool = nbTreeAlloc(sizeof(NBTreePool), 1);
          memset(st->treePool, 0, sizeof(NBTreePool));
      }
@@ -143,7 +143,7 @@
 +    NB_PHASE(NB_TREE_NEW, nbNewTree(st, t));
 +    NB_PHASE(NB_TREE_EXPAND, expandBox(t, st->bodytab, st->nbody, pool));
 +    if (pool) NB_PHASE(NB_TREE_PARTITION, nbPoolPrepare(st));
- #if NBODY_TREE_VARIANT == 3
+ #if NBODY_TREE_VARIANT >= 3
      if (pool) {
          NBTreePool* arena = st->treePool;
 -        nbBalancedPartition(st);
@@ -171,7 +171,7 @@
 +        if (parallel) NB_PHASE(NB_TREE_PARTITION, nbCollectFrontier(t->root, t->rsize, 0, buckets, &used));
      }
      if (t->structureError) return NBODY_TREE_STRUCTURE_ERROR;
- #if NBODY_TREE_VARIANT == 3
+ #if NBODY_TREE_VARIANT >= 3
 -    if (pool) nbBalancedMoments(ctx, t, st->treePool);
 +    if (pool) NB_PHASE(NB_TREE_COFM, nbBalancedMoments(ctx, t, st->treePool));
      else
@@ -182,7 +182,7 @@
 +#if NBODY_TREE_IDENTITY
 +    nbRecordShape(t, shape);
 +#endif
- #if NBODY_TREE_VARIANT == 3
+ #if NBODY_TREE_VARIANT >= 3
 -    if (pool) nbBalancedThread(st->treePool);
 +    if (pool) NB_PHASE(NB_TREE_THREAD, nbBalancedThread(st->treePool));
      else
@@ -190,7 +190,7 @@
 -    threadTree((NBodyNode*) t->root, NULL);
 +    NB_PHASE(NB_TREE_THREAD, threadTree((NBodyNode*) t->root, NULL));
      if (ctx->useQuad) {
- #if NBODY_TREE_VARIANT == 3
+ #if NBODY_TREE_VARIANT >= 3
 -        if (pool) nbBalancedQuads(st->treePool);
 +        if (pool) NB_PHASE(NB_TREE_QUAD, nbBalancedQuads(st->treePool));
          else
