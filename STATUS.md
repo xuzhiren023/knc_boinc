@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 21:00-21:22Z FULL 117676 with the S10-10 batched vector build: 1,294 s card (21.6 min, incl. staging)
+  vs 1,678 s release (27.97 min): -23%. All 8 likelihood tags identical to the stock 1.96 app (-92.418153851030638).
+  Owner's panel: ~163 W during the run (scalar builds ~137 W, WRF 178-181 W). Receipts runs/card/real-117676/.
 - 2026-11-17 20:40-20:57Z window (tcp-large): S10-10 DF_BATCH card seconds core-small 52.1 -> 41.5 (-20%), real-steps
   251.5 -> 181.9 (-28%), likelihoods identical (window self-check failed only on the script hash after the lead's
   card_run path edit). First real star-setup speedup from vectors on the card.
