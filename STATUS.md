@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 owner: knc-boinc books its own card windows on the shared ledger (not GCC-KNC turn rows). S9-02 makes a
+  local card_run with project "knc-boinc" plus turn-row script. Next window after PhiWeather (~13:30Z): 2 PGO training
+  jobs + 8 thread-setting jobs (S9-01, GCC-KNC's order: libgomp defaults first), then the PGO rebuild and its A/B.
 - 2026-11-17 GCC-KNC S14-44 is their next ticket: phase 0 = best existing flag set for x87-heavy scalar double
   under our contract (53-bit, no contraction, no fast-math), ranked with knc-twin, plus a staged A/B list (core-small,
   large) for us to run; lane-0 IMCI codegen is a later go/no-go. Waits on the owner freeing the laptop and disk > 30 GB.
