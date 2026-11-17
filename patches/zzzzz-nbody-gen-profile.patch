@@ -1,0 +1,291 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -36,6 +36,7 @@
+ #include "nbody_potential_types.h"
+ #include "nbody_io.h"
+ #include "nbody_king_model.h"
++#include "nbody_gen_profile.h"
+ 
+ #ifndef NBODY_GEN_PIPELINE
+ #define NBODY_GEN_PIPELINE 0
+@@ -401,6 +402,7 @@
+ 
+     /* Only independent function evaluations run in parallel. No reduction:
+      * retain the truncated 1.96 constants and left-to-right accumulation. */
++    GP_BEGIN(nodes);
+     long node;
+ #if NBODY_GEN_PIPELINE
+     #pragma omp parallel private(node)
+@@ -435,6 +437,7 @@
+     }
+     if (gen_pipe.active) gen_pipe.count = 2;
+ #endif
++    GP_END();
+     size_t i;
+     for (i = 0; i < count; ++i)
+     {
+@@ -455,6 +458,17 @@
+ #else
+ #define gauss_quad gauss_quad_serial
+ #endif
++
++static real gen_quad(real (*func)(real, const Dwarf*, const Dwarf*, real, mwbool),
++                     real lower, real upper, const Dwarf* c1, const Dwarf* c2,
++                     real energy, mwbool dark)
++{
++    GP_COUNT(integrals);
++    GP_BEGIN(quad_serial);
++    real value = gauss_quad(func, lower, upper, c1, c2, energy, dark);
++    GP_END();
++    return value;
++}
+ 
+ static inline real max_finder(real (*profile)(real , real , const Dwarf*, const Dwarf*, mwbool), real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark, real a, real b, real c, int limit, real tolerance)
+ {
+@@ -845,6 +859,7 @@
+ 
+ static real dist_fun(real v, real r, const Dwarf* comp1, const Dwarf* comp2, mwbool isDark)
+ {
++    GP_BEGIN(dist_serial);
+     /*This returns the value of the distribution function*/
+ 
+     //-------------------------------
+@@ -878,8 +893,10 @@
+             }
+         }
+         if (!hit) prepared = gen_prepare(v, r, comp1, comp2);
+-        return v * v * cons * gauss_quad(fun, prepared.lower, prepared.upper,
++        real result = v * v * cons * gen_quad(fun, prepared.lower, prepared.upper,
+                                          comp1, comp2, prepared.energy, isDark);
++        GP_END();
++        return result;
+     }
+ #endif
+ 
+@@ -926,7 +943,7 @@
+         lowerlimit_r = 10.0 * (upperlimit_r);
+ 
+         /*This calls guassian quad to integrate the function for a given energy*/
+-        distribution_function = v * v * cons * gauss_quad(fun, lowerlimit_r, upperlimit_r, comp1, comp2, energy, isDark);
++        distribution_function = v * v * cons * gen_quad(fun, lowerlimit_r, upperlimit_r, comp1, comp2, energy, isDark);
+     } else {
+         real king_energy, rho1, sig;
+         if (comp1->type == King && comp1->mass > 0.0) {
+@@ -943,6 +960,7 @@
+ 
+         distribution_function = v * v * king_df;
+     }
++    GP_END();
+     return distribution_function;
+ }
+ 
+@@ -963,8 +981,9 @@
+      */
+     while (1)
+     {
+-        r = (real)mwXrandom(dsfmtState, 0.0, 1.0) * bound;
+-        u = (real)mwXrandom(dsfmtState, 0.0, 1.0);
++        GP_COUNT(radius_attempts);
++        r = (real)gp_random(dsfmtState, 0.0, 1.0) * bound;
++        u = (real)gp_random(dsfmtState, 0.0, 1.0);
+         val = r * r * get_density(comp, r);
+         if(val / rho_max > u)
+         {
+@@ -1009,11 +1028,15 @@
+     }
+     v_esc = 0.99 * mw_sqrt( mw_fabs(2.0 * (potential( r, comp1, comp2) + potential_offset)) );
+ 
++    GP_BEGIN(max);
+     real dist_max = max_finder(dist_fun, r, comp1, comp2, isDark, 0.0, 0.5 * v_esc, v_esc, 10, 1.0e-2);
++    GP_END();
++    GP_BEGIN(rejection);
+     while(1)
+     {
+-        v = (real)mwXrandom(dsfmtState, 0.0, 1.0) * v_esc;
+-        u = (real)mwXrandom(dsfmtState, 0.0, 1.0);
++        GP_COUNT(velocity_attempts);
++        v = (real)gp_random(dsfmtState, 0.0, 1.0) * v_esc;
++        u = (real)gp_random(dsfmtState, 0.0, 1.0);
+         d = dist_fun(v, r, comp1, comp2, isDark);
+ 
+         if(mw_fabs(d / dist_max) > u)
+@@ -1032,6 +1055,7 @@
+         }
+     }
+ 
++    GP_END();
+     return v; //kpc/Gyr
+ }
+ 
+@@ -1047,7 +1071,7 @@
+ 
+     do
+     {
+-        vec = mwRandomUnitPoint(dsfmtState); /* pick point in NDIM-space */
++        vec = gp_unitpoint(dsfmtState); /* pick point in NDIM-space */
+         r_sq = mw_sqrv(vec);                 /* compute radius squared */
+     }
+     while (r_sq > 1.0);                      /* reject if outside unit sphere */
+@@ -1315,6 +1339,8 @@
+     * etc).    See Aarseth, SJ, Henon, M, & Wielen, R (1974) Astr & Ap, 37,
+     * 183.
+     */
++        GP_RESET();
++        GP_BEGIN(body);
+         unsigned int i = 0;
+         unsigned int nbody_dark = nbody - nbody_baryon;
+         int table = 0;
+@@ -1534,6 +1560,8 @@
+         /*getting the radii and velocities for the bodies*/
+         for (i = 0; i < nbody; i++)
+         {
++            GP_BODY_START();
++            GP_BEGIN(radius);
+             counter = 0;
+             do
+             {
+@@ -1566,6 +1594,7 @@
+                 }
+ 
+             }while (1);
++            GP_END();
+             counter = 0;
+             do
+             {
+@@ -1598,6 +1627,7 @@
+                 }
+ 
+             }while (1);
++            GP_BEGIN(components);
+             vec = get_components(prng, v);
+             vx[i] = vec.x;
+             vy[i] = vec.y;
+@@ -1606,6 +1636,8 @@
+             x[i] = vec.x;
+             y[i] = vec.y;
+             z[i] = vec.z;
++            GP_END();
++            GP_BODY_END();
+         }
+ 
+ 
+@@ -1644,6 +1676,8 @@
+             lua_rawseti(luaSt, table, i + 1);
+         }
+ 
++        GP_END();
++        GP_REPORT(nbody);
+         /* go now and be free!*/
+         free(x);
+         free(y);
+--- /dev/null
++++ b/nbody/include/nbody_gen_profile.h
+@@ -0,0 +1,108 @@
++/* S10-03 instrumentation only. All hooks compile away unless selected. */
++#ifndef NBODY_GEN_PROFILE_H
++#define NBODY_GEN_PROFILE_H
++#ifndef NBODY_GEN_PROFILE
++#define NBODY_GEN_PROFILE 0
++#endif
++#if NBODY_GEN_PROFILE
++#include <omp.h>
++#include <stdio.h>
++#include <string.h>
++#include <limits.h>
++enum { GP_body, GP_nodes, GP_quad_serial, GP_dist_serial, GP_max,
++       GP_rejection, GP_radius, GP_rng, GP_components, GP_N };
++static const char* const gp_names[GP_N] = {
++    "body", "nodes", "quad_serial", "dist_serial", "max", "rejection",
++    "radius", "rng", "components"
++};
++static struct {
++    double exclusive[GP_N], inclusive[GP_N], stamp;
++    int stack[16], depth;
++    unsigned long long integrals, velocity_attempts, radius_attempts, rng_calls;
++    unsigned long long before[3], minimum[3], maximum[3];
++} gp;
++/* Hooks run on the serial generator caller, never on node workers. */
++static void gp_enter(int phase)
++{
++    double now = omp_get_wtime();
++    if (gp.depth) gp.exclusive[gp.stack[gp.depth-1]] += now - gp.stamp;
++    gp.stack[gp.depth++] = phase;
++    gp.inclusive[phase] -= now;
++    gp.stamp = now;
++}
++static void gp_leave(void)
++{
++    double now = omp_get_wtime();
++    int phase = gp.stack[--gp.depth];
++    gp.exclusive[phase] += now - gp.stamp;
++    gp.inclusive[phase] += now;
++    gp.stamp = now;
++}
++static void gp_reset(void)
++{
++    int j;
++    memset(&gp, 0, sizeof(gp));
++    for (j=0; j<3; ++j) gp.minimum[j] = ULLONG_MAX;
++}
++static void gp_body_start(void)
++{
++    gp.before[0]=gp.integrals;
++    gp.before[1]=gp.velocity_attempts;
++    gp.before[2]=gp.radius_attempts;
++}
++static void gp_body_end(void)
++{
++    unsigned long long counts[3] = {gp.integrals,gp.velocity_attempts,gp.radius_attempts};
++    int j;
++    for (j=0; j<3; ++j) {
++        unsigned long long n=counts[j]-gp.before[j];
++        if (n<gp.minimum[j]) gp.minimum[j]=n;
++        if (n>gp.maximum[j]) gp.maximum[j]=n;
++    }
++}
++static real gp_random(dsfmt_t* state, real lo, real hi)
++{
++    gp_enter(GP_rng);
++    ++gp.rng_calls;
++    real value = mwXrandom(state, lo, hi);
++    gp_leave();
++    return value;
++}
++static mwvector gp_unitpoint(dsfmt_t* state)
++{
++    gp_enter(GP_rng);
++    gp.rng_calls += 3; /* mwRandomUnitPoint consumes exactly NDIM=3 draws. */
++    mwvector value = mwRandomUnitPoint(state);
++    gp_leave();
++    return value;
++}
++static void gp_report(unsigned int bodies)
++{
++    int j;
++    fprintf(stderr,"GEN_PROFILE bodies=%u integrals=%llu velocity_attempts=%llu radius_attempts=%llu rng_calls=%llu total_seconds=%.9f\n",
++            bodies,gp.integrals,gp.velocity_attempts,gp.radius_attempts,gp.rng_calls,gp.inclusive[GP_body]);
++    for(j=0;j<GP_N;++j)
++        fprintf(stderr,"GEN_PHASE %s exclusive=%.9f inclusive=%.9f\n",gp_names[j],gp.exclusive[j],gp.inclusive[j]);
++    for(j=0;j<3;++j)
++        fprintf(stderr,"GEN_PER_BODY %s min=%llu max=%llu\n",
++                j==0?"integrals":j==1?"velocity_attempts":"radius_attempts",gp.minimum[j],gp.maximum[j]);
++}
++#define GP_BEGIN(name) gp_enter(GP_##name)
++#define GP_END() gp_leave()
++#define GP_COUNT(name) (++gp.name)
++#define GP_RESET() gp_reset()
++#define GP_BODY_START() gp_body_start()
++#define GP_BODY_END() gp_body_end()
++#define GP_REPORT(n) gp_report(n)
++#else
++#define GP_BEGIN(name) ((void)0)
++#define GP_END() ((void)0)
++#define GP_COUNT(name) ((void)0)
++#define GP_RESET() ((void)0)
++#define GP_BODY_START() ((void)0)
++#define GP_BODY_END() ((void)0)
++#define GP_REPORT(n) ((void)0)
++#define gp_random mwXrandom
++#define gp_unitpoint mwRandomUnitPoint
++#endif
++#endif

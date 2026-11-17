@@ -16,6 +16,8 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `nbody-wrapper-files.patch` | Correctness/portability | Wrapper checkpoint/progress/graphics file protocol |
 | `popt-cygwin.patch` | Correctness/portability | Avoid duplicate Cygwin declaration |
 | `nbody-force-chunk.patch` | Performance | NBODY_FORCE_CHUNK unset preserves upstream scheduling; card build selects 4 |
+| `z-nbody-gen-pipeline.patch` | Performance | NBODY_GEN_PIPELINE=0; exact one-step golden-section root/search speculation |
+| `zzzzz-nbody-gen-profile.patch` | Instrumentation | NBODY_GEN_PROFILE=0; generator nested wall timers and per-body counts |
 | `z-nbody-df-reuse.patch` | Performance | NBODY_DF_REUSE=0; share identical stencil samples |
 | `../probes/s9-df-vector/performance.patch` | Performance | NBODY_DF_VECTOR=0; certified eight-node experiment, requires reuse |
 | `../probes/s9-df-vector/instrumentation.patch` | Instrumentation | NBODY_DF_STATS=0; vector attempts and exact replays |
@@ -149,3 +151,15 @@ isolated source; they cannot silently select an absent implementation.
   released with the pool. Upper cells are stored child-before-parent after
   reversing breadth order; per-cell octant arithmetic is unchanged. expandBox
   retains variant 3's exact max reduction. No instrumentation is in this patch.
+
+- `z-nbody-gen-pipeline.patch` (S10-03): overlap both possible next
+  golden-section root/search preparations with the current quadrature node
+  team. Keep the original decision, bisection and RNG order; consume only
+  bitwise matching velocity keys. Initialized read-only non-King models only;
+  all other paths remain original. `GEN_PIPELINE=1` requires parallel quadrature
+  for an active path; default off. This is speculative algorithmic parallelism.
+- `zzzzz-nbody-gen-profile.patch` (S10-03): `GEN_PROFILE=1`, default off,
+  partitions caller wall time into exclusive generator subphases and reports
+  inclusive max/rejection times plus integral/attempt/RNG counts. Node dispatch
+  includes team overhead and the implicit barrier. See
+  `docs/research/s10-gen.md` for timer semantics, measurements and predictions.
