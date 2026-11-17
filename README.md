@@ -21,5 +21,9 @@ BOINC client (laptop, Windows)
 - Try it yourself: [docs/TRY-IT.md](docs/TRY-IT.md) (written in Sprint 4)
 - Engineer rules: [AGENTS.md](AGENTS.md)
 
-Independent of the GCC-KNC repository; it only uses its installed compiler. GPL-3.0-or-later, because it builds
-and patches GPL code (MilkyWay@home client, BOINC LGPL libraries).
+Independent of the GCC-KNC repository; it only uses its installed compiler. New setup on another machine:
+[WORKSTATION-SETUP.md](WORKSTATION-SETUP.md).
+
+Licence: our own code is Apache-2.0 ([LICENSE](LICENSE)). The files in `patches/` modify GPL-3.0 MilkyWay@home and
+LGPL BOINC sources and stay under those licences; the built card application combines with that code and is
+distributed under GPL-3.0-or-later. Third-party pins and notices: [SOURCES.md](SOURCES.md).
