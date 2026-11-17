@@ -1,5 +1,106 @@
 # Try KNC BOINC on this Windows laptop
 
+Updated 2026-11-17. Use the Windows installer folder for installation, updates,
+uninstall and restore. No command prompt, Python or runtime download is needed.
+Real-card science, installed Manager/screensaver behavior and service-account
+SSH access still require the lead's checks; the installer does not prove them.
+
+## Before installation
+
+Have BOINC installed and attached to MilkyWay@home in BOINC Manager. Keep
+**No new tasks** selected and existing tasks suspended until you choose a trial.
+The first trial should use the interactive Windows login. The card must already
+be provisioned, reachable, and reserved for your use, with Windows OpenSSH Client
+available and a private key plus verified known_hosts file readable by the BOINC
+account. Ask the lead to run the offline sample in the appendix before live work.
+
+Obtain the matching **knc-boinc-installer** release folder from the lead. If it
+arrives as a zip, right-click it and choose **Extract All**. Keep all its files
+and the `package` subfolder together in a writable local folder outside the BOINC
+data directory. Keep this folder: it will hold your logs and backups. Do not
+copy a private key into the release folder or the BOINC project.
+
+## Install or update by double-clicking
+
+1. Open `dist/knc-boinc-installer/` in Explorer (or the extracted release folder).
+   Double-click **Install KNC BOINC.cmd** and approve the Windows UAC prompt.
+2. Review the settings form. It discovers BOINC paths from the registry, with
+   defaults of `C:\ProgramData\BOINC` and `C:\Program Files\BOINC`. Correct them
+   if needed. For the lab card use host `192.168.1.100`, user `root`, your existing
+   SSH key, the verified known_hosts file, and remote base
+   `/tmp/claude/claude-knc-boinc`. On updates the installed wrapper config is kept;
+   the card fields in the form apply only to a first installation.
+3. Click **Continue**. The installer checks BOINC, attachment/project folder,
+   package inventory/manifest, and a strict, noninteractive SSH connection to
+   the card. Review the confirmation dialog and select **Yes** to change files.
+   Foreign `app_info.xml` or `app_config.xml` cause a clear refusal without
+   changing BOINC data. An old manual installation needs lead review because
+   it has no installer ownership record.
+4. BOINC receives a graceful quit request. The installer waits up to 90 seconds
+   without killing processes, backs up the **whole data directory**, installs
+   the package, writes wrapper and single-task concurrency configs, then requests
+   client/Manager restart. A timeout changes no package files: close the client
+   using Manager and retry. A failed copy attempts to roll back the saved data.
+5. Read the final dialog and retain its backup path and log. Each run writes a
+   dated `KNC-*.log` beside the installer. Backups are in its `backups` subfolder.
+   In Manager inspect the Event Log for anonymous-platform recognition and
+   missing-file/version errors. Keep **No new tasks** and the other tasks
+   suspended; resume one task only when you choose a card trial.
+
+For an update, obtain a fresh matching release folder and double-click its
+**Install** entry again. It replaces recorded package files and preserves
+`knc_wrapper.cfg` byte for byte. Keep previous release folders for their backups.
+The installer refuses modified/foreign manifests rather than merging them.
+
+## Uninstall or restore by double-clicking
+
+Select **No new tasks** in Manager and resolve experimental tasks with the lead
+before switching application versions. Double-click **Uninstall KNC BOINC.cmd**
+to remove the installer-recorded KNC files and configs while retaining stock
+files and task state. Review settings and confirm; shutdown, full backup and
+Manager restart use the same flow as installation.
+
+For full rollback, double-click **Restore KNC BOINC backup.cmd**, review settings,
+and select the dated backup folder containing `backup.json` and `data`. The
+installer checks its identity and checksums, asks for confirmation, then saves
+the current data before restoring the chosen backup. **Restore replaces all
+BOINC state**: an old backup can replay already reported results. Choose a
+suitable backup with the lead. The final dialog identifies the safety backup.
+If automatic restart fails, open BOINC Manager from Start and retain the log.
+
+## Appendix: developer build and fake-tree acceptance
+
+The lead assembles the installer from an already built/reviewed package; this
+copies artifacts and does not compile or contact the card:
+
+```bash
+cd /c/Users/xuzhi/Documents/knc-boinc
+bash scripts/make-boinc-installer.sh
+```
+
+The release folder is `dist/knc-boinc-installer/`. Its scripts use Windows
+PowerShell 5.1 and built-in Windows Forms. Keep release files out of BOINC data.
+The assembler refuses an existing `package` destination to protect earlier
+releases and their backups; assemble from a fresh worktree for updates.
+
+Run the acceptance test from Git Bash; it confines data, package, mocked dialogs,
+SSH and lifecycle adapters to marked fixtures under `build/installer-tests`.
+It never controls BOINC, contacts the card or accesses the owner's data tree:
+
+```bash
+mkdir -p build/tmp
+export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
+/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe \
+    -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$PWD/tests/installer.ps1")"
+```
+
+## Appendix: retained command-line build, offline sample and manual checks
+
+The detailed command reference below is retained for the lead. The manual file
+copy/rollback commands are for reviewed legacy installations; use the entry
+points above for installer-owned deployments, whose manifest hashes/inventory
+must remain consistent.
+
 Draft, 2026-11-16. Run the offline sample first. The lead's S4-01 card run,
 measured times, numerical comparison and installed-client/screensaver checks
 are still pending; this guide does not claim they passed. The acceptance test
@@ -7,7 +108,7 @@ for S4-02 is the lead following **Offline sample** verbatim and recording its
 exit status and comparison below. See [wrapper.md](wrapper.md),
 [packaging.md](packaging.md) and [graphics.md](graphics.md) for implementation details.
 
-## Prerequisites and shell
+### Prerequisites and shell
 
 You need an operational Knights Corner card with MPSS/Linux, network access,
 SSH enabled and enough free RAM and `/tmp` space. Card bring-up is outside this
@@ -43,7 +144,7 @@ this override before continuing; elsewhere retain the default:
 export REMOTE_BASE=/tmp/claude/claude-knc-boinc
 ```
 
-### SSH key and host identity, including a fresh laptop
+#### SSH key and host identity, including a fresh laptop
 
 Windows OpenSSH Client must already be available (or enabled by the owner in
 Windows Optional Features). This laptop already has the card in
@@ -81,7 +182,7 @@ first trial runs the BOINC client in the interactive Windows login. A BOINC
 service account has different permissions/profile and needs separate provisioning;
 a successful interactive SSH test does not prove service access.
 
-## Build or use the package
+### Build or use the package
 
 If the lead supplied a matching package and x86 executable, skip the build
 block. Otherwise, from the shell above (scratch exports must precede compilation):
@@ -105,7 +206,7 @@ python packaging/check_package.py dist/milkyway_package
 test -s build/x86/milkyway_nbody.exe
 ```
 
-## Offline sample (no BOINC account, scheduler or result upload)
+### Offline sample (no BOINC account, scheduler or result upload)
 
 This uses real SSH/card transport and the wrapper's standalone mode on the
 64-body sample, followed by the identical x86 sample. BOINC need not be installed
@@ -199,7 +300,7 @@ wrapper exit, comparison, wall time and remote cleanup. **Pending S4-01:** add
 measured card results and observed failures here after the lead's run; no
 real-card failures have been reported in this ticket.
 
-## Owner decision before installing BOINC
+### Owner decision before installing BOINC
 
 **Attaching to MilkyWay@home and returning results is the owner's decision.**
 The following steps can download work and later upload scientific results.
@@ -210,7 +311,7 @@ application. SSH/service permissions, checkpoint portability, real-client
 staging and output declarations still require verification. An offline PASS
 is insufficient to establish production readiness. Stop here for an offline-only trial.
 
-## Capture a stock task before switching
+### Capture a stock task before switching
 
 1. Obtain the Windows installer from [boinc.berkeley.edu](https://boinc.berkeley.edu/).
    Install BOINC Manager/client and the BOINC screensaver. For the initial trial,
@@ -237,7 +338,7 @@ python - <<'PY'
 import os
 import xml.etree.ElementTree as ET
 root = ET.parse(os.environ['BOINC_STATE']).getroot()
-# BOINC writes project records followed by sibling app/workunit/result records.
+## BOINC writes project records followed by sibling app/workunit/result records.
 project = None
 for item in root:
     if item.tag == 'project':
@@ -281,7 +382,7 @@ The fake-card test can take two hours; its host-only thread limit bounds actual
 execution while still checking that the card argv requests 240. Keep that
 test environment override out of real-card launches.
 
-## Install the anonymous-platform package
+### Install the anonymous-platform package
 
 Back up the whole data directory outside it while stopped. Use a shell with
 permission to access the directory; resolve ACL problems deliberately rather
@@ -371,10 +472,10 @@ fi
 Suspended state includes `T`. Use Manager controls for the test. A stopped job's
 wall-clock timer is not scientific progress.
 
-## Graphics and screensaver
+### Graphics and screensaver
 
 After installing the reviewed anonymous-platform package above, resume one
-N-body task and wait until its status is **Running**. In Manager use **View →
+N-body task and wait until its status is **Running**. In Manager use **View â†’
 Advanced view**, open the **Tasks** tab, select that one task on this local
 computer, and click **Show graphics**. A separate window should show gold stars,
 blue dark matter, a Galactic-disc grid, progress and running status. The first
@@ -397,7 +498,7 @@ is still missing, retain the Event Log and package inventory for the lead;
 do not edit a running client's state or slot. See the pinned source/line audit
 in [boinc-graphics-launch.md](boinc-graphics-launch.md).
 
-Open Windows **Settings → Personalization → Lock screen → Screen saver
+Open Windows **Settings â†’ Personalization â†’ Lock screen â†’ Screen saver
 settings** (or search Start for **Change screen saver**). Select **BOINC** in
 the screen-saver list; if absent, the owner must install the BOINC screensaver
 component. Choose a wait time and open **Settings**. Enable project application
@@ -425,7 +526,7 @@ snapshots. Installed Manager/screensaver behavior and a real-card live view
 remain owner checks; neither the owner's client nor its data directory was
 modified by that regression.
 
-## Stop, clean up and roll back
+### Stop, clean up and roll back
 
 Select No new tasks first. Prefer finishing and reporting experimental tasks
 only if the owner has chosen to return results. To stop without returning them,
@@ -458,7 +559,7 @@ results. Restart and inspect the Event Log; the project should supply stock
 apps on subsequent work requests. Retain logs, backup and local slot until
 review finishes. There is no need to delete the sample slot to run BOINC.
 
-## Troubleshooting
+### Troubleshooting
 
 These are recorded repository/laptop issues and anticipated integration checks.
 S4-01's real-card failure list is pending: the lead should append each observed
