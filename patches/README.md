@@ -20,6 +20,7 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `nbody-static-integrate.patch` | Performance | NBODY_STATIC_INTEGRATE=0 |
 | `nbody-tree-variants.patch` | Performance | NBODY_TREE_VARIANT=0 (upstream); 1 CofM, 2 pool |
 | `nbody-tree3.patch` | Performance | NBODY_TREE_VARIANT=3 opts into balanced pool and parallel threading; default remains 0 |
+| `nbody-tree4.patch` | Performance | NBODY_TREE_VARIANT=4 opts into stable parallel per-level partition; default remains 0 |
 | `nbody-vector-gravity.patch` | Performance | NBODY_VECTOR_GRAVITY=0 |
 | `zzz-nbody-walk-layout.patch` | Performance | NBODY_WALK_LAYOUT=0 |
 | `zz-nbody-phase-timers.patch` | Instrumentation | NBODY_PHASE_TIMERS=0 |
@@ -116,3 +117,12 @@ with its context/line numbers. Fetch also verifies the fully patched state.
   All new algorithm paths require TREE_VARIANT=3. Frontier balance counts and
   model diagnostics belong to `zz-nbody-tree-instrumentation.patch` and require
   TREE_IDENTITY=1; the card timing build excludes them.
+
+- `nbody-tree4.patch` (S9-06): variant 4 keeps variant 3's frontier cap,
+  insertion, moments and successor repair. Per-level octant paths are computed
+  in parallel from exact parent midpoints. Contiguous 64-body tiles count keys;
+  per-group prefixes in tile order and ordered local scatters preserve body
+  order independently of thread scheduling. Persistent grouping scratch is
+  released with the pool. Upper cells are stored child-before-parent after
+  reversing breadth order; per-cell octant arithmetic is unchanged. expandBox
+  retains variant 3's exact max reduction. No instrumentation is in this patch.
