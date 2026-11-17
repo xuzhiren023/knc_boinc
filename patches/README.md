@@ -19,6 +19,7 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `z-nbody-gen-pipeline.patch` | Performance | NBODY_GEN_PIPELINE=0; exact one-step golden-section root/search speculation |
 | `zzzzz-nbody-gen-profile.patch` | Instrumentation | NBODY_GEN_PROFILE=0; generator nested wall timers and per-body counts |
 | `zzzzzz-nbody-df-special.patch` | Performance | NBODY_DF_SPECIAL=0; concrete Plummer/cored nodes |
+| `zzzzzzz-nbody-df-vector8.patch` | Performance | DF_VECTOR8=0, DF_VECTOR8_GUARD=0; relaxed eight-node integrand and empirical exact replay |
 | `../probes/s10-df-vmath/performance.patch` | Performance | NBODY_DF_VMATH=0; isolated unguarded numerical experiment |
 | `z-nbody-df-reuse.patch` | Performance | NBODY_DF_REUSE=0; share identical stencil samples |
 | `../probes/s9-df-vector/performance.patch` | Performance | NBODY_DF_VECTOR=0; certified eight-node experiment, requires reuse |
@@ -203,3 +204,17 @@ body-array ownership paths, including clone/checkpoint restore. It uses Linux
 free, following the lead's current MPSS state note. It never changes kernel policy; no mapping success is promised.
 The separate `src/nbody_walk_memory_proof.h` is Instrumentation and is compiled
 only into the card diagnostic binary. Both performance options default off.
+
+- `zzzzzzz-nbody-df-vector8.patch` (S10-09), **Performance**: opt-in
+  `DF_VECTOR8=1` requires `DF_SPECIAL=1` and evaluates eight independent
+  Plummer/cored quadrature nodes with IMCI vector arithmetic, libknc_vmath
+  log/exp/pow/atan2, and lane-masked gamma convergence. The serial quadrature
+  recurrence and sum order are unchanged. `DF_VECTOR8_GUARD=1` optionally
+  replays uncertain velocities from saved dSFMT state with exact nodes using
+  an empirical margin. Both default off. `src/nbody_df_vector8.h` is a
+  Performance helper. Counters, real-node/body/RNG capture and diagnostic
+  wrappers live exclusively in tests/probes, outside this patch. See
+  `docs/research/s10-df-vector8.md` and the S10-09 Engineer report.
+  The owner comparison `DF_VECTOR8_SCALAR_LOG_ATAN=1` keeps exact crlibm
+  log_rn/atan_rn per active lane while retaining vector arithmetic,
+  libknc_vmath exp/pow and masked gamma convergence; its default is 0.
