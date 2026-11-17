@@ -110,6 +110,11 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 first knc-boinc window (10:46-11:14Z, turn closed, card clean). S8-07 pool build, all bit-identical.
+  Thread settings (large, whole_run): defaults 24.41, DELAY512 24.24, DELAY32 24.91, passive 29.17, spin 30 ms 24.01,
+  close 24.05, 180 thr 24.44, 120 thr 25.80: defaults hold (single runs, ~4% spread). PGO (trained on card, core-small
+  + large; instrumented runs 458/254 s): large 23.99 -> 23.94 s (0%), core-small 62.37 -> 59.73 s (-4.2%, setup).
+  Receipts: runs/card/w-knc1/.
 - S9-03 found S9-01's card-base binary was built from an unpatched third_party copy (no pool tree): main and
   S9-01 refetched/re-copied, card-base and card-pgo-train rebuilt (pool symbols present, knc_lint ok), staging
   rerun, GCC-KNC-ordered thread jobs kept. Lesson: refetch main's third_party after merging a patch, before
