@@ -18,6 +18,8 @@ S8-09's selected build options are explicit in `config/s8-09.env`.
 | `nbody-force-chunk.patch` | Performance | NBODY_FORCE_CHUNK unset preserves upstream scheduling; card build selects 4 |
 | `z-nbody-gen-pipeline.patch` | Performance | NBODY_GEN_PIPELINE=0; exact one-step golden-section root/search speculation |
 | `zzzzz-nbody-gen-profile.patch` | Instrumentation | NBODY_GEN_PROFILE=0; generator nested wall timers and per-body counts |
+| `zzzzzz-nbody-df-special.patch` | Performance | NBODY_DF_SPECIAL=0; concrete Plummer/cored nodes |
+| `../probes/s10-df-vmath/performance.patch` | Performance | NBODY_DF_VMATH=0; isolated unguarded numerical experiment |
 | `z-nbody-df-reuse.patch` | Performance | NBODY_DF_REUSE=0; share identical stencil samples |
 | `../probes/s9-df-vector/performance.patch` | Performance | NBODY_DF_VECTOR=0; certified eight-node experiment, requires reuse |
 | `../probes/s9-df-vector/instrumentation.patch` | Instrumentation | NBODY_DF_STATS=0; vector attempts and exact replays |
@@ -175,3 +177,16 @@ checkpoint offsets change: resume with the same build options. WALK_SCHEDULE=1
 selects dynamic1; 2 guided with FORCE_CHUNK minimum; 0 preserves existing
 dynamic scheduling. Profiling requires OpenMP and scalar gravity. All new
 options default off.
+
+- `zzzzzz-nbody-df-special.patch` (S10-05), **Performance**: `DF_SPECIAL=0` by
+  default. With reuse and parallel quadrature enabled, dispatch once per
+  integral to concrete Plummer-light/cored-dark stencils and direct node calls.
+  Original expressions, crlibm, gamma routine, node recurrence and accumulation
+  order are retained. Other models, uninitialized models, arbitrary callbacks,
+  nested quadrature and active generator pipelining keep the original path.
+- `../probes/s10-df-vmath/performance.patch` (S10-05), **Performance** experiment:
+  `DF_VMATH=0`, isolated source only, never fetched or selected by the release.
+  Replaces only the specialized log/atan/exp with actual libknc_vmath lane
+  cores; the installed double atan is expressed as atan2(x,1). The incomplete
+  gamma implementation and its crlibm calls stay scalar and unchanged.
+  No certified bound or replay. See `docs/research/s10-df-special.md`.

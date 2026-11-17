@@ -1,0 +1,82 @@
+--- a/nbody/include/nbody_df_special.h
++++ b/nbody/include/nbody_df_special.h
+@@ -3,6 +3,43 @@
+  * do not reassociate them or substitute the correctly rounded math calls. */
+ #ifndef NBODY_DF_SPECIAL_H
+ #define NBODY_DF_SPECIAL_H
++#if NBODY_DF_VMATH
++/* Performance experiment only: never applied by fetch or release builds.
++ * No replay, interval bound or accept/reject guard. The gamma implementation,
++ * including its own crlibm math, remains the unmodified scalar routine. */
++#include <stdint.h>
++extern int __knc_vmath_core_log_8(const uint64_t*, unsigned, const uint64_t*, uint64_t*);
++extern int __knc_vmath_core_exp_8(const uint64_t*, unsigned, const uint64_t*, uint64_t*);
++extern int __knc_vmath_core_atan2_8(const uint64_t*, const uint64_t*, unsigned, const uint64_t*, uint64_t*);
++static inline real dfs_vlog(real x)
++{
++    uint64_t in[8] = {0}, out[8];
++    memcpy(in, &x, sizeof(x));
++    __knc_vmath_core_log_8(in, 1, in, out);
++    memcpy(&x, out, sizeof(x));
++    return x;
++}
++static inline real dfs_vexp(real x)
++{
++    uint64_t in[8] = {0}, out[8];
++    memcpy(in, &x, sizeof(x));
++    __knc_vmath_core_exp_8(in, 1, in, out);
++    memcpy(&x, out, sizeof(x));
++    return x;
++}
++static inline real dfs_vatan(real x)
++{
++    uint64_t in[8] = {0}, one[8] = {UINT64_C(0x3ff0000000000000)}, out[8];
++    memcpy(in, &x, sizeof(x));
++    __knc_vmath_core_atan2_8(in, one, 1, in, out);
++    memcpy(&x, out, sizeof(x));
++    return x;
++}
++#else
++#define dfs_vlog mw_log
++#define dfs_vexp mw_exp
++#define dfs_vatan mw_atan
++#endif
+ static inline __attribute__((always_inline)) real dfs_plummer_den(const Dwarf* model, real r)
+ {
+     const real mass = model->mass;
+@@ -29,7 +66,7 @@
+         const real pcut = model->pcut;
+         const real delta = model->delta;
+         const real rdecay = model->rdecay;
+-        return pcut * mw_pow(r / rcut, delta) * mw_exp(-(r - rcut) / rdecay);
++        return pcut * mw_pow(r / rcut, delta) * dfs_vexp(-(r - rcut) / rdecay);
+     }
+     else if (r <= r1)
+     {
+@@ -67,7 +104,7 @@
+         const real rdecay = model->rdecay;
+         const real gamma1 = model->gamma1;
+         return (
+-            4.0 * M_PI * pcut * mw_pow(rcut, -delta) * mw_exp(rcut / rdecay) * mw_pow(rdecay, delta + 3)
++            4.0 * M_PI * pcut * mw_pow(rcut, -delta) * dfs_vexp(rcut / rdecay) * mw_pow(rdecay, delta + 3)
+             * (((gamma1 - UpperIncompleteGammaFunc(delta + 3, r / rdecay)) * inv(r))
+             + (UpperIncompleteGammaFunc(delta + 2, r / rdecay) * inv(rdecay)))
+             + ((m_nfw_cut + m_iso_r1 - m_nfw_r1) * inv(r))
+@@ -80,7 +117,7 @@
+         const real psi_iso_r1 = model->psi_iso_r1;
+         const real psi_nfw_r1 = model->psi_nfw_r1;
+         real psi = (
+-            -4.0 * M_PI * p0 * sqr(rc) * ((mw_log(sqr(rc) + sqr(r)) * inv(2.0)) + ((rc * mw_atan(r / rc) * inv(r))))
++            -4.0 * M_PI * p0 * sqr(rc) * ((dfs_vlog(sqr(rc) + sqr(r)) * inv(2.0)) + ((rc * dfs_vatan(r / rc) * inv(r))))
+             - psi_iso_r1 + psi_nfw_r1 + ((m_iso_r1 - m_nfw_r1) * inv(r1))
+         );
+         if (rcut != 0.0) {
+@@ -96,7 +133,7 @@
+         const real ps = model->ps;
+         const real rs = model->scaleLength;
+         real psi = (
+-            4.0 * M_PI * ps * cube(rs) * inv(r) * mw_log(1.0 + r / rs) + ((m_iso_r1 - m_nfw_r1) * inv(r))
++            4.0 * M_PI * ps * cube(rs) * inv(r) * dfs_vlog(1.0 + r / rs) + ((m_iso_r1 - m_nfw_r1) * inv(r))
+         );
+         if (rcut != 0.0) {
+             const real psi_nfw_cut = model->psi_nfw_cut;
