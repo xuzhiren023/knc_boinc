@@ -29,3 +29,6 @@ You implement one ticket from `work/tickets/`. The ticket is the only channel to
   class and never mix them in one file. Correctness/portability: build fixes, result contract, wrapper file
   protocol. Performance: scheduling, parallelism, layout, vectorization, fast paths (all behind an off-by-default
   option). Instrumentation: timers, counters. Name the class in patches/README.md for each new patch.
+- Laptop load (owner 2026-11-17): card DMA uploads fail when the laptop is saturated. Keep your host work to at most
+  4 cores: `make -j2`, x86 test runs with `OMP_NUM_THREADS=4` (state it when you report timings), one heavy job at a
+  time. Full 117676 x86 runs only when a ticket asks for one.
