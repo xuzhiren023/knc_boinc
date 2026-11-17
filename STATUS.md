@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- knc-twin gap to report when the twin session is back: S10-09/S10-10 vector node kernel cannot be simulated
+  (0.4.0): absolute-rodata indirect jump table; unsupported vpaddsetcd, vpadcd, fild; crlibm SCS internals (do_add,
+  pw_core_exp, scs_get_d, scs_set_d); one-operand imul (S10-07). Evidence .work/S10-10/twin/, .work/S10-09/build/s10/
+  df-vector8/twin-nodes/. S10-10 merged (DF_BATCH, off by default); card window running.
 - 2026-11-17 19:42-20:19Z windows (tcp-large, card clean): S10-09 vector star setup, card seconds (incl. staging),
   core-small / real-steps: exact release 54.3 / 246.1; all-vector 57.3 / 283.4; all-vector+guard 57.3 / 290.3;
   scalar log/atan 57.3 / 284.2; scalar+guard 58.2 / 279.8. Every likelihood identical to exact. Slower than exact:
