@@ -26,6 +26,7 @@ static uint32_t last_sequence;
 static bool seen=false,demo=false;
 static auto changed=Clock::now(), started=Clock::now(), retry=Clock::now();
 static const char* state="waiting";
+static std::string generation;
 static double camera[4]={0,0,0,1};
 static bool framed=false;
 static auto frame_time=Clock::now();
@@ -49,13 +50,13 @@ static void update() {
     if(before&1)return;
     memcpy(&incoming,shared,sizeof(incoming));MemoryBarrier();
     if(before!=*seq || incoming.sequence!=before)return;
-    if(incoming.magic!=KNC_GRAPHICS_MAGIC||incoming.version!=1||incoming.size!=sizeof(incoming)||incoming.status>KNC_WAITING||!valid(incoming.snapshot))return;
+    if(incoming.magic!=KNC_GRAPHICS_MAGIC||incoming.version!=1||incoming.size!=sizeof(incoming)||incoming.status>KNC_GENERATING||!valid(incoming.snapshot))return;
     if(!seen||before!=last_sequence){snapshot=incoming.snapshot;last_sequence=before;changed=now;seen=true;}
     // The reader holds the mapping open even after the wrapper exits.
     // Stop on its terminal status, or bound an orphan after producer loss.
     if(incoming.status==KNC_FINISHED && now-changed>std::chrono::seconds(2)) PostMessage(window,WM_CLOSE,0,0);
     if(now-changed>std::chrono::seconds(5)){state="stale - waiting";return;}
-    static const char* names[]={"running","suspended","finished","waiting"};state=names[incoming.status];
+    static const char* names[]={"running","suspended","finished","waiting","generating"};state=names[incoming.status];
 }
 static void text(float x,float y,const std::string& s){glRasterPos2f(x,y);glListBase(font);glCallLists(s.size(),GL_UNSIGNED_BYTE,s.data());}
 static bool capture_window(int width,int height) {
@@ -68,7 +69,11 @@ static bool capture_window(int width,int height) {
     std::ofstream file(screenshot,std::ios::binary);file.write((char*)&header,sizeof(header));file.write((char*)&info,sizeof(info));file.write((char*)pixels.data(),pixels.size());return bool(file);
 }
 static void render() {
-    update();std::string title=std::string("MilkyWay@home - ")+state;SetWindowTextA(window,title.c_str());
+    update();
+    generation.clear();
+    if(seen && incoming.generation_total && incoming.status==KNC_GENERATING)
+        generation="Generating stars "+std::to_string(incoming.generation_done)+" / "+std::to_string(incoming.generation_total);
+    std::string title=std::string("MilkyWay@home - ")+(generation.empty()?state:generation);SetWindowTextA(window,title.c_str());
     RECT r;GetClientRect(window,&r);int w=std::max(1,int(r.right)),h=std::max(1,int(r.bottom));
     glViewport(0,0,w,h);glClearColor(.015,.025,.06,1);glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);glLoadIdentity();double aspect=double(w)/h;
@@ -127,8 +132,8 @@ static void render() {
     else for(int i=0;i<96;i++){double a=i*2.399963;double radius=.15+.75*sqrt(i/96.0);point(cos(a)*radius,sin(a)*radius*.55,sin(a*.7)*.25,i%7==0,.009);}
     glDisable(GL_TEXTURE_2D);glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glMatrixMode(GL_PROJECTION);glLoadIdentity();glOrtho(0,w,0,h,-1,1);glMatrixMode(GL_MODELVIEW);glLoadIdentity();glColor3f(.83,.88,.98);
-    text(24,h-36,"MilkyWay@home | N-body simulation");text(24,h-62,"Gold: stars   Blue: dark matter   Grid: Galactic disc");
-    char line[160];snprintf(line,sizeof(line),"Progress: %.1f%%   Status: %s",seen||demo?snapshot.fraction_done*100:0,state);text(24,32,line);
+    text(24,h-36,"MilkyWay@home | N-body simulation");text(24,h-62,generation.empty()?"Gold: stars   Blue: dark matter   Grid: Galactic disc":generation);
+    char line[160];snprintf(line,sizeof(line),"Progress: %.1f%%   Status: %s",seen||demo?(generation.empty()?(incoming.generation_total?.75+.25*snapshot.fraction_done:snapshot.fraction_done):.75*incoming.generation_done/incoming.generation_total)*100:0,state);text(24,32,line);
     if(active){snprintf(line,sizeof(line),"Bodies: %u   Step: %llu   Simulation time: %.4g",snapshot.body_count,(unsigned long long)snapshot.step,snapshot.sim_time);text(24,56,line);}
     // Live evidence must contain a snapshot, not the launch-time waiting scene.
     if(!screenshot.empty() && (demo || (seen && snapshot.body_count && !strcmp(state,"running")))) {

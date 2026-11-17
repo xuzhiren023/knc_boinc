@@ -1,0 +1,37 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -1489,6 +1489,18 @@
+ }
+ 
+ /*      DWARF GENERATION        */
++/* Instrumentation only: generation counts, no RNG or science state access. */
++static void kncGenerationProgress(unsigned done, unsigned total)
++{
++    FILE* f;
++    if (!getenv("KNC_WRAPPER_FILES") || (done && done != total && done % 64)) return;
++    f = fopen("generation.tmp", "w");
++    if (!f) return;
++    { int ok = fprintf(f, "%u %u%c", done, total, 10) > 0;
++      if (fclose(f)) ok = 0;
++      if (ok) rename("generation.tmp", "generation"); }
++}
++
+ int nbGenerateMixedDwarfCore(lua_State* luaSt, dsfmt_t* prng, unsigned int nbody, unsigned int nbody_baryon,
+                                      Dwarf* comp1,  Dwarf* comp2,
+                                     mwbool __attribute__((unused)) ignore, mwvector rShift, mwvector vShift)
+@@ -1716,6 +1728,7 @@
+         int counter = 0;
+ 
+ 
++        kncGenerationProgress(0, nbody);
+         /*getting the radii and velocities for the bodies*/
+         for (i = 0; i < nbody; i++)
+         {
+@@ -1797,6 +1810,7 @@
+             z[i] = vec.z;
+             GP_END();
+             GP_BODY_END();
++            kncGenerationProgress(i + 1, nbody);
+         }
+ 
+ 

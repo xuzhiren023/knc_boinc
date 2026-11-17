@@ -177,3 +177,11 @@ $(filter $(OUT)/milkyway/src/milkyway_lua%,$(OBJECTS)): CPPFLAGS += $(MW_LUA_CPP
 include boinc.mk
 
 include graphics.mk
+
+# S11 host checkpoint I/O probe. Uses the actual standalone writer/scheduler.
+.PHONY: checkpoint-cost
+checkpoint-cost: $(OUT)/checkpoint_cost.exe
+$(OUT)/checkpoint_cost.o: $(ROOT)/tests/checkpoint_cost.c $(OUT)/.build-options
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+$(OUT)/checkpoint_cost.exe: $(OUT)/checkpoint_cost.o $(filter-out $(OUT)/nbody/src/main.c.o,$(OBJECTS))
+	$(CXX) $(COMMON_LDFLAGS) $^ $(COMMON_LDLIBS) -o $@

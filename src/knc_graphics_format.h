@@ -18,6 +18,7 @@
 #define KNC_SUSPENDED 1
 #define KNC_FINISHED 2
 #define KNC_WAITING 3
+#define KNC_GENERATING 4
 /* Explicit padding keeps this ABI identical on host and K1OM. */
 typedef struct { float x,y,z; uint32_t type; } knc_body;
 typedef struct {
@@ -30,7 +31,9 @@ typedef struct {
 } knc_snapshot;
 typedef struct {
     uint32_t magic,version,size,sequence;
-    uint32_t status,reserved[3];
+    /* Former reserved words, populated only for mixed-dwarf setup.
+     * Snapshot remains at byte 32; snapshot files retain their original ABI. */
+    uint32_t status,generation_done,generation_total,reserved;
     knc_snapshot snapshot;
 } knc_graphics;
 /* Single wrapper writer: aligned atomic sequence becomes odd before any write,

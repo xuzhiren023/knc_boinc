@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
 #include <chrono>
 #include <stdexcept>
@@ -63,6 +64,10 @@ struct Config {
     std::string host,user,key,known_hosts,ssh="C:/Windows/System32/OpenSSH/ssh.exe",scp="C:/Windows/System32/OpenSSH/scp.exe";
     std::string base="/tmp/knc-boinc", app="milkyway_nbody.mic";
     fs::path package;
+    fs::path ledger=posix("C:/Users/xuzhi/Documents/card-coordination/jobs.jsonl");
+    fs::path latch=posix("C:/Users/xuzhi/Documents/gcc_knc/.work/_state/card-dma-active.lock");
+    bool booking=true;
+    double checkpoint_interval=120,booking_suspend_timeout=300;
     int threads=240,retries=3,connect=10,bodies=64;
     double poll=10,checkpoint_timeout=60,snapshot_interval=5;
     Config(const fs::path& file, const fs::path& exe) {
@@ -84,11 +89,21 @@ struct Config {
             else if (k=="poll_interval") poll=std::stod(v);
             else if (k=="checkpoint_timeout") checkpoint_timeout=std::stod(v);
             else if (k=="snapshot_interval") snapshot_interval=std::stod(v);
+            else if (k=="checkpoint_interval") checkpoint_interval=std::stod(v);
+            else if (k=="card_booking") {if(v!="0" && v!="1") throw std::runtime_error("card_booking needs 0 or 1");booking=v=="1";}
+            else if (k=="booking_ledger") ledger=posix(v);
+            else if (k=="dma_stop_latch") latch=posix(v);
+            else if (k=="booking_suspend_timeout") booking_suspend_timeout=std::stod(v);
             else if (k=="bodies") bodies=std::stoi(v);
             else throw std::runtime_error("unknown config key: "+k);
         }
         if (package.is_relative()) package=file.parent_path()/package;
         package=fs::absolute(package);
+        if (ledger.is_relative()) ledger=file.parent_path()/ledger;
+        if (latch.is_relative()) latch=file.parent_path()/latch;
+        if (!std::isfinite(checkpoint_interval) || checkpoint_interval<1 || checkpoint_interval>86400 || checkpoint_interval!=std::floor(checkpoint_interval) ||
+            !std::isfinite(booking_suspend_timeout) || booking_suspend_timeout<1 || booking_suspend_timeout>10800)
+            throw std::runtime_error("config value out of range");
         if (threads<1 || retries<0 || retries>100 || connect<1 || connect>600 || bodies<1 ||
             !std::isfinite(snapshot_interval) || snapshot_interval<.05 || snapshot_interval>3600 ||
             !std::isfinite(poll) || poll<.05 || poll>3600 || !std::isfinite(checkpoint_timeout) || checkpoint_timeout<1)
@@ -102,6 +117,7 @@ struct Config {
         while (base.back()=='/') base.pop_back();
     }
 };
+#include "knc_turn.h"
 static std::function<void()> graphics_tick, graphics_wait;
 // No local shell interpolation. Every child is timed, including a hung scp.
 static int command(const std::vector<std::string>& args, double timeout, std::string& out) {
@@ -133,7 +149,8 @@ class Card {
     fs::path fake;
     std::vector<std::string> options(bool copy) const {
         std::vector<std::string> a{posix(copy?c.scp:c.ssh).string()};
-        if (copy) a.push_back("-O"); else a.push_back("-T");
+        // OpenSSH 9.x legacy downloads need -T for quoted remote paths (lead fix).
+        if (copy) {a.push_back("-O"); a.push_back("-T");} else a.push_back("-T");
         for (auto s:{"BatchMode=yes","StrictHostKeyChecking=yes","ConnectionAttempts=1"}) {a.push_back("-o"); a.push_back(s);}
         if (!c.known_hosts.empty()) a.insert(a.end(),{"-o","UserKnownHostsFile="+c.known_hosts});
         a.insert(a.end(),{"-o","ConnectTimeout="+std::to_string(c.connect),"-i",native(posix(c.key))});
@@ -205,11 +222,12 @@ public:
     }
     void clean() const {exec("rm -rf -- "+quote(dir)); fs::remove("knc_remote"); log("remote cleaned");}
 };
-struct State {double progress=0; int exit=-1; bool live=false,checkpoint=false,pid=false,snapshot=false;};
+struct State {unsigned generated=0,total=0; bool steps=false; double progress=0; int exit=-1; bool live=false,checkpoint=false,pid=false,snapshot=false;};
 static State state(const Card& card) {
     auto text=card.at("if test -f exit; then printf 'exit '; cat exit; fi; "
         "if test -f pid; then p=$(cat pid); case $p in ''|*[!0-9]*) exit 2;; esac; echo pid 1; "
         "if kill -0 \"$p\" 2>/dev/null; then echo live 1; fi; fi; "
+        "if test -f generation; then printf 'generation '; cat generation; fi; "
         "if test -f progress; then printf 'progress '; cat progress; fi; "
         "if test -f snapshot; then echo snapshot 1; fi; "
         "if test -f checkpoint.ready; then echo checkpoint 1; fi; true");
@@ -220,7 +238,12 @@ static State state(const Card& card) {
         else if (k=="live") s.live=v==1; else if (k=="pid") s.pid=v==1;
         else if (k=="snapshot") s.snapshot=v==1;
         else if (k=="checkpoint") s.checkpoint=v==1;
-        else if (k=="progress") s.progress=std::clamp(v,0.0,1.0);
+        else if (k=="generation") {
+            double total; if (!(in>>total) || !std::isfinite(total) || v<0 || total<1 || v>total || total>UINT32_MAX || v!=floor(v) || total!=floor(total))
+                throw std::runtime_error("invalid generation progress");
+            s.generated=unsigned(v);s.total=unsigned(total);
+        }
+        else if (k=="progress") {s.steps=true;s.progress=std::clamp(v,0.0,1.0);}
     }
     return s;
 }
@@ -309,7 +332,7 @@ struct Task {
         // Prepend defaults so POSIX parsing cannot mistake them for Lua parameters.
         std::vector<std::string> defaults={"--snapshot-interval",std::to_string(c.snapshot_interval)};
         if (checkpoint.empty()) {checkpoint=card.dir+"/checkpoint"; defaults.insert(defaults.end(),{"--checkpoint",checkpoint});}
-        if (!interval) defaults.push_back("--checkpoint-interval=1");
+        if (!interval) defaults.push_back("--checkpoint-interval="+std::to_string(int(c.checkpoint_interval)));
         if (!threads) defaults.insert(defaults.end(),{"--nthreads",std::to_string(c.threads)});
         args.insert(args.begin(),defaults.begin(),defaults.end());
     }
@@ -333,7 +356,7 @@ class Graphics {
     knc_snapshot frame={};
     Clock::time_point fetched=Clock::now()-std::chrono::hours(1), beat=fetched;
 public:
-    uint32_t status=KNC_WAITING;
+    uint32_t status=KNC_WAITING,generated=0,total=0;
     Graphics():memory((knc_graphics*)boinc_graphics_make_shmem(KNC_GRAPHICS_NAME,sizeof(knc_graphics))) {
         frame.magic=KNC_SNAPSHOT_MAGIC; frame.version=1; frame.size=sizeof(frame);
         if (!memory) log("graphics mapping unavailable");
@@ -344,7 +367,7 @@ public:
         uint32_t seq=__atomic_load_n(&memory->sequence,__ATOMIC_RELAXED);
         __atomic_store_n(&memory->sequence,seq+1,__ATOMIC_SEQ_CST);
         memory->magic=KNC_GRAPHICS_MAGIC; memory->version=1; memory->size=sizeof(*memory);
-        memory->status=status; memset(memory->reserved,0,sizeof(memory->reserved));memory->snapshot=frame;
+        memory->status=status; memory->generation_done=generated;memory->generation_total=total;memory->reserved=0;memory->snapshot=frame;
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
         __atomic_store_n(&memory->sequence,seq+2,__ATOMIC_SEQ_CST);beat=Clock::now();
     }
@@ -370,12 +393,16 @@ public:
         else {fs::remove("knc_snapshot.tmp");log("ignored invalid graphics snapshot");}
     }
 };
+struct ControlExit {int code;bool finish;};
 int main(int argc,char** argv) {
     BOINC_OPTIONS opt; boinc_options_defaults(opt); opt.direct_process_action=0; opt.normal_thread_priority=1;
     if (boinc_init_options(&opt)) return 2;
     Graphics graphics;
     graphics_tick=[&]{graphics.heartbeat();};
     graphics_wait=[&]{graphics.status=KNC_WAITING;graphics.publish();};
+    std::unique_ptr<Turn> turn;
+    std::unique_ptr<Config> configuration;
+    std::unique_ptr<Card> remote;
     try {
         fs::path fake;
         int first=1;
@@ -391,9 +418,32 @@ int main(int argc,char** argv) {
         executable[length]=0;
         fs::path exe=fs::path(executable).parent_path();
         fs::path cfg=fs::exists("knc_wrapper.cfg")?fs::absolute("knc_wrapper.cfg"):exe/"knc_wrapper.cfg";
-        Config c(cfg,exe); Card card(c,fake);
+        configuration=std::make_unique<Config>(cfg,exe);Config& c=*configuration;
+        remote=std::make_unique<Card>(c,fake);Card& card=*remote;
         Task task(incoming,c,card);
         bool leased=fs::exists("knc_remote");
+        turn=std::make_unique<Turn>(c);
+        auto admission=[&] {
+            auto paused=Clock::now();
+            while (true) {
+                BOINC_STATUS b;boinc_get_status(&b);
+                if(b.abort_request){
+                    if(fs::exists("knc_remote")){auto q=state(card);if(q.live)card.signal("KILL");card.clean();turn->retain=false;}
+                    turn->finish("aborted");throw ControlExit{202,true};
+                }
+                if(b.quit_request||b.no_heartbeat){
+                    if(turn->retain)throw Unreachable("quit while awaiting card admission; stopped lease retained");
+                    turn->finish("quit");throw ControlExit{0,false};
+                }
+                if(!b.suspended && turn->ready())return;
+                if(b.suspended && std::chrono::duration<double>(Clock::now()-paused).count()>=c.booking_suspend_timeout)
+                    turn->finish("long suspension");
+                graphics.status=b.suspended?KNC_SUSPENDED:KNC_WAITING;graphics.publish();
+                boinc_sleep(.1);
+            }
+        };
+        if(leased){auto prior=state(card);if(prior.live){turn->retain=true;card.signal("STOP");}}
+        admission();
         if (!leased) {
             card.exec("test -d "+quote(card.dir)+" || mkdir "+(fake.empty()?"-p -- ":"-- ")+quote(card.dir));
             write("knc_remote",card.dir+"\n");
@@ -416,6 +466,8 @@ int main(int argc,char** argv) {
             run+=" &\n";
             run+="p=$!\nprintf '%s\n' \"$p\" > pid.tmp\nmv pid.tmp pid\nwait \"$p\"\nr=$?\nprintf '%s\n' \"$r\" > exit.tmp\nmv exit.tmp exit\n";
             write("knc_run.sh",run); card.copy("knc_run.sh",card.dir+"/run.sh",true);
+            admission();
+            turn->retain=true; // An uncertain launch must retain its ledger turn and remote lease.
             card.at("chmod u+x "+quote(c.app)+" && if mkdir started 2>/dev/null; then nohup sh ./run.sh >stdout.txt 2>stderr.txt </dev/null & fi");
         } else {
             log("reattached remote lease");
@@ -423,19 +475,22 @@ int main(int argc,char** argv) {
             if (s.live && !initial.suspended) card.signal("CONT");
         }
         graphics.status=KNC_RUNNING; graphics.publish();
-        bool suspended=false; auto last=Clock::now()-std::chrono::hours(1);
+        bool suspended=false; auto suspend_since=Clock::now();auto booking_check=Clock::now(); auto last=Clock::now()-std::chrono::hours(1);
         auto missing_since=Clock::now();
         while (true) {
             graphics.heartbeat();
             BOINC_STATUS b; boinc_get_status(&b);
             if (b.abort_request) {
-                s=state(card); if (s.live) card.signal("KILL"); card.clean(); log("abort acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return boinc_finish(202);
+                s=state(card); if (s.live) card.signal("KILL"); card.clean(); turn->retain=false;turn->finish("aborted");log("abort acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return boinc_finish(202);
             }
             if (b.quit_request || b.no_heartbeat) {
                 s=state(card);
                 if (s.exit<0 && s.live) {
                     card.at("rm -f checkpoint.ready; touch checkpoint.request");
-                    if (suspended) card.signal("CONT");
+                    if (suspended) {
+                        if(!turn->ready())throw Unreachable("checkpoint blocked awaiting card turn; stopped lease retained");
+                        card.signal("CONT");
+                    }
                     auto deadline=Clock::now()+std::chrono::duration<double>(c.checkpoint_timeout);
                     do {s=state(card); if (s.checkpoint || s.exit>=0) break; boinc_sleep(.1);} while (Clock::now()<deadline);
                     if (!s.checkpoint && s.exit<0) throw Unreachable("checkpoint request timed out; remote lease retained");
@@ -444,16 +499,27 @@ int main(int argc,char** argv) {
                 if (s.live) card.signal("STOP"); // freeze the acknowledged checkpoint during transfer
                 card.copy("knc_checkpoint.tmp",task.checkpoint,false);
                 fs::rename("knc_checkpoint.tmp","knc_checkpoint"); boinc_checkpoint_completed(); log("checkpoint saved");
-                if (s.live) card.signal("KILL"); card.clean(); log("quit acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return 0;
+                if (s.live) card.signal("KILL"); card.clean(); turn->retain=false;turn->finish("quit");log("quit acknowledged"); graphics.status=KNC_FINISHED;graphics.publish(); return 0;
             }
             if (bool(b.suspended)!=suspended) {
                 s=state(card);
-                if (s.live) {card.signal(b.suspended?"STOP":"CONT"); suspended=b.suspended;graphics.status=suspended?KNC_SUSPENDED:KNC_RUNNING;graphics.publish();}
+                if (!b.suspended) admission();
+                if (s.live) {card.signal(b.suspended?"STOP":"CONT");suspend_since=Clock::now(); suspended=b.suspended;graphics.status=suspended?KNC_SUSPENDED:KNC_RUNNING;graphics.publish();}
+            }
+            if(suspended && std::chrono::duration<double>(Clock::now()-suspend_since).count()>=c.booking_suspend_timeout)
+                turn->finish("long suspension");
+            if(!suspended && Clock::now()-booking_check>=std::chrono::seconds(1)) {
+                booking_check=Clock::now();
+                if(turn->renewal_due()) {
+                    s=state(card);if(s.live)card.signal("STOP");
+                    admission();if(s.live)card.signal("CONT");
+                }
             }
             if (std::chrono::duration<double>(Clock::now()-last).count()>=c.poll) {
                 s=state(card); last=Clock::now();
-                graphics.status=suspended?KNC_SUSPENDED:KNC_RUNNING;graphics.publish();
-                boinc_fraction_done(s.progress);
+                graphics.generated=s.generated;graphics.total=s.total;
+                graphics.status=suspended?KNC_SUSPENDED:(!s.steps && s.total?KNC_GENERATING:KNC_RUNNING);graphics.publish();
+                boinc_fraction_done(s.total?(s.steps?.75+.25*s.progress:.75*s.generated/s.total):s.progress);
                 graphics.fetch(card,s,c.snapshot_interval);
                 if (s.exit>=0) break;
                 if (s.live) missing_since=Clock::now();
@@ -467,7 +533,7 @@ int main(int argc,char** argv) {
         card.copy(resolved("nbody_stdout.txt"),card.dir+"/stdout.txt",false);
         card.copy(resolved("nbody_stderr.txt"),card.dir+"/stderr.txt",false);
         if (!s.exit) task.collect(card);
-        card.clean();
+        card.clean();turn->retain=false;turn->finish(s.exit?"app-failed":"success");
         // Real 196/mt results declare no output files. BOINC sends this
         // process's stderr to the validator, not our private diagnostic file.
         // Forward the complete stream, including all present/future science
@@ -481,11 +547,21 @@ int main(int argc,char** argv) {
         if (science.bad() || !std::cerr) throw std::runtime_error("cannot forward science stderr");
         if (s.exit) {log("card app exit "+std::to_string(s.exit)); return boinc_finish(s.exit);}
         fs::remove("knc_checkpoint"); boinc_fraction_done(1); log("finished"); return boinc_finish(0);
+    } catch (const ControlExit& e) {
+        graphics.status=KNC_FINISHED;graphics.publish();return e.finish?boinc_finish(e.code):e.code;
     } catch (const Unreachable& e) {
         graphics.status=KNC_FINISHED;graphics.publish();
-        log(e.what()); boinc_temporary_exit(60,e.what()); return 0;
+        log(e.what());
+        if(turn && !turn->retain)try{turn->finish("transport-failed");}catch(const std::exception& close){log(close.what());}
+        boinc_temporary_exit(60,e.what()); return 0;
     } catch (const std::exception& e) {
         graphics.status=KNC_FINISHED;graphics.publish();
-        log(e.what()); return boinc_finish(1);
+        log(e.what());
+        if(turn && turn->retain && remote)try{
+            auto q=state(*remote);if(q.live)remote->signal("KILL");remote->clean();turn->retain=false;
+        }catch(const std::exception& cleanup){log(cleanup.what());}
+        if(turn && turn->retain){boinc_temporary_exit(60,"remote state uncertain; turn and lease retained");return 0;}
+        if(turn)try{turn->finish("wrapper-failed");}catch(const std::exception& close){log(close.what());}
+        return boinc_finish(1);
     }
 }

@@ -2,18 +2,19 @@
 # Task contracts and five control flows through the S2-01 shared-memory client.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+export OMP_NUM_THREADS=4
 export PATH="/c/Users/xuzhi/Documents/gcc_knc/.work/_shared/toolchain/cygwin/bin:$PATH"
 mkdir -p build/tmp
 export TMPDIR="$PWD/build/tmp" TMP="$PWD/build/tmp" TEMP="$PWD/build/tmp"
 x86_out=${X86_OUT:-build/x86}
-make -C mk -j6 knc-wrapper boinc-api-test graphics
-make -C mk -j6 OUT="../$x86_out" x86
+make -C mk -j2 knc-wrapper boinc-api-test graphics
+make -C mk -j2 OUT="../$x86_out" x86
 wrapper=$(cygpath -aw build/wrapper/knc_wrapper.exe)
 client=$(cygpath -am build/boinc/boinc_fake_client.exe)
 run=$(mktemp -d build/wrapper/test.XXXXXX)
 scenarios=("$@")
 if [[ ${#scenarios[@]} == 0 ]]; then
-    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable graphics graphics-launch)
+    scenarios=(forum-contract sample-contract normal suspend quit abort unreachable graphics graphics-launch setup-progress checkpoint-config booking booking-disabled booking-requeue booking-quit scp-options)
 fi
 for scenario in "${scenarios[@]}"; do
     slot="$run/$scenario"
@@ -37,7 +38,32 @@ retry_limit=2
 checkpoint_timeout=15
 snapshot_interval=0.2
 bodies=1024
+card_booking=0
+dma_stop_latch=$(cygpath -am "$slot/card/.dma-stop")
 CFG
+    if [[ "$scenario" == setup-progress || "$scenario" == checkpoint-config || "$scenario" == booking* ]]; then
+        cp tests/wrapper_science.sh "$slot/package/milkyway_nbody.exe"
+        chmod +x "$slot/package/milkyway_nbody.exe"
+        interval=120
+        [[ "$scenario" != checkpoint-config ]] || interval=180
+        printf 'checkpoint_interval=%s\n' "$interval" >> "$slot/knc_wrapper.cfg"
+        if [[ "$scenario" == booking* && "$scenario" != booking-disabled ]]; then
+            python tests/wrapper_booking_fixture.py "$slot" "$scenario"
+        fi
+    fi
+    if [[ "$scenario" == booking-disabled ]]; then touch "$slot/card/.dma-stop"; fi
+    if [[ "$scenario" == scp-options ]]; then
+        cp tests/wrapper_transport_stub.sh "$slot/transport.exe"
+        chmod +x "$slot/transport.exe"
+        cat >> "$slot/knc_wrapper.cfg" <<CFG
+host=local-test
+user=test
+ssh_key=dummy-test-key
+ssh_path=$(cygpath -am "$slot/transport.exe")
+scp_path=$(cygpath -am "$slot/transport.exe")
+retry_limit=0
+CFG
+    fi
     if [[ "$scenario" == unreachable ]]; then touch "$slot/card/.unreachable"; fi
     export KNC_FAKE_CARD=$(cygpath -am "$slot/card")
     export KNC_GRAPHICS_EXE=$(cygpath -aw build/graphics/knc_nbody_graphics.exe)
@@ -81,6 +107,13 @@ PY
         fi
     fi
     (cd "$slot"; "$client" "$wrapper" local "$mode")
+    if [[ "$scenario" == scp-options ]]; then
+        test -f "$slot/scp-options-ok"
+        printf 'PASS wrapper scp-options: real transport arguments contain -O -T (local stubs only)\n'
+    fi
+    if [[ "$scenario" == booking || "$scenario" == booking-requeue || "$scenario" == booking-quit ]]; then
+        python tests/wrapper_booking_fixture.py "$slot" check
+    fi
     if [[ "$scenario" == graphics-launch ]]; then
         python tests/capture_slot_graphics.py "$slot"
     fi
