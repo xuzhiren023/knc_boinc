@@ -110,6 +110,10 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 14:53Z knc-boinc window 5 FAILED (infrastructure): first S10-01 release job, card_run exit 126, DMA
+  helper deadline / SCIF endpoint cleanup unresolved during claude-pin upload; leftover /tmp/claude/claude-b03d34bf...
+  (claude-dma-active marker, part file); no card processes; turn closed. Holding card jobs until the GCC-KNC lead
+  (card_run/card_dma owner) says how to recover. S11-01 merged (BOINC Show graphics/screensaver). S10-01 merged.
 - 2026-11-17 knc-boinc window 4 (13:57-13:59Z, closed, card clean): S9-06 TREE_VARIANT=4 large whole 15.89 s
   (pred 15.94), nbMakeTree 2.07 s (partition 0.90, threadTree 0.50), force 12.70 s; bit-identical. Card now beats the
   best x86 build (18.0 s) by 1.13x and stock 1.96 (23.1 s) by 1.45x on large. Force walk is now 80% of the run.
