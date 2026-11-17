@@ -110,6 +110,12 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 card uploads: ssh measured ~20 KB/s to the card (48 MB job = ~40 min), owner chose auto (DMA >= 1 MiB).
+  17:02Z window: core-small 47.86 s ok (DMA ~1.3 GB/s); real-steps refused at upload: DMA helper deadline, cleanup
+  uncertain, on libgomp.so.1 while the laptop was loaded by engineers (second such failure; GCC-KNC lead: do not
+  start DMA on a saturated laptop). No latch left, card and host clean. Run card batches only when no engineer runs.
+  S10-05 merged: DF_SPECIAL exact (host -10.7% generation); 1-ULP vmath changed 0/4000 and 0/110000 bodies, likelihood
+  identical; vectorization still blocked by crlibm/gamma control flow in the node loop.
 - 2026-11-17 knc-boinc window 8 (16:02-16:15Z, card clean): S10-02 force candidates no gain (prefetch 12.82, hot 12.70,
   both 12.84 vs 12.71 s; twin predicted no winner). Walk profile: per-thread nbGravity 3.05 s of 12.43 s active force
   loop time, balanced (max 12.64 s): ~75% of the large case's force phase is OUTSIDE the tree walk, in the external
