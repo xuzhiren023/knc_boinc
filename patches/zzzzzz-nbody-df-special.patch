@@ -1,0 +1,406 @@
+--- a/nbody/src/nbody_mixeddwarf.c
++++ b/nbody/src/nbody_mixeddwarf.c
+@@ -38,6 +38,9 @@
+ #include "nbody_king_model.h"
+ #include "nbody_gen_profile.h"
+ 
++#ifndef NBODY_DF_SPECIAL
++#define NBODY_DF_SPECIAL 0
++#endif
+ #ifndef NBODY_GEN_PIPELINE
+ #define NBODY_GEN_PIPELINE 0
+ #endif
+@@ -265,6 +268,18 @@
+     return intv;
+ }
+ 
++#if NBODY_DF_SPECIAL
++#if !NBODY_DF_REUSE || !NBODY_PARALLEL_QUAD || !defined(_OPENMP)
++#error DF_SPECIAL requires DF_REUSE=1, PARALLEL_QUAD=1 and OpenMP
++#endif
++#include "nbody_df_special.h"
++static real fun(real, const Dwarf*, const Dwarf*, real, mwbool);
++static int df_special_ready(const Dwarf* a, const Dwarf* b)
++{
++    return a->type == Plummer && b->type == Cored && b->p0 != 0.0;
++}
++#endif
++
+ #if NBODY_PARALLEL_QUAD && defined(_OPENMP)
+ typedef struct
+ {
+@@ -404,6 +419,30 @@
+      * retain the truncated 1.96 constants and left-to-right accumulation. */
+     GP_BEGIN(nodes);
+     long node;
++#if NBODY_DF_SPECIAL
++    /* Dispatch once per integral, never once per node or stencil sample. */
++    int special = func == fun && df_special_ready(comp1, comp2);
++#if NBODY_GEN_PIPELINE
++    special = special && !gen_pipe.active;
++#endif
++    if (special)
++    {
++        if (isDark)
++        {
++            #pragma omp parallel for schedule(static)
++            for (node = 0; node < (long)(3 * count); ++node)
++                nodes[node / 3].f[node % 3] = dfs_fun_dark(nodes[node / 3].x[node % 3], comp1, comp2, energy);
++        }
++        else
++        {
++            #pragma omp parallel for schedule(static)
++            for (node = 0; node < (long)(3 * count); ++node)
++                nodes[node / 3].f[node % 3] = dfs_fun_light(nodes[node / 3].x[node % 3], comp1, comp2, energy);
++        }
++    }
++    else
++#endif
++    {
+ #if NBODY_GEN_PIPELINE
+     #pragma omp parallel private(node)
+     {
+@@ -437,6 +476,7 @@
+     }
+     if (gen_pipe.active) gen_pipe.count = 2;
+ #endif
++    }
+     GP_END();
+     size_t i;
+     for (i = 0; i < count; ++i)
+--- /dev/null
++++ b/nbody/include/nbody_df_special.h
+@@ -0,0 +1,333 @@
++/* Performance: concrete Plummer-light / initialized cored-dark integrand.
++ * Private to nbody_mixeddwarf.c. Expressions are copied from pinned 1.96;
++ * do not reassociate them or substitute the correctly rounded math calls. */
++#ifndef NBODY_DF_SPECIAL_H
++#define NBODY_DF_SPECIAL_H
++static inline __attribute__((always_inline)) real dfs_plummer_den(const Dwarf* model, real r)
++{
++    const real mass = model->mass;
++    const real rscale = model->scaleLength;
++    return  (3.0 / (4.0 * M_PI)) * (mass / cube(rscale)) * minusfivehalves( (1.0 + sqr(r / rscale)) ) ;
++}
++
++static inline __attribute__((always_inline)) real dfs_plummer_pot(const Dwarf* model, real r)
++{
++    const real mass = model->mass;
++    const real rscale = model->scaleLength;
++    return mass / mw_sqrt(sqr(r) + sqr(rscale));
++}
++
++static inline __attribute__((always_inline)) real dfs_cored_den(const Dwarf* model, real r)
++{
++    const real r1 = model->r1;
++    const real rcut = model->rcut;
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if (rcut != 0.0 && r > rcut)
++    {
++        const real pcut = model->pcut;
++        const real delta = model->delta;
++        const real rdecay = model->rdecay;
++        return pcut * mw_pow(r / rcut, delta) * mw_exp(-(r - rcut) / rdecay);
++    }
++    else if (r <= r1)
++    {
++        const real p0 = model->p0;
++        const real rc = model->rc;
++        return p0 / (1.0 + sqr(r / rc));
++    }
++    else
++    {
++        const real ps = model->ps;
++        const real rs = model->scaleLength;
++        return ps / ((r / rs) * sqr(1.0 + r / rs));
++    }
++#pragma GCC diagnostic pop
++}
++
++static inline __attribute__((always_inline)) real dfs_cored_pot(const Dwarf* model, real r)
++{
++    const real r1 = model->r1;
++    const real p0 = model->p0;
++    const real rc = model->rc;
++    const real ps = model->ps;
++    const real rs = model->scaleLength;
++    const real rcut = model->rcut;
++    const real m_iso_r1 = model->m_iso_r1;
++    const real m_nfw_r1 = model->m_nfw_r1;
++    const real m_nfw_cut = model->m_nfw_cut;
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if (rcut != 0.0 && r > rcut)
++    {
++        const real pcut = model->pcut;
++        const real delta = model->delta;
++        const real rdecay = model->rdecay;
++        const real gamma1 = model->gamma1;
++        return (
++            4.0 * M_PI * pcut * mw_pow(rcut, -delta) * mw_exp(rcut / rdecay) * mw_pow(rdecay, delta + 3)
++            * (((gamma1 - UpperIncompleteGammaFunc(delta + 3, r / rdecay)) * inv(r))
++            + (UpperIncompleteGammaFunc(delta + 2, r / rdecay) * inv(rdecay)))
++            + ((m_nfw_cut + m_iso_r1 - m_nfw_r1) * inv(r))
++        );
++    }
++    else if (r <= r1)
++    {
++        const real p0 = model->p0;
++        const real rc = model->rc;
++        const real psi_iso_r1 = model->psi_iso_r1;
++        const real psi_nfw_r1 = model->psi_nfw_r1;
++        real psi = (
++            -4.0 * M_PI * p0 * sqr(rc) * ((mw_log(sqr(rc) + sqr(r)) * inv(2.0)) + ((rc * mw_atan(r / rc) * inv(r))))
++            - psi_iso_r1 + psi_nfw_r1 + ((m_iso_r1 - m_nfw_r1) * inv(r1))
++        );
++        if (rcut != 0.0) {
++            const real psi_nfw_cut = model->psi_nfw_cut;
++            const real psi_cut_cut = model->psi_cut_cut;
++            psi += -psi_nfw_cut - ((m_iso_r1 - m_nfw_r1) * inv(rcut))
++                + psi_cut_cut + ((m_nfw_cut + m_iso_r1 - m_nfw_r1) * inv(rcut));
++        }
++        return psi;
++    }
++    else
++    {
++        const real ps = model->ps;
++        const real rs = model->scaleLength;
++        real psi = (
++            4.0 * M_PI * ps * cube(rs) * inv(r) * mw_log(1.0 + r / rs) + ((m_iso_r1 - m_nfw_r1) * inv(r))
++        );
++        if (rcut != 0.0) {
++            const real psi_nfw_cut = model->psi_nfw_cut;
++            const real psi_cut_cut = model->psi_cut_cut;
++            const real m_nfw_cut = model->m_nfw_cut;
++            psi += -psi_nfw_cut - ((m_iso_r1 - m_nfw_r1) * inv(rcut))
++                + psi_cut_cut + ((m_nfw_cut + m_iso_r1 - m_nfw_r1) * inv(rcut));
++        }
++        return psi;
++    }
++#pragma GCC diagnostic pop
++}
++
++static inline __attribute__((always_inline)) DfDerivatives dfs_d_plummer_pot(real x, const Dwarf* model)
++{
++    const real h = 0.001;
++    real mm = dfs_plummer_pot(model, x - 2.0 * h);
++    real m  = dfs_plummer_pot(model, x - h);
++    real pp = dfs_plummer_pot(model, x + 2.0 * h);
++    real p  = dfs_plummer_pot(model, x + h);
++    real c  = dfs_plummer_pot(model, x);
++    DfDerivatives d;
++    /* Keep upstream's coefficient, addition and reciprocal order verbatim. */
++    real p1 = 1.0 * mm, p2 = -8.0 * m, p3 = -1.0 * pp, p4 = 8.0 * p;
++    real denom = inv(12.0 * h);
++    d.first = (p1 + p2 + p3 + p4) * denom;
++    p1 = -1.0 * pp; p2 = 16.0 * p; p3 = -30.0 * c;
++    p4 = 16.0 * m;
++    real p5 = -1.0 * mm;
++    denom = inv(12.0 * h * h);
++    d.second = (p1 + p2 + p3 + p4 + p5) * denom;
++    d.center = c;
++    return d;
++}
++
++static inline __attribute__((always_inline)) DfDerivatives dfs_d_cored_pot(real x, const Dwarf* model)
++{
++    const real h = 0.001;
++    real mm = dfs_cored_pot(model, x - 2.0 * h);
++    real m  = dfs_cored_pot(model, x - h);
++    real pp = dfs_cored_pot(model, x + 2.0 * h);
++    real p  = dfs_cored_pot(model, x + h);
++    real c  = dfs_cored_pot(model, x);
++    DfDerivatives d;
++    /* Keep upstream's coefficient, addition and reciprocal order verbatim. */
++    real p1 = 1.0 * mm, p2 = -8.0 * m, p3 = -1.0 * pp, p4 = 8.0 * p;
++    real denom = inv(12.0 * h);
++    d.first = (p1 + p2 + p3 + p4) * denom;
++    p1 = -1.0 * pp; p2 = 16.0 * p; p3 = -30.0 * c;
++    p4 = 16.0 * m;
++    real p5 = -1.0 * mm;
++    denom = inv(12.0 * h * h);
++    d.second = (p1 + p2 + p3 + p4 + p5) * denom;
++    d.center = c;
++    return d;
++}
++
++static inline __attribute__((always_inline)) DfDerivatives dfs_d_plummer_den(real x, const Dwarf* model)
++{
++    const real h = 0.001;
++    real mm = dfs_plummer_den(model, x - 2.0 * h);
++    real m  = dfs_plummer_den(model, x - h);
++    real pp = dfs_plummer_den(model, x + 2.0 * h);
++    real p  = dfs_plummer_den(model, x + h);
++    real c  = dfs_plummer_den(model, x);
++    DfDerivatives d;
++    /* Keep upstream's coefficient, addition and reciprocal order verbatim. */
++    real p1 = 1.0 * mm, p2 = -8.0 * m, p3 = -1.0 * pp, p4 = 8.0 * p;
++    real denom = inv(12.0 * h);
++    d.first = (p1 + p2 + p3 + p4) * denom;
++    p1 = -1.0 * pp; p2 = 16.0 * p; p3 = -30.0 * c;
++    p4 = 16.0 * m;
++    real p5 = -1.0 * mm;
++    denom = inv(12.0 * h * h);
++    d.second = (p1 + p2 + p3 + p4 + p5) * denom;
++    d.center = c;
++    return d;
++}
++
++static inline __attribute__((always_inline)) DfDerivatives dfs_d_cored_den(real x, const Dwarf* model)
++{
++    const real h = 0.001;
++    real mm = dfs_cored_den(model, x - 2.0 * h);
++    real m  = dfs_cored_den(model, x - h);
++    real pp = dfs_cored_den(model, x + 2.0 * h);
++    real p  = dfs_cored_den(model, x + h);
++    real c  = dfs_cored_den(model, x);
++    DfDerivatives d;
++    /* Keep upstream's coefficient, addition and reciprocal order verbatim. */
++    real p1 = 1.0 * mm, p2 = -8.0 * m, p3 = -1.0 * pp, p4 = 8.0 * p;
++    real denom = inv(12.0 * h);
++    d.first = (p1 + p2 + p3 + p4) * denom;
++    p1 = -1.0 * pp; p2 = 16.0 * p; p3 = -30.0 * c;
++    p4 = 16.0 * m;
++    real p5 = -1.0 * mm;
++    denom = inv(12.0 * h * h);
++    d.second = (p1 + p2 + p3 + p4 + p5) * denom;
++    d.center = c;
++    return d;
++}
++
++static inline __attribute__((always_inline)) real dfs_fun_light(
++    real ri, const Dwarf* comp1, const Dwarf* comp2, real energy)
++{
++    DfDerivatives p1 = dfs_d_plummer_pot(ri, comp1);
++    DfDerivatives p2 = dfs_d_cored_pot(ri, comp2);
++    DfDerivatives d = dfs_d_plummer_den(ri, comp1);
++    real first_deriv_psi = p1.first + p2.first;
++    real second_deriv_psi = p1.second + p2.second;
++    real first_deriv_density = d.first;
++    real second_deriv_density = d.second;
++    real center_potential = p1.center + p2.center;
++    real denominator = 0.0;
++    /*
++    * Instead of calculating the second derivative of density with respect to -pot directly,
++    * did product rule since both density and pot are functions of radius.
++    */
++
++    /*
++     * we take the absolute value in the squareroot even though we shouldn't. We do this because there is a singularity in the
++     * denom. After this occurs, the numbers in the squareroot become negative or: E-psi = neg because psi > E after the singularity.
++     * we took the absolute value to avoid NANs from this. It is ok to do this because the alternative would be stopping the procedure
++     * just before it goes to the singlularity. Either way, we over estimate or under estimate the denom by the same amount (the step size)
++     */
++
++
++    /*just in case*/
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if(first_deriv_psi == 0.0)
++    {
++#pragma GCC diagnostic pop
++        first_deriv_psi = 1.0e-6;//this should be small enough
++    }
++
++    /*second derivative of density with respect to -potential (psi) */
++    real dsqden_dpsisq = second_deriv_density * inv(first_deriv_psi) - first_deriv_density * second_deriv_psi * inv(sqr(first_deriv_psi));
++    real diff = mw_fabs(energy - center_potential);
++
++    /*we don't want to have a 0 in the demon*/
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if(diff != 0.0)
++    {
++#pragma GCC diagnostic pop
++        denominator = minushalf( diff );
++    }
++    else
++    {
++        /*if the r is exactly at the singularity then move it a small amount.*/
++        denominator = minushalf( mw_fabs(energy - (dfs_plummer_pot(comp1, ri + 0.0001) + dfs_cored_pot(comp2, ri + 0.0001)) ) );
++    }
++
++
++    /*
++     * the second derivative term should be divided by the first derivate of psi.
++     * However, from changing from dpsi to dr we multiply by first derivative of psi.
++     * Since these undo each other we left them out completely.
++     */
++
++    real func = dsqden_dpsisq * denominator;
++    //printf("radius: %1f, energy: %1f, numerator: %1f, denom: %1f, func: %1f\n", ri, energy, dsqden_dpsisq, 1.0 / denominator, func);
++
++    return func;
++
++}
++
++static inline __attribute__((always_inline)) real dfs_fun_dark(
++    real ri, const Dwarf* comp1, const Dwarf* comp2, real energy)
++{
++    DfDerivatives p1 = dfs_d_plummer_pot(ri, comp1);
++    DfDerivatives p2 = dfs_d_cored_pot(ri, comp2);
++    DfDerivatives d = dfs_d_cored_den(ri, comp2);
++    real first_deriv_psi = p1.first + p2.first;
++    real second_deriv_psi = p1.second + p2.second;
++    real first_deriv_density = d.first;
++    real second_deriv_density = d.second;
++    real center_potential = p1.center + p2.center;
++    real denominator = 0.0;
++    /*
++    * Instead of calculating the second derivative of density with respect to -pot directly,
++    * did product rule since both density and pot are functions of radius.
++    */
++
++    /*
++     * we take the absolute value in the squareroot even though we shouldn't. We do this because there is a singularity in the
++     * denom. After this occurs, the numbers in the squareroot become negative or: E-psi = neg because psi > E after the singularity.
++     * we took the absolute value to avoid NANs from this. It is ok to do this because the alternative would be stopping the procedure
++     * just before it goes to the singlularity. Either way, we over estimate or under estimate the denom by the same amount (the step size)
++     */
++
++
++    /*just in case*/
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if(first_deriv_psi == 0.0)
++    {
++#pragma GCC diagnostic pop
++        first_deriv_psi = 1.0e-6;//this should be small enough
++    }
++
++    /*second derivative of density with respect to -potential (psi) */
++    real dsqden_dpsisq = second_deriv_density * inv(first_deriv_psi) - first_deriv_density * second_deriv_psi * inv(sqr(first_deriv_psi));
++    real diff = mw_fabs(energy - center_potential);
++
++    /*we don't want to have a 0 in the demon*/
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++    if(diff != 0.0)
++    {
++#pragma GCC diagnostic pop
++        denominator = minushalf( diff );
++    }
++    else
++    {
++        /*if the r is exactly at the singularity then move it a small amount.*/
++        denominator = minushalf( mw_fabs(energy - (dfs_plummer_pot(comp1, ri + 0.0001) + dfs_cored_pot(comp2, ri + 0.0001)) ) );
++    }
++
++
++    /*
++     * the second derivative term should be divided by the first derivate of psi.
++     * However, from changing from dpsi to dr we multiply by first derivative of psi.
++     * Since these undo each other we left them out completely.
++     */
++
++    real func = dsqden_dpsisq * denominator;
++    //printf("radius: %1f, energy: %1f, numerator: %1f, denom: %1f, func: %1f\n", ri, energy, dsqden_dpsisq, 1.0 / denominator, func);
++
++    return func;
++
++}
++
++#endif

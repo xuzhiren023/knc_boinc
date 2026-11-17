@@ -40,6 +40,14 @@ CPPFLAGS += -DNBODY_GEN_PIPELINE=$(GEN_PIPELINE)
 GEN_PROFILE ?= 0
 CPPFLAGS += -DNBODY_GEN_PROFILE=$(GEN_PROFILE)
 DF_REUSE ?= 0
+DF_SPECIAL ?= 0
+DF_VMATH ?= 0
+ifeq ($(DF_VMATH),1)
+ifeq ($(strip $(DFS_TREE)),)
+$(error DF_VMATH is an isolated experiment: use scripts/build-s10-df-special.sh)
+endif
+endif
+CPPFLAGS += -DNBODY_DF_SPECIAL=$(DF_SPECIAL) -DNBODY_DF_VMATH=$(DF_VMATH)
 DF_VECTOR ?= 0
 DF_STATS ?= 0
 DF_SOURCE ?=
