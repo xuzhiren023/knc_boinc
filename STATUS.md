@@ -110,6 +110,9 @@ Lead-maintained. Last update: 2026-11-16 EST.
   68 s card_minutes, bit-identical (runs/card/pkg/). Dispatched S8-09 mission (Codex, xhigh effort, owns
   integration, stages card batches in its ticket), S8-07 (tree on the card) and S8-08 (force walk layout), high.
 
+- 2026-11-17 20:40-20:57Z window (tcp-large): S10-10 DF_BATCH card seconds core-small 52.1 -> 41.5 (-20%), real-steps
+  251.5 -> 181.9 (-28%), likelihoods identical (window self-check failed only on the script hash after the lead's
+  card_run path edit). First real star-setup speedup from vectors on the card.
 - Card power (owner's panel readings, 2026-11-17): scalar N-body builds ~133-137 W; S10-10 batched vector build
   ~145 W; best seen on this card is PhiWeather's WRF (GCC-KNC vectorized) at 178-181 W. Use it as a rough
   vector-activity yardstick next to card time.

@@ -251,5 +251,28 @@
    "work/tickets/S10-07.md",
    "runs/card/w-knc12/"
   ]
+ },
+ {
+  "id": "s10-df-batch",
+  "tickets": [
+   "S10-10"
+  ],
+  "method": "model",
+  "predicted_text": "uncalibrated: core-small 30-120 s, real-steps 150-600 s (twin blocked)",
+  "predicted_range": [
+   30,
+   120
+  ],
+  "predicted_winner": null,
+  "measured_winner": "batch",
+  "measured": 41.5,
+  "measured_text": "card seconds core-small 52.1 -> 41.5 (-20%), real-steps 251.5 -> 181.9 (-28%); likelihoods identical; panel ~145 W",
+  "baseline": 52.1,
+  "unit": "s",
+  "notes": "Ranges too wide to score direction; twin could not simulate the kernel.",
+  "sources": [
+   "work/tickets/S10-10.md",
+   "runs/card/w-knc17/"
+  ]
  }
 ]
